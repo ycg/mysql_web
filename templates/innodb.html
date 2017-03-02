@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <h3 class="text-center">
+                MySQL Innodb
+            </h3>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+     <div class="row-fluid">
+        <div class="span12">
+            <table class="table table-condensed table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            Host
+                        </th>
+                        <th>
+                            Read
+                        </th>
+                        <th>
+                            Update
+                        </th>
+                        <th>
+                            Delete
+                        </th>
+                         <th>
+                            Insert
+                        </th>
+                        <th>
+                            P_Dirty
+                        </th>
+                        <th>
+                            P_Free
+                        </th>
+                        <th>
+                            T_Total
+                        </th>
+                        <th>
+                            Flush_Page
+                        </th>
+                        <th>
+                            Buffer_Hit
+                        </th>
+                        <th>
+                            Log_Waits
+                        </th>
+                        <th>
+                            Log_Writes
+                        </th>
+                        <th>
+                            Row_Locks
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for status in data %}
+                    <tr>
+                        <td>
+                            {{ status.remark }}
+                        </td>
+                        <td>
+                            {{ status.rows_read }}
+                        </td>
+                        <td>
+                            {{ status.rows_updated }}
+                        </td>
+                        <td>
+                            {{ status.rows_deleted }}
+                        </td>
+                        <td>
+                            {{ status.rows_inserted }}
+                        </td>
+                        <td>
+                            {{ status.page_dirty_count }}
+                        </td>
+                        <td>
+                            {{ status.page_free_count }}
+                        </td>
+                        <td>
+                            {{ status.page_total_count }}
+                        </td>
+                        <td>
+                            {{ status.page_flush_persecond }}
+                        </td>
+                        <td>
+                            {{ status.buffer_pool_hit }}
+                        </td>
+                        <td>
+                            {{ status.innodb_log_waits }}
+                        </td>
+                        <td>
+                            {{ status.innodb_log_writes }}
+                        </td>
+                        <td>
+                            {{ status.innodb_row_lock_waits }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
