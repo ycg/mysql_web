@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import time, threadpool, cache, threading, db_util, enum, host_info
+import time, threadpool, cache, threading, db_util, enum
 
 class MonitorEnum(enum.Enum):
     Status = 0
@@ -14,16 +14,19 @@ class MonitorServer(threading.Thread):
     __thread_pool = None
 
     def __init__(self):
+        pass
+
+    def __new__(cls, *args, **kwargs):
+        if(cls.__instance is None):
+            MonitorServer.__instance = object.__new__(cls, *args, **kwargs)
+        return MonitorServer.__instance
+
+    def load(self):
         self.__cache = cache.Cache()
         self.__db_util = db_util.DBUtil()
         self.__thread_pool = threadpool.ThreadPool(36)
         threading.Thread.__init__(self)
         self.setDaemon(True)
-
-    def __new__(cls, *args, **kwargs):
-        if(MonitorServer.__instance is None):
-            MonitorServer.__instance = object.__new__(cls, *args, **kwargs)
-        return MonitorServer.__instance
 
     def run(self):
         while (True):
@@ -31,14 +34,14 @@ class MonitorServer(threading.Thread):
             for request in requests:
                 self.__thread_pool.putRequest(request)
             self.__thread_pool.poll()
-            time.sleep(1)
+            time.sleep(3)
 
     def get_mysql_status(self, host_info):
         aa = time.time()
         mysql_status_old = self.get_dic_data(host_info, "show global status;")
         time.sleep(1)
         mysql_status_new = self.get_dic_data(host_info, "show global status;")
-        mysql_variables = self.get_dic_data(host_info, "show global variables;")
+        #mysql_variables = self.get_dic_data(host_info, "show global variables;")
 
         #1.---------------------------------------------------------获取mysql global status--------------------------------------------------------
         status_info = self.__cache.get_status_infos(host_info.key)
@@ -65,10 +68,11 @@ class MonitorServer(threading.Thread):
         status_info.create_tmp_table_count = int(mysql_status_new["Created_tmp_tables"]) - int(mysql_status_old["Created_tmp_tables"])
         status_info.create_tmp_disk_table_count = int(mysql_status_new["Created_tmp_disk_tables"]) - int(mysql_status_old["Created_tmp_disk_tables"])
         status_info.thread_cache_hit = (1 - status_info.thread_created / status_info.connections) * 100
-        status_info.connections_usage_rate = status_info.threads_count * 100 / int(mysql_variables["max_connections"])
+        #status_info.connections_usage_rate = status_info.threads_count * 100 / int(mysql_variables["max_connections"])
         status_info.send_bytes = self.get_data_length(int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"]))
         status_info.receive_bytes = self.get_data_length(int(mysql_status_new["Bytes_received"])  - int(mysql_status_old["Bytes_received"]))
-        status_info.tps = (int(mysql_status_new["Com_commit"]) + int(mysql_status_new["Com_rollback"])) - (int(mysql_status_old["Com_commit"]) + int(mysql_status_old["Com_rollback"]))
+        status_info.tps = status_info.insert_count + status_info.update_count + status_info.delete_count
+        #status_info.tps = (int(mysql_status_new["Com_commit"]) + int(mysql_status_new["Com_rollback"])) - (int(mysql_status_old["Com_commit"]) + int(mysql_status_old["Com_rollback"]))
         if(status_info.binlog_cache_use > 0):
             #从库没有写binlog，所以这边要判断下
             status_info.binlog_cache_hit = (1 - status_info.binlog_cache_disk_use / status_info.binlog_cache_use) * 100
@@ -133,7 +137,8 @@ class MonitorServer(threading.Thread):
 
         self.insert_status_log(status_info)
         bb = time.time()
-        print(bb - aa - 1)
+        if(host_info.id == 1):
+            print(bb - aa - 1)
 
     def get_data_length(self, data_length):
         value = float(1024)
@@ -161,11 +166,10 @@ class MonitorServer(threading.Thread):
             return self.__cache.get_all_repl_infos()
 
     def insert_status_log(self, status_info):
-        monitor_host_info = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
         sql = "insert into mysql_web.mysql_status_log(host_id, qps, tps, commit, rollback, connections, " \
               "thread_count, thread_running_count, tmp_tables, tmp_disk_tables, send_bytes, receive_bytes) VALUES " \
               "({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, \'{10}\', \'{11}\')"\
               .format(status_info.host_info.id, status_info.qps, status_info.tps, status_info.commit, status_info.rollback, status_info.connections_per,
                       status_info.threads_count, status_info.threads_run_count, status_info.create_tmp_table_count, status_info.create_tmp_disk_table_count,
                       status_info.send_bytes, status_info.receive_bytes)
-        self.__db_util.execute(monitor_host_info, sql)
+        self.__db_util.execute(self.__cache.get_mysql_web_host_info(), sql)

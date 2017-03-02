@@ -1,23 +1,28 @@
 import base_class, host_info, collections, db_util
 
 class Cache(object):
+    __number = False
     __instance = None
     __host_infos = collections.OrderedDict()
     __repl_infos = collections.OrderedDict()
     __status_infos = collections.OrderedDict()
     __innodb_infos = collections.OrderedDict()
+    __mysql_web_host_info = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
 
     def __init__(self):
-        self.load_all_host_infos()
-        for value in self.__host_infos.values():
-            self.__repl_infos[value.id] = base_class.BaseClass(value)
-            self.__status_infos[value.id] = base_class.BaseClass(value)
-            self.__innodb_infos[value.id] = base_class.BaseClass(value)
+        pass
 
     def __new__(cls, *args, **kwargs):
         if(Cache.__instance is None):
             Cache.__instance = object.__new__(cls, *args, **kwargs)
         return Cache.__instance
+
+    def load(self):
+        self.load_all_host_infos()
+        for value in self.__host_infos.values():
+            self.__repl_infos[value.id] = base_class.BaseClass(value)
+            self.__status_infos[value.id] = base_class.BaseClass(value)
+            self.__innodb_infos[value.id] = base_class.BaseClass(value)
 
     def load_all_host_infos(self):
         '''
@@ -26,12 +31,16 @@ class Cache(object):
         self.__host_infos[host_info1.key] = host_info1
         self.__host_infos[host_info2.key] = host_info2'''
 
-        monitor_host_info = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
-        sql = "select host_id, host, port, user, password, remark, is_master, is_slave, master_id " \
-              "from mysql_web.host_infos where is_deleted = 0;"
-        for row in db_util.DBUtil().fetchall(monitor_host_info, sql):
-            host_info_temp = host_info.HoseInfo()
-            host_info_temp.id = row["host_id"]
+        print("000000000000000000000000000000000")
+        sql = "select host_id, host, port, user, password, remark, is_master, is_slave, master_id, is_deleted from mysql_web.host_infos;"
+        for row in db_util.DBUtil().fetchall(self.__mysql_web_host_info, sql):
+            host_id = row["host_id"]
+            if(self.__host_infos.has_key(host_id) == True):
+                host_info_temp = self.__host_infos[host_id]
+            else:
+                host_info_temp = host_info.HoseInfo()
+                host_info_temp.id = host_id
+                self.__host_infos[host_info_temp.id] = host_info_temp
             host_info_temp.host = row["host"]
             host_info_temp.port = row["port"]
             host_info_temp.user = row["user"]
@@ -41,7 +50,9 @@ class Cache(object):
             host_info_temp.is_slave = row["is_slave"]
             host_info_temp.master_id = row["master_id"]
             host_info_temp.key = host_info_temp.id
-            self.__host_infos[host_info_temp.id] = host_info_temp
+            if(row["is_deleted"] == 1):
+                self.__host_infos.pop(host_id)
+        return "load all host infos ok."
 
     def get_all_host_infos(self):
         return self.__host_infos.values()
@@ -63,3 +74,6 @@ class Cache(object):
 
     def get_innodb_infos(self, key):
         return self.__innodb_infos[key]
+
+    def get_mysql_web_host_info(self):
+        return self.__mysql_web_host_info

@@ -23,6 +23,15 @@
                                 Select
                             </th>
                             <th>
+                                Insert
+                            </th>
+                            <th>
+                                Update
+                            </th>
+                            <th>
+                                Delete
+                            </th>
+                            <th>
                                 QPS
                             </th>
                             <th>
@@ -86,6 +95,15 @@
                             </td>
                             <td>
                                 {{ status.select_count }}
+                            </td>
+                            <td>
+                                {{ status.insert_count }}
+                            </td>
+                            <td>
+                                {{ status.update_count }}
+                            </td>
+                            <td>
+                                {{ status.delete_count }}
                             </td>
                             <td>
                                 {{ status.qps }}
