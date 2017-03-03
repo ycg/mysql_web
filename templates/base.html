@@ -3,20 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>MySQL Monitor</title>
-    <link href={{ url_for('static', filename='css/bootstrap.min.css') }} rel="stylesheet" type="text/css">
+    <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
     <script language="JavaScript">
         function myrefresh(){
             window.location.reload();
         }
         setTimeout('myrefresh()', 2000);
-
-        function displaycolor(value,row,index) {
-            var css_value = "";
-            if(value == "No") {
-                var css_value = '<span style="color:#DC143C">'+value+'</span>';
-            }
-            return css_value;
-        }
     </script>
 </head>
 <body>

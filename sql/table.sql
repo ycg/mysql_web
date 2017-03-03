@@ -23,6 +23,10 @@ create table host_infos
 #("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"),
 #("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");
 #insert into host_infos (host, port, user, password, remark) values ("192.168.11.128", 3306, "yangcg", "yangcaogui", "Monitor");
+#host_info1 = host_info.HoseInfo("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master")
+#host_info2 = host_info.HoseInfo("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave")
+#self.__host_infos[host_info1.key] = host_info1
+#self.__host_infos[host_info2.key] = host_info2'''
 
 DROP TABLE mysql_status_log;
 CREATE TABLE mysql_status_log

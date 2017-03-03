@@ -37,11 +37,11 @@
                             <th>
                                 TPS
                             </th>
-                            <th>
-                                Threads
+                            <th title="thread count">
+                                Thds
                             </th>
-                             <th>
-                                Threads_R
+                             <th title="thread running count">
+                                Thd_R
                             </th>
                             <th>
                                 commit
@@ -67,16 +67,16 @@
                             <th>
                                 read_rnd_n
                             </th>
-                            <th>
+                            <th title="receive bytes">
                                 Rece_B
                             </th>
-                            <th>
+                            <th title="send bytes">
                                 Send_B
                             </th>
-                            <th>
+                            <th title="tmp table count">
                                 Tmp_T
                             </th>
-                            <th>
+                            <th title="tmp table disk count">
                                 Tmp_DT
                             </th>
                             <th title="thread cache hit">
@@ -323,6 +323,9 @@
                                 Delay_Pos
                             </th>
                             <th>
+                                Seconds_Behind
+                            </th>
+                            <th>
                                 Error_Msg
                             </th>
                         </tr>
@@ -334,10 +337,10 @@
                                 <td>
                                     {{ status.host_info.remark }}
                                 </td>
-                                <td>
+                                <td {% if(status.io_status == "No") %} class="text-danger" {% endif %}>
                                     {{ status.io_status }}
                                 </td>
-                                <td>
+                                <td {% if(status.io_status == "No") %} class="text-danger" {% endif %}>
                                     {{ status.sql_status }}
                                 </td>
                                 <td>
@@ -358,8 +361,11 @@
                                 <td>
                                     {{ status.slave_execute_gtid_set }}
                                 </td>
-                                <td>
+                                <td {% if(status.delay_pos_count > 20000) %} class="text-danger" {% endif %}>
                                     {{ status.delay_pos_count }}
+                                </td>
+                                <td>
+                                    {{ status.seconds_Behind_Master }}
                                 </td>
                                 <td>
                                     {{ status.error_message }}

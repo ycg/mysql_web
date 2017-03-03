@@ -34,7 +34,7 @@ class MonitorServer(threading.Thread):
             for request in requests:
                 self.__thread_pool.putRequest(request)
             self.__thread_pool.poll()
-            time.sleep(3)
+            time.sleep(1)
 
     def get_mysql_status(self, host_info):
         aa = time.time()
@@ -133,6 +133,7 @@ class MonitorServer(threading.Thread):
             repl_info.slave_log_pos = int(result["Exec_Master_Log_Pos"])
             repl_info.slave_retrieved_gtid_set = result["Retrieved_Gtid_Set"]
             repl_info.slave_execute_gtid_set = result["Executed_Gtid_Set"]
+            repl_info.seconds_Behind_Master = result["Seconds_Behind_Master"]
             repl_info.delay_pos_count = repl_info.master_log_pos - repl_info.slave_log_pos
 
         self.insert_status_log(status_info)

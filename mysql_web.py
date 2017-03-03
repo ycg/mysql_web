@@ -6,13 +6,13 @@ from monitor import cache, server, alarm_thread
 app = Flask(__name__)
 
 mysql_cache = cache.Cache()
-mysql_cache.load()
+mysql_cache.load_all_host_infos()
 monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
-thread1 = alarm_thread.AlarmThread()
-thread1.load()
-thread1.start()
+#thread1 = alarm_thread.AlarmThread()
+#thread1.load()
+#thread1.start()
 
 @app.route('/')
 def hello_world():
@@ -30,9 +30,12 @@ def monitor(type):
         return render_template("monitor.html", data_status=None, data_innodb=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb), data_repl=None)
     elif(type.upper() == server.MonitorEnum.Replication.name.upper()):
         return render_template("monitor.html", data_status=None, data_innodb=None, data_repl=monitor_server.get_cache_by_type(server.MonitorEnum.Replication))
-    return render_template("monitor.html", data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status),
-                                           data_innodb=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb),
-                                           data_repl=monitor_server.get_cache_by_type(server.MonitorEnum.Replication))
+    elif(type.upper() == "ALL"):
+        return render_template("monitor.html", data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status),
+                                               data_innodb=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb),
+                                               data_repl=monitor_server.get_cache_by_type(server.MonitorEnum.Replication))
+    else:
+        return "No data."
 
 @app.route("/load")
 def load_host_info():

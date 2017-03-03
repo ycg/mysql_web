@@ -3,7 +3,14 @@
 #实现邮件告警，以及数据库健康检查状态的report发送
 #告警，包括CPU，内存，线程数，qps和tps等等
 
-import threading, time, cache, mail_util
+import threading, time, cache, mail_util, enum
+
+class AlarmEnum(enum.Enum):
+    ReplStatus = 0
+    ReplDelay = 1
+    CPU = 2
+    Memory = 3
+    Disk = 4
 
 class AlarmThread(threading.Thread):
     __instance = None
@@ -28,9 +35,17 @@ class AlarmThread(threading.Thread):
     def alarm_for_replication(self):
         for repl_info in cache.Cache().get_all_repl_infos():
             if(hasattr(repl_info, "io_status") == True):
+                subject = "MySQL-" + repl_info.host_info.remark
                 if(repl_info.io_status == "No" or repl_info.sql_status == "No"):
-                    subject = "MySQL - " + repl_info.host_info.remark + "复制异常"
-                    text = "IO Status: {0}\nSQL Status: {1}\n".format(repl_info.io_status, repl_info.sql_status)
-                    if(len(repl_info.error_message) > 0):
-                        text = text + "Error: {1}".format(repl_info.error_message)
-                    mail_util.MailUtil().send_text(subject, "yangcaogui.sh@superjia.com", text)
+                    subject = subject + "复制异常"
+                    mail_util.MailUtil().send_text(subject, "yangcaogui.sh@superjia.com", self.get_alarm_for_repl_status_format(repl_info))
+                elif(repl_info.delay_pos_count > 20000):
+                    subject = subject + "复制延迟"
+                mail_util.MailUtil().send_text(subject, "yangcaogui.sh@superjia.com", self.get_alarm_for_repl_status_format(repl_info))
+
+    def alarm_for_mysql_status(self):
+        pass
+
+    def get_alarm_for_repl_status_format(self, repl_info):
+        return "IO Status: {0}\nYes Status: {1}\nDelay Pos: {2}\nError Msg: {3}"\
+               .format(repl_info.io_status, repl_info.sql_status, repl_info.delay_pos_count, repl_info.error_message)
