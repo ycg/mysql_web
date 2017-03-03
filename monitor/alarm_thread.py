@@ -35,13 +35,16 @@ class AlarmThread(threading.Thread):
     def alarm_for_replication(self):
         for repl_info in cache.Cache().get_all_repl_infos():
             if(hasattr(repl_info, "io_status") == True):
+                error_flag = False
                 subject = "MySQL-" + repl_info.host_info.remark
                 if(repl_info.io_status == "No" or repl_info.sql_status == "No"):
+                    error_flag = True
                     subject = subject + "复制异常"
-                    mail_util.MailUtil().send_text(subject, "yangcaogui.sh@superjia.com", self.get_alarm_for_repl_status_format(repl_info))
                 elif(repl_info.delay_pos_count > 20000):
+                    error_flag = True
                     subject = subject + "复制延迟"
-                mail_util.MailUtil().send_text(subject, "yangcaogui.sh@superjia.com", self.get_alarm_for_repl_status_format(repl_info))
+                if(error_flag == True):
+                    mail_util.MailUtil().send_text(subject, "yangcaogui.sh@superjia.com", self.get_alarm_for_repl_status_format(repl_info))
 
     def alarm_for_mysql_status(self):
         pass

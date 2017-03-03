@@ -32,6 +32,9 @@
                                 Delete
                             </th>
                             <th>
+                                Conn
+                            </th>
+                            <th>
                                 QPS
                             </th>
                             <th>
@@ -44,28 +47,28 @@
                                 Thd_R
                             </th>
                             <th>
-                                commit
+                                Commit
                             </th>
                             <th>
-                                rollback
+                                Rollback
                             </th>
-                            <th>
-                                read_key
+                            <th title="handler read key">
+                                R_Key
                             </th>
-                            <th>
-                                read_next
+                            <th title="handler read next">
+                                R_Next
                             </th>
-                            <th>
-                                read_first
+                            <th title="handler read first">
+                                R_First
                             </th>
-                            <th>
-                                read_last
+                            <th title="handler read last">
+                                R_Last
                             </th>
-                            <th>
-                                read_rnd
+                            <th title="handler read rnd">
+                                R_Rnd
                             </th>
-                            <th>
-                                read_rnd_n
+                            <th title="handler read rnd next">
+                                R_Rnd_N
                             </th>
                             <th title="receive bytes">
                                 Rece_B
@@ -84,6 +87,9 @@
                             </th>
                             <th title="binlog cache hit">
                                 B_C_U
+                            </th>
+                            <th title="use table cache">
+                                U_T_C
                             </th>
                         </tr>
                     </thead>
@@ -104,6 +110,9 @@
                             </td>
                             <td>
                                 {{ status.delete_count }}
+                            </td>
+                            <td>
+                                {{ status.connections_per }}
                             </td>
                             <td>
                                 {{ status.qps }}
@@ -158,6 +167,13 @@
                             </td>
                             <td>
                                 {{ status.binlog_cache_hit }}
+                            </td>
+                            <td {% if(status.table_open_cache_overflows > 0 or status.table_open_cache_misses > 0) %} class="text-danger" {% endif %}>
+                                {% if(status.table_open_cache_overflows > 0 or status.table_open_cache_misses > 0) %}
+                                    No
+                                {% else %}
+                                    Yes
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

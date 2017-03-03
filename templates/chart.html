@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src={{ url_for("static", filename="js/Chart.min.js") }} ></script>
+    </head>
+    <body>
+        <canvas id="myChart" height="450" width="600"></canvas>
+        <script type="text/javascript">
+            var ctx = document.getElementById("myChart").getContext("2d");
+            // 线型图
+            var LineChart = {
+                labels: ["Ruby", "jQuery", "Java", "ASP.Net", "PHP"],
+                datasets: [{
+                    fillColor: "rgba(151,249,190,0.5)",
+                    strokeColor: "rgba(255,255,255,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    data: [10, 20, 30, 40, 50]
+                    }, {
+                    fillColor: "rgba(252,147,65,0.5)",
+                    strokeColor: "rgba(255,255,255,1)",
+                    pointColor: "rgba(173,173,173,1)",
+                    pointStrokeColor: "#fff",
+                    data: [28, 68, 40, 19, 96]
+                }]
+            }
+            new Chart(ctx).Line(LineChart);
+        </script>
+    </body>
+</html>
