@@ -48,6 +48,18 @@ CREATE TABLE mysql_status_log
     created_time TIMESTAMP NOT NULL DEFAULT NOW()
 ) COMMENT = 'mysql monitor log';
 
+DROP TABLE mysql_enviroment_data;
+CREATE TABLE mysql_enviroment_data
+(
+    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    host_id MEDIUMINT UNSIGNED NOT NULL ,
+    process_list TEXT NOT NULL DEFAULT '',
+    innodb_status TEXT NOT NULL DEFAULT '',
+    slave_status TEXT NOT NULL DEFAULT '',
+    trx_status TEXT NOT NULL DEFAULT '',
+    created_time TIMESTAMP NOT NULL DEFAULT NOW()
+) COMMENT = 'mysql envirment data';
+
 CREATE TABLE mysql_host_status_log
 (
     id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,

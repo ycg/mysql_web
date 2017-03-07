@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+#pip install flask threadpool pymysql DBUtils
+
 from flask import Flask, render_template, request, current_app, app, redirect
-from monitor import cache, server, alarm_thread
+from monitor import cache, server, alarm_thread, innodb
 
 app = Flask(__name__)
 
@@ -10,9 +12,11 @@ mysql_cache.load_all_host_infos()
 monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
-thread1 = alarm_thread.AlarmThread()
-thread1.load()
-thread1.start()
+#thread1 = alarm_thread.AlarmThread()
+#thread1.load()
+#thread1.start()
+innodb.Innodb().start()
+
 
 @app.route('/')
 def hello_world():
@@ -25,17 +29,24 @@ def my_hello_wordaaa():
 @app.route("/<type>")
 def monitor(type):
     if(type.upper() == server.MonitorEnum.Status.name.upper()):
-        return render_template("monitor.html", data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status), data_innodb=None, data_repl=None)
+        return get_monitor_data(data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status))
     elif(type.upper() == server.MonitorEnum.Innodb.name.upper()):
-        return render_template("monitor.html", data_status=None, data_innodb=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb), data_repl=None)
+        return get_monitor_data(data_innodb=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb))
     elif(type.upper() == server.MonitorEnum.Replication.name.upper()):
-        return render_template("monitor.html", data_status=None, data_innodb=None, data_repl=monitor_server.get_cache_by_type(server.MonitorEnum.Replication))
+        return get_monitor_data(data_repl=monitor_server.get_cache_by_type(server.MonitorEnum.Replication))
     elif(type.upper() == "ALL"):
-        return render_template("monitor.html", data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status),
-                                               data_innodb=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb),
-                                               data_repl=monitor_server.get_cache_by_type(server.MonitorEnum.Replication))
+        return get_monitor_data(data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status),
+                                data_innodb=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb),
+                                data_repl=monitor_server.get_cache_by_type(server.MonitorEnum.Replication))
     else:
         return "No data."
+
+@app.route("/innodb/<hostid>")
+def get_innodb_buffer_poo_infos(hostid):
+    return get_monitor_data(data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(int(hostid)))
+
+def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None):
+    return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl)
 
 @app.route("/load")
 def load_host_info():
@@ -44,6 +55,10 @@ def load_host_info():
 @app.route("/test")
 def test_chart():
     return render_template("chart.html")
+
+@app.route("/home")
+def home():
+    return render_template("home.html")
 
 '''
 @app.route("/status")
@@ -61,4 +76,4 @@ def replication():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=int("5000"))

@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "home.html" %}
 {% block content %}
     {% if(data_status != None) %}
+    <!--
     <div class="container-fluid">
         <div class="row-fluid">
             <div class="span12">
@@ -9,7 +10,7 @@
                 </h3>
             </div>
         </div>
-</div>
+    </div>-->
     <div class="container-fluid">
         <div class="row-fluid">
             <div class="span12">
@@ -31,9 +32,9 @@
                             <th>
                                 Delete
                             </th>
-                            <th>
+                            <!--<th>
                                 Conn
-                            </th>
+                            </th>-->
                             <th>
                                 QPS
                             </th>
@@ -41,16 +42,16 @@
                                 TPS
                             </th>
                             <th title="thread count">
-                                Thds
+                                T_S
                             </th>
                              <th title="thread running count">
-                                Thd_R
+                                T_RS
                             </th>
-                            <th>
-                                Commit
+                            <th title="commit count">
+                                Com
                             </th>
-                            <th>
-                                Rollback
+                            <th title="rollback count">
+                                Roll
                             </th>
                             <th title="handler read key">
                                 R_Key
@@ -111,9 +112,9 @@
                             <td>
                                 {{ status.delete_count }}
                             </td>
-                            <td>
+                            <!--<td>
                                 {{ status.connections_per }}
-                            </td>
+                            </td>-->
                             <td>
                                 {{ status.qps }}
                             </td>
@@ -165,7 +166,7 @@
                             <td>
                                 {{ status.thread_cache_hit }}
                             </td>
-                            <td>
+                            <td {% if(status.binlog_cache_hit > 0 and status.binlog_cache_hit < 80) %} class="text-danger" {% endif %}>
                                 {{ status.binlog_cache_hit }}
                             </td>
                             <td {% if(status.table_open_cache_overflows > 0 or status.table_open_cache_misses > 0) %} class="text-danger" {% endif %}>
@@ -185,7 +186,7 @@
     {% endif %}
 
     {% if(data_innodb != None) %}
-    <div class="container-fluid">
+    <!--<div class="container-fluid">
         <div class="row-fluid">
             <div class="span12">
                 <h3 class="text-center">
@@ -193,7 +194,7 @@
                 </h3>
             </div>
         </div>
-    </div>
+    </div>-->
     <div class="container-fluid">
         <div class="row-fluid">
         <div class="span12">
@@ -215,8 +216,11 @@
                          <th>
                             Insert
                         </th>
-                        <th>
+                        <th title="page dirty count">
                             P_Dirty
+                        </th>
+                        <th title="page dirty percent">
+                            D_PCT
                         </th>
                         <th>
                             P_Free
@@ -238,6 +242,9 @@
                         </th>
                         <th>
                             Row_Locks
+                        </th>
+                        <th>
+
                         </th>
                     </tr>
                 </thead>
@@ -263,6 +270,9 @@
                             {{ status.page_dirty_count }}
                         </td>
                         <td>
+                            {{ status.page_dirty_pct }}
+                        </td>
+                        <td>
                             {{ status.page_free_count }}
                         </td>
                         <td>
@@ -283,6 +293,9 @@
                         <td>
                             {{ status.innodb_row_lock_waits }}
                         </td>
+                        <td class="text-center">
+                            <a href="innodb/{{ status.host_info.key }}">Buffer Pool Detail</a>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -293,7 +306,7 @@
     {% endif %}
 
     {% if(data_repl != None) %}
-    <div class="container-fluid">
+    <!--<div class="container-fluid">
         <div class="row-fluid">
             <div class="span12">
                 <h3 class="text-center">
@@ -301,7 +314,7 @@
                 </h3>
             </div>
         </div>
-    </div>
+    </div>-->
     <div class="container-fluid">
         <div class="row-fluid">
             <div class="span12">
@@ -394,5 +407,95 @@
             </div>
         </div>
     </div>
+    {% endif %}
+
+    {% if(data_host != None) %}
+    {% endif %}
+
+    {% if(data_engine_innodb != None) %}
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span12">
+                    <table class="table table-condensed table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Buffer_Name
+                                </th>
+                                <th>
+                                    Free_P
+                                </th>
+                                <th>
+                                    LRU_P
+                                </th>
+                                <th>
+                                    OLD_P
+                                </th>
+                                <th>
+                                    Dirty_P
+                                </th>
+                                <th>
+                                    Pending_R
+                                </th>
+                                <th>
+                                    Read_Per
+                                </th>
+                                <th>
+                                    Create_Per
+                                </th>
+                                <th>
+                                    Write_Per
+                                </th>
+                                <th>
+                                    Hit
+                                </th>
+                                <th>
+                                    Unzip_LRU
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for info in data_engine_innodb.buffer_pool_infos.values() %}
+                            <tr>
+                                <td>
+                                    {{ info.name }}
+                                </td>
+                                <td >
+                                    {{ info.free_pages }}
+                                </td>
+                                <td >
+                                    {{ info.lru_pages }}
+                                </td>
+                                <td>
+                                    {{ info.old_pages }}
+                                </td>
+                                <td>
+                                    {{ info.dirty_pages }}
+                                </td>
+                                <td>
+                                    {{ info.pending_reads }}
+                                </td>
+                                <td>
+                                    {{ info.reads_per }}
+                                </td>
+                                <td>
+                                    {{ info.creates_per }}
+                                </td>
+                                <td>
+                                    {{ info.writes_per }}
+                                </td>
+                                <td>
+                                    {{ info.buffer_pool_hit }}
+                                </td>
+                                <td>
+                                    {{ info.unzip_lur }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     {% endif %}
 {% endblock %}

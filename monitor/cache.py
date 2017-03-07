@@ -7,7 +7,9 @@ class Cache(object):
     __repl_infos = collections.OrderedDict()
     __status_infos = collections.OrderedDict()
     __innodb_infos = collections.OrderedDict()
+    __innodb_status_infos = collections.OrderedDict()
     __mysql_web_host_info = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
+    #__mysql_web_host_info = host_info.HoseInfo(host="10.171.251.52", port=3309, user="yangcaogui", password="r_yangcaogui", remark="Monitor")
 
     def __init__(self):
         pass
@@ -48,6 +50,9 @@ class Cache(object):
                     self.__status_infos[host_id] = base_class.BaseClass(host_info_temp)
                 if(self.__innodb_infos.has_key(host_id) == False):
                     self.__innodb_infos[host_id] = base_class.BaseClass(host_info_temp)
+                if(self.__innodb_status_infos.has_key(host_id) == False):
+                    self.__innodb_status_infos[host_id] = base_class.BaseClass(host_info_temp)
+                    self.__innodb_status_infos[host_id].buffer_pool_infos = collections.OrderedDict()
         return "load all host infos ok."
 
     def get_all_host_infos(self):
@@ -73,3 +78,6 @@ class Cache(object):
 
     def get_mysql_web_host_info(self):
         return self.__mysql_web_host_info
+
+    def get_engine_innodb_status_infos(self, key):
+        return self.__innodb_status_infos[key]

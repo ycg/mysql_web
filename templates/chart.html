@@ -7,16 +7,7 @@
         <canvas id="myChart" height="200" width="500"></canvas>
         <script type="text/javascript">
             var ctx = document.getElementById("myChart").getContext("2d");
-            Line.defaults = {
-                // 刻度是否显示标签, 即Y轴上是否显示文字
-                scaleShowLabels : true,
-                // Y轴上的刻度,即文字
-                scaleLabel : "<%=value%>",
-                // 字体
-                scaleFontFamily : "'Arial'",
-                // 文字大小
-                scaleFontSize : 12,
-            }
+
             // 线型图
             var LineChart = {
                 //labels: ["Ruby", "jQuery", "Java", "ASP.Net", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP"],

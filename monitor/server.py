@@ -101,6 +101,7 @@ class MonitorServer(threading.Thread):
         innodb_info.page_dirty_count = int(mysql_status_new["Innodb_buffer_pool_pages_dirty"])
         innodb_info.page_free_count = int(mysql_status_new["Innodb_buffer_pool_pages_free"])
         innodb_info.page_total_count = int(mysql_status_new["Innodb_buffer_pool_pages_total"])
+        innodb_info.page_dirty_pct = innodb_info.page_dirty_count / innodb_info.page_total_count
         innodb_info.page_flush_persecond = int(mysql_status_new["Innodb_buffer_pool_pages_flushed"]) - int(mysql_status_old["Innodb_buffer_pool_pages_flushed"])
         innodb_info.commit = int(mysql_status_new["Com_commit"]) - int(mysql_status_old["Com_commit"])
         innodb_info.rollback = int(mysql_status_new["Com_rollback"]) - int(mysql_status_old["Com_rollback"])
@@ -138,8 +139,10 @@ class MonitorServer(threading.Thread):
             repl_info.slave_execute_gtid_set = result["Executed_Gtid_Set"]
             repl_info.seconds_Behind_Master = result["Seconds_Behind_Master"]
             repl_info.delay_pos_count = repl_info.master_log_pos - repl_info.slave_log_pos
+            if(repl_info.seconds_Behind_Master is None):
+                repl_info.seconds_Behind_Master = 0
 
-        self.insert_status_log(status_info)
+        #self.insert_status_log(status_info)
         bb = time.time()
         if(host_info.id == 1):
             print(bb - aa - 1)
