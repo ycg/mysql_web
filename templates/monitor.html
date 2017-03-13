@@ -294,7 +294,7 @@
                             {{ status.innodb_row_lock_waits }}
                         </td>
                         <td class="text-center">
-                            <a href="innodb/{{ status.host_info.key }}">Buffer Pool Detail</a>
+                            <a href="innodb/{{ status.host_info.key }}">Innodb Status Detail</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -361,7 +361,7 @@
                     </thead>
                     <tbody>
                     {% for status in data_repl %}
-                        {% if status.io_status %}
+                        {% if(status.io_status and status.is_slave == 1) %}
                             <tr>
                                 <td>
                                     {{ status.host_info.remark }}
@@ -423,13 +423,16 @@
                                     Buffer_Name
                                 </th>
                                 <th>
+                                    Total_P
+                                </th>
+                                <th>
                                     Free_P
                                 </th>
                                 <th>
                                     LRU_P
                                 </th>
                                 <th>
-                                    OLD_P
+                                    Old_P
                                 </th>
                                 <th>
                                     Dirty_P
@@ -459,6 +462,9 @@
                             <tr>
                                 <td>
                                     {{ info.name }}
+                                </td>
+                                <td>
+                                    {{ info.total_pages }}
                                 </td>
                                 <td >
                                     {{ info.free_pages }}
@@ -492,6 +498,61 @@
                                 </td>
                             </tr>
                         {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="span12">
+                    <table class="table table-condensed table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Log_LSN
+                                </th>
+                                <th>
+                                    Log_Flush_LSN
+                                </th>
+                                <th>
+                                    Log_Flush_Diff
+                                </th>
+                                <th>
+                                    Page_Flush_LSN
+                                </th>
+                                <th>
+                                    Page_Flush_Diff
+                                </th>
+                                <th>
+                                    Checkpoint_LSN
+                                </th>
+                                <th>
+                                    Checkpoint_Diff
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    {{ data_engine_innodb.log_lsn }}
+                                </td>
+                                <td>
+                                    {{ data_engine_innodb.log_flush_lsn }}
+                                </td>
+                                <td>
+                                    {{ data_engine_innodb.log_flush_diff }}
+                                </td>
+                                <td >
+                                    {{ data_engine_innodb.page_flush_lsn }}
+                                </td>
+                                <td>
+                                    {{ data_engine_innodb.page_flush_diff }}
+                                </td>
+                                <td >
+                                    {{ data_engine_innodb.checkpoint_lsn }}
+                                </td>
+                                <td>
+                                    {{ data_engine_innodb.checkpoint_diff }}
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

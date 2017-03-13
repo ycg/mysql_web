@@ -124,10 +124,10 @@ class MonitorServer(threading.Thread):
         innodb_info.innodb_row_lock_waits = int(mysql_status_new["Innodb_row_lock_waits"]) - int(mysql_status_old["Innodb_row_lock_waits"])
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
-        #if (host_info.is_slave > 0):
         result = self.__db_util.fetchone(host_info, "show slave status;")
         if(result != None):
             repl_info = self.__cache.get_repl_info(host_info.key)
+            repl_info.is_slave = 1
             repl_info.error_message = result["Last_Error"]
             repl_info.io_status = result["Slave_IO_Running"]
             repl_info.sql_status = result["Slave_SQL_Running"]
@@ -141,6 +141,8 @@ class MonitorServer(threading.Thread):
             repl_info.delay_pos_count = repl_info.master_log_pos - repl_info.slave_log_pos
             if(repl_info.seconds_Behind_Master is None):
                 repl_info.seconds_Behind_Master = 0
+            if(mysql_status_new["Slave_running"] == "OFF"):
+                repl_info.is_slave = 0
 
         #self.insert_status_log(status_info)
         bb = time.time()
