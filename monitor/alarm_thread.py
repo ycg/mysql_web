@@ -3,7 +3,7 @@
 #实现邮件告警，以及数据库健康检查状态的report发送
 #告警，包括CPU，内存，线程数，qps和tps等等
 
-import threading, time, cache, mail_util, enum, db_util
+import threading, time, cache, mail_util, enum, db_util, settings
 
 class AlarmEnum(enum.Enum):
     ReplStatus = 0
@@ -29,7 +29,7 @@ class AlarmThread(threading.Thread):
 
     def run(self):
         while(True):
-            time.sleep(2)
+            time.sleep(settings.ALARM_INTERVAL)
             self.alarm_for_replication()
 
     def alarm_for_replication(self):

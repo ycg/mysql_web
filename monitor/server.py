@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import time, threadpool, cache, threading, db_util, enum
+import time, threadpool, cache, threading, db_util, enum, settings, paramiko
 
 class MonitorEnum(enum.Enum):
+    Host = 3
     Status = 0
     Innodb = 1
     Replication = 2
 
 class MonitorServer(threading.Thread):
+    __times = 1
     __cache = None
     __db_util = None
     __instance = None
@@ -30,18 +32,26 @@ class MonitorServer(threading.Thread):
 
     def run(self):
         while (True):
-            requests = threadpool.makeRequests(self.get_mysql_status, list(self.__cache.get_all_host_infos()), None)
-            for request in requests:
-                self.__thread_pool.putRequest(request)
-            self.__thread_pool.poll()
+            if(self.__times % settings.UPDATE_INTERVAL == 0):
+                self.join_thread_pool(self.get_mysql_status)
+            #if(self.__times % settings.LINUX_UPDATE_INTERVAL == 0):
+            #    self.join_thread_pool(self.monitor_host_status)
             time.sleep(1)
+
+    def join_thread_pool(self, method_name):
+        requests = threadpool.makeRequests(method_name, list(self.__cache.get_all_host_infos()), None)
+        for request in requests:
+            self.__thread_pool.putRequest(request)
+        self.__thread_pool.poll()
 
     def get_mysql_status(self, host_info):
         aa = time.time()
         mysql_status_old = self.get_dic_data(host_info, "show global status;")
         time.sleep(1)
         mysql_status_new = self.get_dic_data(host_info, "show global status;")
-        #mysql_variables = self.get_dic_data(host_info, "show global variables;")
+        mysql_variables = self.get_dic_data(host_info, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', 'max_connections');")
+        host_info.mysql_data_dir = mysql_variables["datadir"]
+        host_info.mysql_pid_file = mysql_variables["pid_file"]
 
         #1.---------------------------------------------------------获取mysql global status--------------------------------------------------------
         status_info = self.__cache.get_status_infos(host_info.key)
@@ -71,7 +81,7 @@ class MonitorServer(threading.Thread):
         status_info.create_tmp_table_count = int(mysql_status_new["Created_tmp_tables"]) - int(mysql_status_old["Created_tmp_tables"])
         status_info.create_tmp_disk_table_count = int(mysql_status_new["Created_tmp_disk_tables"]) - int(mysql_status_old["Created_tmp_disk_tables"])
         status_info.thread_cache_hit = (1 - status_info.thread_created / status_info.connections) * 100
-        #status_info.connections_usage_rate = status_info.threads_count * 100 / int(mysql_variables["max_connections"])
+        status_info.connections_usage_rate = status_info.threads_count * 100 / int(mysql_variables["max_connections"])
         status_info.send_bytes = self.get_data_length(int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"]))
         status_info.receive_bytes = self.get_data_length(int(mysql_status_new["Bytes_received"])  - int(mysql_status_old["Bytes_received"]))
         status_info.tps = status_info.insert_count + status_info.update_count + status_info.delete_count
@@ -101,7 +111,7 @@ class MonitorServer(threading.Thread):
         innodb_info.page_dirty_count = int(mysql_status_new["Innodb_buffer_pool_pages_dirty"])
         innodb_info.page_free_count = int(mysql_status_new["Innodb_buffer_pool_pages_free"])
         innodb_info.page_total_count = int(mysql_status_new["Innodb_buffer_pool_pages_total"])
-        innodb_info.page_dirty_pct = innodb_info.page_dirty_count / innodb_info.page_total_count
+        innodb_info.page_dirty_pct = round(float(innodb_info.page_dirty_count) / float(innodb_info.page_total_count) * 100, 2)
         innodb_info.page_flush_persecond = int(mysql_status_new["Innodb_buffer_pool_pages_flushed"]) - int(mysql_status_old["Innodb_buffer_pool_pages_flushed"])
         innodb_info.commit = int(mysql_status_new["Com_commit"]) - int(mysql_status_old["Com_commit"])
         innodb_info.rollback = int(mysql_status_new["Com_rollback"]) - int(mysql_status_old["Com_rollback"])
@@ -144,7 +154,7 @@ class MonitorServer(threading.Thread):
             if(mysql_status_new["Slave_running"] == "OFF"):
                 repl_info.is_slave = 0
 
-        #self.insert_status_log(status_info)
+        self.insert_status_log(status_info)
         bb = time.time()
         if(host_info.id == 1):
             print(bb - aa - 1)
@@ -181,4 +191,121 @@ class MonitorServer(threading.Thread):
               .format(status_info.host_info.id, status_info.qps, status_info.tps, status_info.commit, status_info.rollback, status_info.connections_per,
                       status_info.threads_count, status_info.threads_run_count, status_info.create_tmp_table_count, status_info.create_tmp_disk_table_count,
                       status_info.send_bytes, status_info.receive_bytes)
-        self.__db_util.execute(self.__cache.get_mysql_web_host_info(), sql)
+        self.__db_util.execute(settings.MySQL_Host, sql)
+
+    def monitor_host_status(self, host_info):
+        host_client = None
+        linux_info = self.__cache.get_linux_info(host_info.key)
+        try:
+            host_client = paramiko.SSHClient()
+            host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            host_client.connect(host_info.ip, port=22, username="root")
+
+            #监测CPU负载
+            self.monitor_host_for_cpu(host_client, linux_info)
+            #监测网卡流量
+            self.monitor_host_for_net(host_client, linux_info)
+            #监测硬盘空间
+            self.monitor_host_for_disk(host_client, linux_info)
+            #监测linux内存使用情况
+            self.monitor_host_for_memory(host_client, linux_info)
+            #监控mysql的cpu和memory以及data大小
+            self.monitor_host_for_mysql_cpu_and_memory(host_client, host_info, linux_info)
+        finally:
+            if (host_client != None):
+                host_client.close()
+
+    def monitor_host_for_cpu(self, host_client, linux_info):
+        stdin, stdout, stderr = host_client.exec_command("cat /proc/loadavg")
+        cpu_value = stdout.readlines()[0].split()
+        linux_info.cpu_1 = cpu_value[0]
+        linux_info.cpu_5 = cpu_value[1]
+        linux_info.cpu_15 = cpu_value[2]
+
+    def monitor_host_for_net(self, host_client, linux_info):
+        net_send_byte, net_receive_byte = 0, 0
+        stdin, stdout, stderr = host_client.exec_command("cat /proc/net/dev")
+        for line in stdout.readlines():
+            if(line.find("eth") >= 0):
+                value_list = []
+                for value in line.split(" "):
+                    if(len(value) > 0):
+                        value_list.append(value)
+                net_send_byte = net_send_byte + long(value_list[9])
+                net_receive_byte = net_receive_byte + long(value_list[1])
+
+        linux_info.net_send_old = linux_info.net_send_new
+        linux_info.net_receive_old = linux_info.net_receive_new
+        linux_info.net_send_new = net_send_byte
+        linux_info.net_receive_new = net_receive_byte
+        linux_info.net_send_byte = linux_info.net_send_new - linux_info.net_send_old
+        linux_info.net_receive_byte = linux_info.net_receive_new - linux_info.net_receive_old
+
+    def monitor_host_for_disk(self, host_client, linux_info):
+        id_tmp = 0
+        max_disk_value = 0
+        total_disk_value = 0
+        stdin, stdout, stderr = host_client.exec_command("df")
+        for line in stdout.readlines():
+            id_tmp = id_tmp + 1
+            if(id_tmp == 1):
+                continue
+            values = line.split()
+            for value in values:
+                if(value.find("%") >= 0):
+                    disk_value_int = int(value.replace("%", ""))
+                    if(max_disk_value == 0):
+                        max_disk_value = disk_value_int
+                    else:
+                        if(disk_value_int > max_disk_value):
+                            max_disk_value = disk_value_int
+
+            list_len = len(values)
+            if(list_len >= 3):
+                if(list_len == 6):
+                    total_disk_value = total_disk_value + int(values[1])
+                elif(list_len == 5):
+                    total_disk_value = total_disk_value + int(values[0])
+        linux_info.disk_value = str(max_disk_value) + "%"
+        linux_info.total_disk_value = str(total_disk_value / 1024 / 1024)
+
+    def monitor_host_for_memory(self, host_client, linux_info):
+        stdin, stdout, stderr = host_client.exec_command("cat /proc/meminfo")
+        for line in stdout.readlines():
+            values = line.split(":")
+            if(len(values) >= 2):
+                if(values[0].find("MemTotal") >= 0):
+                    linux_info.memory_total = self.change_byte_to_g(values[1])
+                elif(values[0].find("MemFree") >= 0):
+                    linux_info.memory_free = self.change_byte_to_g(values[1])
+                elif (values[0].strip().lstrip() == "Buffers"):
+                    linux_info.memory_buffers = self.change_byte_to_g(values[1])
+                elif (values[0].strip().lstrip() == "Cached"):
+                    linux_info.memory_cache = self.change_byte_to_g(values[1])
+                elif (values[0].find("SwapTotal") >= 0):
+                    linux_info.swap_total = self.change_byte_to_g(values[1])
+                elif (values[0].find("SwapFree") >= 0):
+                    linux_info.swap_free = self.change_byte_to_g(values[1])
+        linux_info.memory_free = linux_info.memory_free + linux_info.memory_buffers + linux_info.memory_cache
+
+    def monitor_host_for_mysql_cpu_and_memory(self, host_client, host_info, linux_info):
+        stdin, stdout, stderr = host_client.exec_command("cat %s" % host_info.mysql_pid_file)
+        linux_info.mysql_pid = int(stdout.readlines()[0])
+
+        stdin, stdout, stderr = host_client.exec_command("top -b -n1 | grep mysql")
+        for line in stdout.readlines():
+            values = line.split()
+            if (int(values[0]) == linux_info.mysql_pid):
+                if(float(values[8]) >= 1):
+                    #防止获取的CPU为0的情况
+                    linux_info.mysql_cpu = values[8]
+                linux_info.mysql_memory = values[9]
+                break
+
+        #监测MySQL数据目录大小
+        stdin, stdout, stderr = host_client.exec_command("du -h %s | tail -n1 | awk '{print $1'}" % host_info.mysql_data_dir)
+        linux_info.mysql_data_size = stdout.readlines()[0].replace("\n", "").replace("G", "")
+
+    def change_byte_to_g(self, value):
+        return int(value.replace("kB", "")) / 1024 / 1024
+

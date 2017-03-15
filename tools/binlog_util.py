@@ -27,6 +27,15 @@ from pymysqlreplication.row_event import WriteRowsEvent, UpdateRowsEvent, Delete
 #如果想过滤一些表的sql，需要先写databases参数
 #如果加上log-file参数，默认值读取log-file指定的二进制日志
 #start-datetime和end-datetime参数，这样更容易进行二进制日志的筛选
+#参数列表：
+#--start-pos
+#--end-pos
+#--start-datetime
+#--end-datetime
+#--out-file
+#--databases
+#--tables
+#-B
 
 connection_settings = {}
 insert_sql = "INSERT INTO `{0}`.`{1}` ({2}) VALUES ({3});"

@@ -1,15 +1,14 @@
-import base_class, host_info, collections, db_util
+import base_class, host_info, collections, db_util, settings
 
 class Cache(object):
     __number = False
     __instance = None
     __host_infos = collections.OrderedDict()
     __repl_infos = collections.OrderedDict()
+    __linux_infos = collections.OrderedDict()
     __status_infos = collections.OrderedDict()
     __innodb_infos = collections.OrderedDict()
     __innodb_status_infos = collections.OrderedDict()
-    __mysql_web_host_info = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
-    #__mysql_web_host_info = host_info.HoseInfo(host="10.171.251.52", port=3309, user="yangcaogui", password="r_yangcaogui", remark="Monitor")
 
     def __init__(self):
         pass
@@ -21,7 +20,7 @@ class Cache(object):
 
     def load_all_host_infos(self):
         sql = "select host_id, host, port, user, password, remark, is_master, is_slave, master_id, is_deleted from mysql_web.host_infos;"
-        for row in db_util.DBUtil().fetchall(self.__mysql_web_host_info, sql):
+        for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
             host_id = row["host_id"]
             if(self.__host_infos.has_key(host_id) == True):
                 host_info_temp = self.__host_infos[host_id]
@@ -43,9 +42,12 @@ class Cache(object):
                 self.__repl_infos.pop(host_id)
                 self.__status_infos.pop(host_id)
                 self.__innodb_infos.pop(host_id)
+                self.__linux_infos.pop(host_id)
             else:
                 if(self.__repl_infos.has_key(host_id) == False):
                     self.__repl_infos[host_id] = base_class.BaseClass(host_info_temp)
+                if(self.__linux_infos.has_key(host_id) == False):
+                    self.__linux_infos[host_id] = base_class.BaseClass(host_info_temp)
                 if(self.__status_infos.has_key(host_id) == False):
                     self.__status_infos[host_id] = base_class.BaseClass(host_info_temp)
                 if(self.__innodb_infos.has_key(host_id) == False):
@@ -69,6 +71,9 @@ class Cache(object):
 
     def get_repl_info(self, key):
         return self.__repl_infos[key]
+
+    def get_linux_info(self, key):
+        return self.__linux_infos[key]
 
     def get_status_infos(self, key):
         return self.__status_infos[key]

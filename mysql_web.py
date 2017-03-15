@@ -60,20 +60,5 @@ def test_chart():
 def home():
     return render_template("home.html")
 
-'''
-@app.route("/status")
-def status():
-    return render_template("status.html", data=monitor_server.get_cache_by_type(server.MonitorEnum.Status), monitorname=server.MonitorEnum.Status.name)
-
-@app.route("/innodb")
-def innodb():
-    return render_template("innodb.html", data=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb), monitorname=server.MonitorEnum.Innodb.name)
-
-@app.route("/replication")
-def replication():
-    return render_template("replication.html", data=monitor_server.get_cache_by_type(server.MonitorEnum.Replication), monitorname=server.MonitorEnum.Replication.name)
-'''
-
-
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=int("5000"))

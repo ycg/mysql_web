@@ -3,8 +3,10 @@
 #检查数据库表空间报表
 #python check_tablespace.py --host=192.168.11.130 --user=yangcg --password='123456'
 #python check_tablespace.py --host=192.168.11.130 --port=3310 --user=yangcg --password='123456'
+#数据保存在tmp目录下，以host值为文件名
+#--convert：是否把大小进行可读性格式化，如-1024M
 
-import MySQLdb, paramiko, sys, operator, argparse
+import MySQLdb, paramiko, sys, argparse
 
 class TableInfo():
     diff = 0
@@ -15,6 +17,7 @@ def check_arguments():
     parser.add_argument("--port", type=int, dest="port", help="mysql port", default=3306)
     parser.add_argument("--user", type=str, dest="user", help="mysql user")
     parser.add_argument("--password", type=str, dest="password", help="mysql password")
+    parser.add_argument("--convert", type=str, dest="convert", help="data size convert", default=True)
     args = parser.parse_args()
 
     if(not args.host or not args.port or not args.user or not args.password):
@@ -55,16 +58,20 @@ def get_data_length(data_length):
         return str(data_length) + "KB"
 
 def save_file(args, table_infos):
-    file = open("/tmp/{0}.txt".format(args.host), "w")
-    file.write("schema\ttable_name\ttable_fragment\tdata_size\tindex_size\ttotal_size\tfile_size\tfragment_size")
+    file = open("/tmp/{0}_tb.txt".format(args.host), "w")
+    file.write("schema\ttable_name\ttable_fragment\tdata_size\tindex_size\ttotal_size\tfile_size\n")
     for table_info in table_infos:
-        file.write(get_print_string(table_info) + "\n")
+        file.write(get_print_string(args, table_info) + "\n")
     file.close()
 
-def get_print_string(table_info):
-    str_format = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}"
-    return str_format.format(table_info.schema, table_info.t_name, table_info.value, table_info.data_size,
-                             table_info.index_size, table_info.total_size, table_info.file_size, table_info.diff)
+def get_print_string(args, table_info):
+    str_format = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}"
+    if(args.convert == True):
+        return str_format.format(table_info.schema, table_info.t_name, table_info.value, get_data_length(table_info.data_size),
+                             get_data_length(table_info.index_size), get_data_length(table_info.total_size), get_data_length(table_info.file_size))
+    else:
+        return str_format.format(table_info.schema, table_info.t_name, table_info.value, table_info.data_size,
+                                 table_info.index_size, table_info.total_size, table_info.file_size)
 
 def check_table_space(args):
     list_tmp = []
@@ -82,7 +89,7 @@ def check_table_space(args):
             table_info.diff = table_info.file_size - table_info.total_size
             table_info.value = get_data_length(table_info.diff)
             list_tmp.append(table_info)
-            print(get_print_string(table_info))
+            print(get_print_string(args, table_info))
 
 
     host_client.close()
