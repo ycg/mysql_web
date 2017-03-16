@@ -13,17 +13,7 @@ class AlarmEnum(enum.Enum):
     Disk = 4
 
 class AlarmThread(threading.Thread):
-    __instance = None
-
     def __init__(self):
-        pass
-
-    def __new__(cls, *args, **kwargs):
-        if(AlarmThread.__instance is None):
-            AlarmThread.__instance = object.__new__(cls, *args, **kwargs)
-        return AlarmThread.__instance
-
-    def load(self):
         threading.Thread.__init__(self)
         self.setDaemon(True)
 
@@ -44,7 +34,7 @@ class AlarmThread(threading.Thread):
                     error_flag = True
                     subject = subject + "复制延迟"
                 if(error_flag == True):
-                    mail_util.MailUtil().send_text(subject, "yangcaogui.sh@superjia.com", self.get_alarm_for_repl_status_format(repl_info))
+                    mail_util.send_text(subject, "yangcaogui.sh@superjia.com", self.get_alarm_for_repl_status_format(repl_info))
 
     def alarm_for_mysql_status(self):
         pass

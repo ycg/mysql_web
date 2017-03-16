@@ -63,12 +63,13 @@ def save_file(args, table_infos):
     for table_info in table_infos:
         file.write(get_print_string(args, table_info) + "\n")
     file.close()
+    return table_infos
 
 def get_print_string(args, table_info):
     str_format = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}"
     if(args.convert == True):
         return str_format.format(table_info.schema, table_info.t_name, table_info.value, get_data_length(table_info.data_size),
-                             get_data_length(table_info.index_size), get_data_length(table_info.total_size), get_data_length(table_info.file_size))
+                                 get_data_length(table_info.index_size), get_data_length(table_info.total_size), get_data_length(table_info.file_size))
     else:
         return str_format.format(table_info.schema, table_info.t_name, table_info.value, table_info.data_size,
                                  table_info.index_size, table_info.total_size, table_info.file_size)

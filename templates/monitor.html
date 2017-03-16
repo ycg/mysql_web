@@ -1,16 +1,6 @@
 {% extends "home.html" %}
 {% block content %}
     {% if(data_status != None) %}
-    <!--
-    <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span12">
-                <h3 class="text-center">
-                    MySQL Status
-                </h3>
-            </div>
-        </div>
-    </div>-->
     <div class="container-fluid">
         <div class="row-fluid">
             <div class="span12">
@@ -186,15 +176,6 @@
     {% endif %}
 
     {% if(data_innodb != None) %}
-    <!--<div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span12">
-                <h3 class="text-center">
-                    MySQL Innodb
-                </h3>
-            </div>
-        </div>
-    </div>-->
     <div class="container-fluid">
         <div class="row-fluid">
         <div class="span12">
@@ -294,7 +275,7 @@
                             {{ status.innodb_row_lock_waits }}
                         </td>
                         <td class="text-center">
-                            <a href="innodb/{{ status.host_info.key }}">Innodb Status Detail</a>
+                            <a href="innodb/{{ status.host_info.key }}">Innodb Status</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -306,15 +287,6 @@
     {% endif %}
 
     {% if(data_repl != None) %}
-    <!--<div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span12">
-                <h3 class="text-center">
-                    MySQL Replication
-                </h3>
-            </div>
-        </div>
-    </div>-->
     <div class="container-fluid">
         <div class="row-fluid">
             <div class="span12">
@@ -410,10 +382,118 @@
     {% endif %}
 
     {% if(data_host != None) %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12">
+                <table class="table table-condensed table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th>
+                                CPU_1
+                            </th>
+                            <th>
+                                CPU_5
+                            </th>
+                            <th>
+                                CPU_15
+                            </th>
+                            <th>
+                                MySQL_C
+                            </th>
+                            <th>
+                                MySQL_M
+                            </th>
+                            <th>
+                                MySQL_D
+                            </th>
+                            <th>
+                                Disk_P
+                            </th>
+                            <th>
+                                Disk_T
+                            </th>
+                            <th>
+                                Memory_T
+                            </th>
+                            <th>
+                                Memory_F
+                            </th>
+                            <th>
+                                SWAP_T
+                            </th>
+                            <th>
+                                SWAP_F
+                            </th>
+                            <th>
+                                NET_R
+                            </th>
+                            <th>
+                                NET_S
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for status in data_host %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.cpu_1 }}
+                            </td>
+                            <td>
+                                {{ status.cpu_5 }}
+                            </td>
+                            <td>
+                                {{ status.cpu_15 }}
+                            </td>
+                            <td>
+                                {{ status.mysql_cpu }}
+                            </td>
+                            <td>
+                                {{ status.mysql_memory }}
+                            </td>
+                            <td>
+                                {{ status.mysql_data_size }}
+                            </td>
+                            <td>
+                                {{ status.disk_value }}
+                            </td>
+                            <td>
+                                {{ status.total_disk_value }}
+                            </td>
+                            <td>
+                                {{ status.memory_total }}
+                            </td>
+                            <td>
+                                {{ status.memory_free }}
+                            </td>
+                            <td>
+                                {{ status.swap_total }}
+                            </td>
+                            <td>
+                                {{ status.swap_free }}
+                            </td>
+                            <td>
+                                {{ status.net_receive_byte }}
+                            </td>
+                            <td>
+                                {{ status.net_send_byte }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
     {% if(data_engine_innodb != None) %}
-        <div class="container-fluid">
+    <div class="container-fluid">
             <div class="row-fluid">
                 <div class="span12">
                     <table class="table table-condensed table-hover table-bordered">

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import time, threadpool, cache, threading, db_util, enum, settings, paramiko
+import time, threadpool, cache, threading, db_util, enum, settings, paramiko, collections, base_class
 
 class MonitorEnum(enum.Enum):
     Host = 3
@@ -26,7 +26,7 @@ class MonitorServer(threading.Thread):
     def load(self):
         self.__cache = cache.Cache()
         self.__db_util = db_util.DBUtil()
-        self.__thread_pool = threadpool.ThreadPool(36)
+        self.__thread_pool = threadpool.ThreadPool(settings.THREAD_POOL_SIZE)
         threading.Thread.__init__(self)
         self.setDaemon(True)
 
@@ -36,7 +36,10 @@ class MonitorServer(threading.Thread):
                 self.join_thread_pool(self.get_mysql_status)
             #if(self.__times % settings.LINUX_UPDATE_INTERVAL == 0):
             #    self.join_thread_pool(self.monitor_host_status)
+            if(self.__times % settings.INNODB_UPDATE_INTERVAL == 0):
+                self.join_thread_pool(self.read_innodb_status)
             time.sleep(1)
+            self.__times = self.__times + 1
 
     def join_thread_pool(self, method_name):
         requests = threadpool.makeRequests(method_name, list(self.__cache.get_all_host_infos()), None)
@@ -177,7 +180,9 @@ class MonitorServer(threading.Thread):
         return data
 
     def get_cache_by_type(self, monitor_type):
-        if(monitor_type == MonitorEnum.Status):
+        if(monitor_type == MonitorEnum.Host):
+            return self.__cache.get_all_linux_infos()
+        elif(monitor_type == MonitorEnum.Status):
             return self.__cache.get_all_status_infos()
         elif(monitor_type == MonitorEnum.Innodb):
             return self.__cache.get_all_innodb_infos()
@@ -309,3 +314,122 @@ class MonitorServer(threading.Thread):
     def change_byte_to_g(self, value):
         return int(value.replace("kB", "")) / 1024 / 1024
 
+    def read_innodb_status(self, host_info):
+        innodb_status = self.get_innodb_status_infos(host_info)
+        if(innodb_status.has_key("LOG") == True):
+            self.get_lsn_info(host_info, innodb_status["LOG"])
+        if(innodb_status.has_key("INDIVIDUAL BUFFER POOL INFO") == True):
+            self.get_buffer_pool_infos(host_info, innodb_status["INDIVIDUAL BUFFER POOL INFO"])
+        if(innodb_status.has_key("LATEST DETECTED DEADLOCK") == True):
+            self.get_latest_deadlock(host_info, innodb_status["LATEST DETECTED DEADLOCK"])
+        if(innodb_status.has_key("TRANSACTIONS") == True):
+            self.get_transactions_info(host_info, innodb_status["TRANSACTIONS"])
+
+    def get_lsn_info(self, host_info, values):
+        info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
+        num = 0
+        for line in values:
+            line_split = line.split(" ")
+            split_value = line_split[len(line_split) - 1]
+            if(num == 1):
+                info_tmp.log_lsn = split_value
+            elif(num == 2):
+                info_tmp.log_flush_lsn = split_value
+            elif(num == 3):
+                info_tmp.page_flush_lsn = split_value
+            elif(num == 4):
+                info_tmp.checkpoint_lsn = split_value
+            num = num + 1
+        info_tmp.log_flush_diff = int(info_tmp.log_lsn) - int(info_tmp.log_flush_lsn)
+        info_tmp.page_flush_diff = int(info_tmp.log_lsn) - int(info_tmp.page_flush_lsn)
+        info_tmp.checkpoint_diff = int(info_tmp.log_lsn) - int(info_tmp.checkpoint_lsn)
+
+    def get_buffer_pool_infos(self, host_info, values):
+        buffer_pool_key = ""
+        buffer_pool_infos = collections.OrderedDict()
+
+        for line in values:
+            str_value = line.replace("\n", "")
+            if(len(str_value) > 0):
+                if(str_value.find("---BUFFER POOL") >= 0):
+                    buffer_pool_key = str_value
+                    buffer_pool_infos[buffer_pool_key] = []
+                else:
+                    if(len(buffer_pool_key) > 0):
+                        buffer_pool_infos[buffer_pool_key].append(str_value)
+
+        for key, value_list in buffer_pool_infos.items():
+            num = 0
+            info_tmp = base_class.BaseClass(None)
+            buffer_pool_name = key.replace("-", "")
+            info_tmp.name = buffer_pool_name
+            for line in value_list:
+                line_split = line.split(" ")
+                split_value = line_split[len(line_split) - 1].replace(",", "")
+                if(line.find("unzip_LRU") >= 0):
+                    info_tmp.unzip_lur = split_value
+                elif(line.find("Free buffers") >= 0):
+                    info_tmp.free_pages = split_value
+                elif(line.find("Buffer pool size ") >= 0):
+                    info_tmp.total_pages = split_value
+                elif(line.find("Database pages") >= 0):
+                    info_tmp.lru_pages = split_value
+                elif(line.find("Old database pages") >= 0):
+                    info_tmp.old_pages = split_value
+                elif(line.find("Modified db pages") >= 0):
+                    info_tmp.dirty_pages = split_value
+                elif(line.find("Buffer pool hit rate") >= 0):
+                    info_tmp.buffer_pool_hit = int(line_split[4].replace(",", "")) / int(line_split[6].replace(",", "")) * 100
+                elif(line.find("reads") >= 0 and line.find("creates") >= 0 and line.find("writes") >= 0):
+                    info_tmp.reads_per = line_split[0]
+                    info_tmp.creates_per = line_split[2]
+                    info_tmp.writes_per = line_split[4]
+                elif(line.find("Pending reads") >= 0):
+                    info_tmp.pending_reads = split_value
+                num = num + 1
+                cache.Cache().get_engine_innodb_status_infos(host_info.key).buffer_pool_infos[buffer_pool_name] = info_tmp
+
+    def get_latest_deadlock(self, host_info, values):
+        info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
+        if(len(values) > 0):
+            info_tmp.latest_deadlock = ""
+        for line in values:
+            info_tmp.latest_deadlock = info_tmp.latest_deadlock + line + "\n"
+
+    def get_transactions_info(self, host_info, values):
+        info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
+        for line in values:
+            line_split = line.split(" ")
+            split_value = line_split[len(line_split) - 1].replace(",", "")
+            if(line.find("History list length") >= 0):
+                info_tmp.undo_history_list_len = split_value
+
+    def get_innodb_status_infos(self, host_info):
+        flag_list = []
+        flag_list.append("BACKGROUND THREAD")
+        flag_list.append("SEMAPHORES")
+        flag_list.append("LATEST DETECTED DEADLOCK")
+        flag_list.append("TRANSACTIONS")
+        flag_list.append("FILE I/O")
+        flag_list.append("INSERT BUFFER AND ADAPTIVE HASH INDEX")
+        flag_list.append("LOG")
+        flag_list.append("BUFFER POOL AND MEMORY")
+        flag_list.append("INDIVIDUAL BUFFER POOL INFO")
+        flag_list.append("ROW OPERATIONS")
+        flag_list.append("LATEST DETECTED DEADLOCK")
+        flag_list.append("TRANSACTIONS")
+        flag_list.append("END OF INNODB MONITOR OUTPUT")
+        innodb_status_infos = collections.OrderedDict()
+
+        innodb_status = self.__db_util.fetchone(host_info, "show engine innodb status;")
+        key_name = ""
+        for line in innodb_status["Status"].split("\n"):
+            str_value = line.replace("\n", "")
+            if(len(str_value) > 0):
+                if(str_value in flag_list):
+                    key_name = str_value
+                    innodb_status_infos[key_name] = []
+                else:
+                    if(len(key_name) > 0):
+                        innodb_status_infos[key_name].append(str_value)
+        return innodb_status_infos

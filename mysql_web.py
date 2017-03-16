@@ -3,7 +3,7 @@
 #pip install flask threadpool pymysql DBUtils
 
 from flask import Flask, render_template, request, current_app, app, redirect
-from monitor import cache, server, alarm_thread, innodb
+from monitor import cache, server, alarm_thread, report_server
 
 app = Flask(__name__)
 
@@ -12,11 +12,8 @@ mysql_cache.load_all_host_infos()
 monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
-#thread1 = alarm_thread.AlarmThread()
-#thread1.load()
-#thread1.start()
-innodb.Innodb().start()
-
+#alarm_thread.AlarmThread().start()
+report_server.Report().report_tablespace()
 
 @app.route('/')
 def hello_world():
@@ -28,7 +25,9 @@ def my_hello_wordaaa():
 
 @app.route("/<type>")
 def monitor(type):
-    if(type.upper() == server.MonitorEnum.Status.name.upper()):
+    if(type.upper() == server.MonitorEnum.Host.name.upper()):
+        return get_monitor_data(data_host=monitor_server.get_mysql_status(server.MonitorEnum.Status))
+    elif(type.upper() == server.MonitorEnum.Status.name.upper()):
         return get_monitor_data(data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status))
     elif(type.upper() == server.MonitorEnum.Innodb.name.upper()):
         return get_monitor_data(data_innodb=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb))
@@ -45,8 +44,8 @@ def monitor(type):
 def get_innodb_buffer_poo_infos(hostid):
     return get_monitor_data(data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(int(hostid)))
 
-def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None):
-    return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl)
+def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None, data_host=None):
+    return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl, data_host=data_host)
 
 @app.route("/load")
 def load_host_info():

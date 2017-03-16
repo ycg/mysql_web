@@ -69,6 +69,9 @@ class Cache(object):
     def get_all_innodb_infos(self):
         return self.__innodb_infos.values()
 
+    def get_all_linux_infos(self):
+        return self.__linux_infos.values()
+
     def get_repl_info(self, key):
         return self.__repl_infos[key]
 
