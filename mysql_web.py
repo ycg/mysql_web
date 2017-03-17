@@ -2,8 +2,8 @@
 
 #pip install flask threadpool pymysql DBUtils
 
-from flask import Flask, render_template, request, current_app, app, redirect
-from monitor import cache, server, alarm_thread, report_server
+from flask import Flask, render_template, request, app
+from monitor import cache, server, report_server
 
 app = Flask(__name__)
 
@@ -13,7 +13,6 @@ monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
 #alarm_thread.AlarmThread().start()
-report_server.Report().report_tablespace()
 
 @app.route('/')
 def hello_world():
@@ -53,6 +52,7 @@ def load_host_info():
 
 @app.route("/test")
 def test_chart():
+    report_server.Report().report_tablespace()
     return render_template("chart.html")
 
 @app.route("/home")

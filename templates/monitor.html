@@ -210,6 +210,9 @@
                             T_Total
                         </th>
                         <th>
+                            P_Wait_Free
+                        </th>
+                        <th>
                             Flush_Page
                         </th>
                         <th>
@@ -258,6 +261,9 @@
                         </td>
                         <td>
                             {{ status.page_total_count }}
+                        </td>
+                        <td>
+                            {{ status.pool_wait_free }}
                         </td>
                         <td>
                             {{ status.page_flush_persecond }}

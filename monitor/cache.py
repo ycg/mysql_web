@@ -1,4 +1,4 @@
-import base_class, host_info, collections, db_util, settings
+import base_class, host_info, collections, db_util, settings, mysql_branch
 
 class Cache(object):
     __number = False
@@ -38,11 +38,13 @@ class Cache(object):
             host_info_temp.master_id = row["master_id"]
             host_info_temp.key = host_info_temp.id
             if(row["is_deleted"] == 1):
-                self.__host_infos.pop(host_id)
-                self.__repl_infos.pop(host_id)
-                self.__status_infos.pop(host_id)
-                self.__innodb_infos.pop(host_id)
-                self.__linux_infos.pop(host_id)
+                self.remove_key(self.__host_infos, host_id)
+                self.remove_key(self.__repl_infos, host_id)
+                self.remove_key(self.__status_infos, host_id)
+                self.remove_key(self.__host_infos, host_id)
+                self.remove_key(self.__innodb_infos, host_id)
+                self.remove_key(self.__linux_infos, host_id)
+                self.remove_key(self.__innodb_status_infos, host_id)
             else:
                 if(self.__repl_infos.has_key(host_id) == False):
                     self.__repl_infos[host_id] = base_class.BaseClass(host_info_temp)
@@ -55,7 +57,13 @@ class Cache(object):
                 if(self.__innodb_status_infos.has_key(host_id) == False):
                     self.__innodb_status_infos[host_id] = base_class.BaseClass(host_info_temp)
                     self.__innodb_status_infos[host_id].buffer_pool_infos = collections.OrderedDict()
+
+        self.check_mysql_server_version_and_branch()
         return "load all host infos ok."
+
+    def remove_key(self, dic, key):
+        if(dic.has_key(key) == True):
+            dic.pop(key)
 
     def get_all_host_infos(self):
         return self.__host_infos.values()
@@ -89,3 +97,15 @@ class Cache(object):
 
     def get_engine_innodb_status_infos(self, key):
         return self.__innodb_status_infos[key]
+
+    def check_mysql_server_version_and_branch(self):
+        for host_info in self.__host_infos.values():
+            result = db_util.DBUtil().fetchall(host_info, "show global variables where variable_name in ('version', 'version_comment');")
+            host_info.version = result[0]["Value"]
+            str_branch = result[1]["Value"]
+            if(str_branch.find(mysql_branch.MySQLBranch.Percona.name) >= 0):
+                host_info.branch = mysql_branch.MySQLBranch.Percona
+            elif(str_branch.find(mysql_branch.MySQLBranch.Mariadb.name) >= 0):
+                host_info.branch = mysql_branch.MySQLBranch.Mariadb
+            else:
+                host_info.branch = mysql_branch.MySQLBranch.MySQL

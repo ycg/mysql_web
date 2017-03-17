@@ -297,9 +297,9 @@ def change_byte_to_g(value):
 
 #T_S = Threads | T_Run = Thread_running | T_C_H = Thread_Cache_Hit | B_C_H = Binlog_Cache_Hit
 #C_Per = Connections Persecond | C_U_R = Connections Usage Rate
-mysql_status_string_format = "%-15s%-6s%-5s%-5s%-5s%-7s%-6s%-6s%-6s" \
+mysql_status_string_format = "%-15s%-6s%-5s%-5s%-5s%-7s%-6s%-6s%-6s%-6s" \
                              "%-6s%-7s%-7s%-7s%-7s%-7s%-5s%-5s%-7s%-7s"
-mysql_status_print_title_string = mysql_status_string_format % ("Name", "Sele", "Ins", "Upd", "Del", "QPS", "TPS", "Comm", "Roll",
+mysql_status_print_title_string = mysql_status_string_format % ("Name", "Sele", "Ins", "Upd", "Del", "QPS", "TPS", "Trx_C", "Comm", "Roll",
                                                                 "T_S", "T_Run", "T_C_H", "B_C_H", "Rec", "Send", "CTT", "CTDT", "C_Per", "C_U_R")
 
 '''监测mysql状态
@@ -613,7 +613,7 @@ def print_status_info_by_host_key(host_key):
     host_info = host_infos[host_key]
     status_info = mysql_status_infos[host_key]
     return mysql_status_string_format % (host_info.remark, status_info.select_count, status_info.insert_count, status_info.update_count, status_info.delete_count,
-                                         status_info.qps, status_info.tps, status_info.commit,
+                                         status_info.qps, status_info.tps, status_info.trx_count, status_info.commit,
                                          status_info.rollback, status_info.threads_count, status_info.threads_run_count,
                                          status_info.thread_cache_hit, status_info.binlog_cache_hit,
                                          status_info.receive_bytes, status_info.send_bytes, status_info.create_tmp_table_count,
@@ -759,6 +759,12 @@ def monitor_mysql_new(host_info):
     status_info.handler_read_last = int(mysql_status_new["Handler_read_last"]) - int(mysql_status_old["Handler_read_last"])
     status_info.handler_read_rnd = int(mysql_status_new["Handler_read_rnd"]) - int(mysql_status_old["Handler_read_rnd"])
     status_info.handler_read_rnd_next = int(mysql_status_new["Handler_read_rnd_next"]) - int(mysql_status_old["Handler_read_rnd_next"])
+    if(mysql_status_new.get("Innodb_max_trx_id") != None):
+        #percona
+        status_info.trx_count = int(mysql_status_new["Innodb_max_trx_id"]) - int(mysql_status_old["Innodb_max_trx_id"])
+    else:
+        #需要show engine innodb status获取
+        status_info.trx_count = 0
 
     #2.---------------------------------------------------------获取innodb的相关数据-------------------------------------------------------------------
     innodb_info = mysql_innodb_infos[host_info.key]

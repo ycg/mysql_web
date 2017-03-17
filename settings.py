@@ -26,6 +26,9 @@ THREAD_POOL_SIZE = 50
 #报表发送时间
 REPORT_INTERVAL = 24 * 60 * 60
 
+#检查数据增长量间隔
+TABLE_CHECK_INTERVAL = ONE_DAY
+
 
 EMAIL_HOST = "smtp.exmail.qq.com"
 EMAIL_PORT = 25

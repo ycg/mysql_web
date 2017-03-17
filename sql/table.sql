@@ -67,3 +67,47 @@ CREATE TABLE mysql_host_status_log
     cpu SMALLINT UNSIGNED NOT NULL,
     memory SMALLINT UNSIGNED NOT NULL
 ) COMMENT = 'mysql monitor log';
+
+CREATE TABLE mysql_data_size_for_day
+(
+    id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    host_id MEDIUMINT NOT NULL,
+    data_size_incr BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    index_size_incr BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    rows_incr INT UNSIGNED NOT NULL DEFAULT 0,
+    auto_increment_incr INT UNSIGNED NOT NULL DEFAULT 0,
+    file_size_incr BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    created_time TIMESTAMP NOT NULL DEFAULT NOW()
+) COMMENT = 'mysql data size log';
+
+DROP TABLE mysql_data_size_for_day;
+CREATE TABLE mysql_data_size_for_day
+(
+    id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    host_id MEDIUMINT NOT NULL,
+    data_size_incr BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    index_size_incr BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    rows_incr INT UNSIGNED NOT NULL DEFAULT 0,
+    auto_increment_incr INT UNSIGNED NOT NULL DEFAULT 0,
+    file_size_incr BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    `date` DATE NOT NULL,
+    created_time TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE KEY idx_host_id_date(host_id, `date`)
+) COMMENT = 'mysql data size log';
+
+DROP TABLE mysql_data_size_log;
+CREATE TABLE mysql_data_size_log
+(
+    id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    host_id MEDIUMINT NOT NULL,
+    `schema` VARCHAR(50) NOT NULL DEFAULT '',
+    table_name VARCHAR(50) NOT NULL DEFAULT '',
+    data_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    index_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    rows INT UNSIGNED NOT NULL DEFAULT 0,
+    auto_increment INT UNSIGNED NOT NULL DEFAULT 0,
+    file_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    diff INT UNSIGNED NOT NULL DEFAULT 0,
+    `date` DATE NOT NULL,
+    created_time TIMESTAMP NOT NULL DEFAULT NOW()
+) COMMENT = 'mysql data size log';
