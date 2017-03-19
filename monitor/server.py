@@ -52,11 +52,12 @@ class MonitorServer(threading.Thread):
 
     def get_mysql_status(self, host_info):
         aa = time.time()
-        mysql_status_old = self.get_dic_data(host_info, "show global status;")
+        connection = self.__db_util.get_mysql_connection(host_info)
+        cursor = connection.cursor()
+        mysql_status_old = self.get_dic_data(cursor, "show global status;")
         time.sleep(1)
-        mysql_status_new = self.get_dic_data(host_info, "show global status;")
-        #mysql_variables = self.get_dic_data(host_info, "show global variables;")
-        mysql_variables = self.get_dic_data(host_info, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
+        mysql_status_new = self.get_dic_data(cursor, "show global status;")
+        mysql_variables = self.get_dic_data(cursor, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
                                                        "'max_connections', 'table_open_cache', 'table_open_cache_instances');")
         host_info.mysql_data_dir = mysql_variables["datadir"]
         host_info.mysql_pid_file = mysql_variables["pid_file"]
@@ -177,7 +178,7 @@ class MonitorServer(threading.Thread):
         innodb_info.rows_inserted = int(mysql_status_new["Innodb_rows_inserted"]) - int(mysql_status_old["Innodb_rows_inserted"])
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
-        result = self.__db_util.fetchone(host_info, "show slave status;")
+        result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
         if(result != None):
             repl_info = self.__cache.get_repl_info(host_info.key)
             repl_info.is_slave = 1
@@ -201,6 +202,7 @@ class MonitorServer(threading.Thread):
         bb = time.time()
         if(host_info.id == 1):
             print(bb - aa - 1)
+        self.__db_util.close(connection, cursor)
 
     def get_data_length(self, data_length):
         value = float(1024)
@@ -213,9 +215,15 @@ class MonitorServer(threading.Thread):
         else:
             return str(data_length) + "KB"
 
-    def get_dic_data(self, host_info, sql):
+    '''def get_dic_data(self, host_info, sql):
         data = {}
         for row in self.__db_util.fetchall(host_info, sql):
+             data[row.get("Variable_name")] = row.get("Value")
+        return data'''
+
+    def get_dic_data(self, cursor, sql):
+        data = {}
+        for row in self.__db_util.fetchall_for_cursor(sql, cursor=cursor):
              data[row.get("Variable_name")] = row.get("Value")
         return data
 

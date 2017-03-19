@@ -36,6 +36,23 @@ class DBUtil(object):
         finally:
            self.close(connection, cursor)
 
+    def execute_for_cursor(self, sql ,connection=None, cursor=None):
+        return self.cursor_execute(connection, cursor, sql)
+
+    def fetchone_for_cursor(self, sql, connection=None, cursor=None):
+        cursor = self.cursor_execute(connection, cursor, sql)
+        return cursor.fetchone()
+
+    def fetchall_for_cursor(self, sql, connection=None, cursor=None):
+        cursor = self.cursor_execute(connection, cursor, sql)
+        return cursor.fetchall()
+
+    def cursor_execute(self, connection, cursor, sql):
+        if(cursor == None):
+            cursor = connection.cursor()
+        cursor.execute(sql)
+        return cursor
+
     def close(self, connection, cursor):
         if(cursor != None):
             cursor.close()
@@ -53,10 +70,6 @@ class DBUtil(object):
         connection = self.get_mysql_connection(host_info)
         cursor = connection.cursor()
         return connection, cursor
-
-    def execute_fetchall(self, cursor, sql):
-        cursor.execute(sql)
-        return cursor.fetchall()
 
     def get_mysql_connection(self, host_info):
         if(self.__connection_pools.get(host_info.key) == None):
