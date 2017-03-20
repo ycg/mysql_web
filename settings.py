@@ -3,7 +3,6 @@
 from monitor import host_info
 
 MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
-#MySQL_Host = host_info.HoseInfo(host="10.171.251.52", port=3309, user="yangcaogui", password="r_yangcaogui", remark="Monitor")
 
 #一天的秒数
 ONE_DAY = 24 * 60 * 60
@@ -30,8 +29,8 @@ REPORT_INTERVAL = 24 * 60 * 60
 TABLE_CHECK_INTERVAL = ONE_DAY
 
 
-EMAIL_HOST = "smtp.exmail.qq.com"
+EMAIL_HOST = "test"
 EMAIL_PORT = 25
-EMAIL_HOST_USER = "sendmail@superjia.com"
-EMAIL_HOST_PASSWORD = "Iw2015Many"
+EMAIL_HOST_USER = "test"
+EMAIL_HOST_PASSWORD = "test"
 
