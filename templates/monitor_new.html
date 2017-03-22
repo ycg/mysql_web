@@ -1,0 +1,427 @@
+{% extends "home.html" %}
+{% block content %}
+    {% if(data_status != None) %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <!--QPS TPS-->
+            <div class="col-md-6">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th colspan="10" class="text-center">
+                                QPS TPS
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th>
+                                Select
+                            </th>
+                            <th>
+                                Insert
+                            </th>
+                            <th>
+                                Update
+                            </th>
+                            <th>
+                                Delete
+                            </th>
+                            <th>
+                                QPS
+                            </th>
+                            <th>
+                                TPS
+                            </th>
+                            <th>
+                                Trxs
+                            </th>
+                            <th>
+                                Rec_B
+                            </th>
+                            <th>
+                                Send_B
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status in data_status %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.select_count }}
+                            </td>
+                            <td>
+                                {{ status.insert_count }}
+                            </td>
+                            <td>
+                                {{ status.update_count }}
+                            </td>
+                            <td>
+                                {{ status.delete_count }}
+                            </td>
+                            <td>
+                                {{ status.qps }}
+                            </td>
+                            <td>
+                                {{ status.tps }}
+                            </td>
+                            <td>
+                                {{ status.trx_count }}
+                            </td>
+                            <td>
+                                {{ status.send_bytes }}
+                            </td>
+                            <td>
+                                {{ status.receive_bytes }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!--Thread-->
+            <div class="col-md-6">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th colspan="8" class="text-center">
+                                Thread Cache
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th>
+                                Threads
+                            </th>
+                            <th>
+                                Thread_Run
+                            </th>
+                            <th title="thread cache hit">
+                                T_C_H
+                            </th>
+                            <th>
+                                Conn_Per
+                            </th>
+                            <th>
+                                Conn_Usage
+                            </th>
+                            <th title="aborted clients">
+                                A_Clients
+                            </th>
+                            <th title="aborted connections">
+                                A_Conns
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status in data_status %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.threads_count }}
+                            </td>
+                            <td>
+                                {{ status.threads_run_count }}
+                            </td>
+                            <td>
+                                {{ status.thread_cache_hit }}
+                            </td>
+                            <td>
+                                {{ status.connections_per }}
+                            </td>
+                            <td>
+                                {{ status.connections_usage_rate }}
+                            </td>
+                            <td>
+                                {{ status.aborted_clients }}
+                            </td>
+                            <td>
+                                {{ status.aborted_connects }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <!--Handler-->
+            <div class="col-md-7">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th colspan="9" class="text-center">
+                                Handler Read
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th>
+                                Commit
+                            </th>
+                            <th title="rollback">
+                                Roll
+                            </th>
+                            <th>
+                                R_Key
+                            </th>
+                            <th>
+                                R_Next
+                            </th>
+                            <th>
+                                R_First
+                            </th>
+                            <th>
+                                R_Last
+                            </th>
+                            <th>
+                                R_Rnd
+                            </th>
+                            <th>
+                                R_Rnd_Next
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {% for status in data_status %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.handler_commit }}
+                            </td>
+                            <td>
+                                {{ status.handler_rollback }}
+                            </td>
+                            <td>
+                                {{ status.handler_read_key }}
+                            </td>
+                            <td>
+                                {{ status.handler_read_next }}
+                            </td>
+                            <td>
+                                {{ status.handler_read_first }}
+                            </td>
+                            <td>
+                                {{ status.handler_read_last }}
+                            </td>
+                            <td>
+                                {{ status.handler_read_rnd }}
+                            </td>
+                            <td>
+                                {{ status.handler_read_rnd_next }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!--Table Open Cache-->
+            <div class="col-md-5">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th colspan="6" class="text-center">
+                                Table Open Cache
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th>
+                                Open_T
+                            </th>
+                            <th>
+                                Opened_T
+                            </th>
+                            <th>
+                                Hits
+                            </th>
+                            <th>
+                                Misses
+                            </th>
+                            <th>
+                                Overflows
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status in data_status %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.open_tables }}
+                            </td>
+                            <td>
+                                {{ status.openend_tables }}
+                            </td>
+                            <td>
+                                {{ status.table_open_cache_hits }}
+                            </td>
+                            <td>
+                                {{ status.table_open_cache_misses }}
+                            </td>
+                            <td>
+                                {{ status.table_open_cache_overflows }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <!--Tmp Table Binlog Table Lock-->
+            <div class="col-md-6">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th colspan="7" class="text-center">
+                                Tmp Table Binlog Table Lock
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th title="create tmp files">
+                                Tmp_F
+                            </th>
+                            <th title="create tmp tables">
+                                Tmp_T
+                            </th>
+                            <th title="create disk tmp tables">
+                                Tmp_D_T
+                            </th>
+                            <th title="binlog cache hit">
+                                B_C_H
+                            </th>
+                            <th title="table locks immediate">
+                                T_L_I
+                            </th>
+                            <th title="table locks waited">
+                                T_L_W
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status in data_status %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.create_tmp_files }}
+                            </td>
+                            <td>
+                                {{ status.create_tmp_table_count }}
+                            </td>
+                            <td>
+                                {{ status.create_tmp_disk_table_count }}
+                            </td>
+                            <td>
+                                {{ status.binlog_cache_hit }}
+                            </td>
+                            <td>
+                                {{ status.table_locks_immediate }}
+                            </td>
+                            <td>
+                                {{ status.table_locks_waited }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!--Select Sort-->
+            <div class="col-md-6">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th colspan="9" class="text-center">
+                                Select Sort
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th title="select full join">
+                                Sel_F_J
+                            </th>
+                            <th title="select scan table">
+                                Sel_S
+                            </th>
+                            <th title="select full range join">
+                                Sel_F_R_J
+                            </th>
+                            <th title="select range check">
+                                Sel_R_C
+                            </th>
+                            <th title="select range">
+                                Sel_R
+                            </th>
+                            <th title="sort merge passes">
+                                Sort_M_P
+                            </th>
+                            <th title="sort range">
+                                Sort_R
+                            </th>
+                            <th title="sort scan">
+                                Sort_S
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status in data_status %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.select_full_join }}
+                            </td>
+                            <td>
+                                {{ status.select_scan }}
+                            </td>
+                            <td>
+                                {{ status.select_full_range_join }}
+                            </td>
+                            <td>
+                                {{ status.select_range_check }}
+                            </td>
+                            <td>
+                                {{ status.select_range }}
+                            </td>
+                            <td>
+                                {{ status.sort_merge_passes }}
+                            </td>
+                            <td>
+                                {{ status.sort_range }}
+                            </td>
+                            <td>
+                                {{ status.sort_scan }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

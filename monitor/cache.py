@@ -80,23 +80,28 @@ class Cache(object):
     def get_all_linux_infos(self):
         return self.__linux_infos.values()
 
-    def get_repl_info(self, key):
-        return self.__repl_infos[key]
-
-    def get_linux_info(self, key):
-        return self.__linux_infos[key]
-
-    def get_status_infos(self, key):
-        return self.__status_infos[key]
-
-    def get_innodb_infos(self, key):
-        return self.__innodb_infos[key]
-
     def get_mysql_web_host_info(self):
         return self.__mysql_web_host_info
 
+    def get_repl_info(self, key):
+        return self.get_value_for_key(self.__repl_infos, key)
+
+    def get_linux_info(self, key):
+        return self.get_value_for_key(self.__linux_infos, key)
+
+    def get_status_infos(self, key):
+        return self.get_value_for_key(self.__status_infos, key)
+
+    def get_innodb_infos(self, key):
+        return self.get_value_for_key(self.__innodb_infos, key)
+
     def get_engine_innodb_status_infos(self, key):
-        return self.__innodb_status_infos[key]
+        return self.get_value_for_key(self.__innodb_status_infos, key)
+
+    def get_value_for_key(self, dir, key):
+        if(dir.has_key(key)):
+            return dir[key]
+        return None
 
     def check_mysql_server_version_and_branch(self):
         for host_info in self.__host_infos.values():

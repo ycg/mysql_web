@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-#pip install flask threadpool pymysql DBUtils
+#yum install openssl-devel  python-devel -y
+#pip install flask threadpool pymysql DBUtils paramiko
 
 from flask import Flask, render_template, request, app
-from monitor import cache, server, report_server
+from monitor import cache, server
 
 app = Flask(__name__)
 
@@ -39,12 +40,33 @@ def monitor(type):
     else:
         return "No data."
 
-@app.route("/innodb/<hostid>")
+@app.route("/innodb/<int:hostid>")
 def get_innodb_buffer_poo_infos(hostid):
-    return get_monitor_data(data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(int(hostid)))
+    return get_monitor_data(data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(hostid))
 
 def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None, data_host=None):
     return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl, data_host=data_host)
+
+
+@app.route("/mysqls")
+def get_mysql_infos():
+    return render_template("mysqls.html", mysql_infos=mysql_cache.get_all_host_infos())
+
+
+@app.route("/mysqls/<int:hostid>")
+def get_host_monitor_status(hostid):
+    return get_monitor_data(data_host=convert_object_to_list(mysql_cache.get_linux_info(hostid)),
+                            data_status=convert_object_to_list(mysql_cache.get_status_infos(hostid)),
+                            data_repl=convert_object_to_list(mysql_cache.get_repl_info(hostid)),
+                            data_innodb=convert_object_to_list(mysql_cache.get_innodb_infos(hostid)),
+                            data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(hostid))
+
+def convert_object_to_list(obj):
+    list_tmp = None
+    if(obj != None):
+        list_tmp = []
+        list_tmp.append(obj)
+    return list_tmp
 
 @app.route("/load")
 def load_host_info():
@@ -52,8 +74,7 @@ def load_host_info():
 
 @app.route("/test")
 def test_chart():
-    report_server.Report().report_tablespace()
-    return render_template("chart.html")
+    return render_template("monitor_new.html", data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status))
 
 @app.route("/home")
 def home():

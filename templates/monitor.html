@@ -147,10 +147,10 @@
                             <td>
                                 {{ status.receive_bytes }}
                             </td>
-                            <td>
+                            <td {% if(status.create_tmp_table_count > 100) %} class="text-danger" {% endif %}>
                                 {{ status.create_tmp_table_count }}
                             </td>
-                            <td>
+                            <td {% if(status.create_tmp_disk_table_count > 10) %} class="text-danger" {% endif %}>
                                 {{ status.create_tmp_disk_table_count }}
                             </td>
                             <td>
@@ -178,117 +178,123 @@
     {% if(data_innodb != None) %}
     <div class="container-fluid">
         <div class="row-fluid">
-        <div class="span12">
-            <table class="table table-condensed table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            Read
-                        </th>
-                        <th>
-                            Update
-                        </th>
-                        <th>
-                            Delete
-                        </th>
-                         <th>
-                            Insert
-                        </th>
-                        <th title="page dirty count">
-                            P_Dirty
-                        </th>
-                        <th title="page dirty percent">
-                            D_PCT
-                        </th>
-                        <th>
-                            P_Free
-                        </th>
-                        <th>
-                            T_Total
-                        </th>
-                        <th>
-                            P_Wait_Free
-                        </th>
-                        <th>
-                            Flush_Page
-                        </th>
-                        <th>
-                            Buffer_Hit
-                        </th>
-                        <th>
-                            Log_Waits
-                        </th>
-                        <th>
-                            Log_Writes
-                        </th>
-                        <th>
-                            Row_Locks
-                        </th>
-                        <th>
+            <div class="span12">
+                <table class="table table-condensed table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th>
+                                Read
+                            </th>
+                            <th>
+                                Update
+                            </th>
+                            <th>
+                                Delete
+                            </th>
+                            <th>
+                                Insert
+                            </th>
+                            <th title="page dirty count">
+                                P_Dirty
+                            </th>
+                            <th title="page dirty percent">
+                                D_PCT
+                            </th>
+                            <th>
+                                P_Free
+                            </th>
+                            <th>
+                                T_Total
+                            </th>
+                            <th title="buffer pool page wait free">
+                                P_W_F
+                            </th>
+                            <th>
+                                Flush_Page
+                            </th>
+                            <th>
+                                Buffer_Hit
+                            </th>
+                            <th title="buffer pool write request">
+                                B_W_R
+                            </th>
+                            <th>
+                                Log_Waits
+                            </th>
+                            <th>
+                                Log_Writes
+                            </th>
+                            <th>
+                                Row_Locks
+                            </th>
+                            <th>
 
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for status in data_innodb %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td>
-                            {{ status.rows_read }}
-                        </td>
-                        <td>
-                            {{ status.rows_updated }}
-                        </td>
-                        <td>
-                            {{ status.rows_deleted }}
-                        </td>
-                        <td>
-                            {{ status.rows_inserted }}
-                        </td>
-                        <td>
-                            {{ status.page_dirty_count }}
-                        </td>
-                        <td>
-                            {{ status.page_dirty_pct }}
-                        </td>
-                        <td>
-                            {{ status.page_free_count }}
-                        </td>
-                        <td>
-                            {{ status.page_total_count }}
-                        </td>
-                        <td>
-                            {{ status.pool_wait_free }}
-                        </td>
-                        <td>
-                            {{ status.page_flush_persecond }}
-                        </td>
-                        <td>
-                            {{ status.buffer_pool_hit }}
-                        </td>
-                        <td>
-                            {{ status.innodb_log_waits }}
-                        </td>
-                        <td>
-                            {{ status.innodb_log_writes }}
-                        </td>
-                        <td>
-                            {{ status.innodb_row_lock_waits }}
-                        </td>
-                        <td class="text-center">
-                            <a href="innodb/{{ status.host_info.key }}">Innodb Status</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for status in data_innodb %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.rows_read }}
+                            </td>
+                            <td>
+                                {{ status.rows_updated }}
+                            </td>
+                            <td>
+                                {{ status.rows_deleted }}
+                            </td>
+                            <td>
+                                {{ status.rows_inserted }}
+                            </td>
+                            <td>
+                                {{ status.page_dirty_count }}
+                            </td>
+                            <td>
+                                {{ status.page_dirty_pct }}
+                            </td>
+                            <td>
+                                {{ status.page_free_count }}
+                            </td>
+                            <td>
+                                {{ status.page_total_count }}
+                            </td>
+                            <td>
+                                {{ status.pool_wait_free }}
+                            </td>
+                            <td>
+                                {{ status.page_flush_persecond }}
+                            </td>
+                            <td>
+                                {{ status.buffer_pool_hit }}
+                            </td>
+                            <td>
+                                {{ status.buffer_pool_write_requests }}
+                            </td>
+                            <td>
+                                {{ status.innodb_log_waits }}
+                            </td>
+                            <td>
+                                {{ status.innodb_log_writes }}
+                            </td>
+                            <td>
+                                {{ status.innodb_row_lock_waits }}
+                            </td>
+                            <td class="text-center">
+                                <a href="innodb/{{ status.host_info.key }}">Innodb Status</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
     </div>
     {% endif %}
 

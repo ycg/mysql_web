@@ -51,16 +51,17 @@ class MonitorServer(threading.Thread):
         self.__thread_pool.poll()
 
     def get_mysql_status(self, host_info):
-        aa = time.time()
+        #aa = time.time()
         connection = self.__db_util.get_mysql_connection(host_info)
         cursor = connection.cursor()
         mysql_status_old = self.get_dic_data(cursor, "show global status;")
         time.sleep(1)
         mysql_status_new = self.get_dic_data(cursor, "show global status;")
         mysql_variables = self.get_dic_data(cursor, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
-                                                       "'max_connections', 'table_open_cache', 'table_open_cache_instances');")
+                                                    "'max_connections', 'table_open_cache', 'table_open_cache_instances');")
         host_info.mysql_data_dir = mysql_variables["datadir"]
         host_info.mysql_pid_file = mysql_variables["pid_file"]
+
 
         #1.---------------------------------------------------------获取mysql global status--------------------------------------------------------
         status_info = self.__cache.get_status_infos(host_info.key)
@@ -83,8 +84,7 @@ class MonitorServer(threading.Thread):
             status_info.trx_count = int(mysql_status_new["Innodb_max_trx_id"]) - int(mysql_status_old["Innodb_max_trx_id"])
         else:
             #mysql show engine innodb status
-            if(getattr(status_info, "trx_count") == None):
-                status_info.trx_count = 0
+            status_info.trx_count = 0
 
         #thread and connection
         status_info.connections = int(mysql_status_new["Connections"])
@@ -94,6 +94,8 @@ class MonitorServer(threading.Thread):
         status_info.thread_cache_hit = (1 - status_info.thread_created / status_info.connections) * 100
         status_info.connections_per = int(mysql_status_new["Connections"]) - int(mysql_status_old["Connections"])
         status_info.connections_usage_rate = status_info.threads_count * 100 / int(mysql_variables["max_connections"])
+        status_info.aborted_clients = int(mysql_status_new["Aborted_clients"]) - int(mysql_status_old["Aborted_clients"])
+        status_info.aborted_connects = int(mysql_status_new["Aborted_connects"]) - int(mysql_status_old["Aborted_connects"])
 
         #binlog cache
         status_info.binlog_cache_use = int(mysql_status_new["Binlog_cache_use"])
@@ -105,6 +107,8 @@ class MonitorServer(threading.Thread):
             status_info.binlog_cache_hit = 0
 
         #Handler_read
+        status_info.handler_commit = int(mysql_status_new["Handler_commit"]) - int(mysql_status_old["Handler_commit"])
+        status_info.handler_rollback = int(mysql_status_new["Handler_rollback"]) - int(mysql_status_old["Handler_rollback"])
         status_info.handler_read_first = int(mysql_status_new["Handler_read_first"]) - int(mysql_status_old["Handler_read_first"])
         status_info.handler_read_key = int(mysql_status_new["Handler_read_key"]) - int(mysql_status_old["Handler_read_key"])
         status_info.handler_read_next = int(mysql_status_new["Handler_read_next"]) - int(mysql_status_old["Handler_read_next"])
@@ -130,14 +134,31 @@ class MonitorServer(threading.Thread):
         status_info.table_locks_immediate = int(mysql_status_new["Table_locks_immediate"]) - int(mysql_status_old["Table_locks_immediate"])
         status_info.table_locks_waited = int(mysql_status_new["Table_locks_waited"]) - int(mysql_status_old["Table_locks_waited"])
 
+        #select sort
+        status_info.select_full_join = int(mysql_status_new["Select_full_join"]) - int(mysql_status_old["Select_full_join"])
+        status_info.select_scan = int(mysql_status_new["Select_scan"]) - int(mysql_status_old["Select_scan"])
+        status_info.select_full_range_join = int(mysql_status_new["Select_full_range_join"]) - int(mysql_status_old["Select_full_range_join"])
+        status_info.select_range_check = int(mysql_status_new["Select_range_check"]) - int(mysql_status_old["Select_range_check"])
+        status_info.select_range = int(mysql_status_new["Select_range"]) - int(mysql_status_old["Select_range"])
+        status_info.sort_merge_passes = int(mysql_status_new["Sort_merge_passes"]) - int(mysql_status_old["Sort_merge_passes"])
+        status_info.sort_range = int(mysql_status_new["Sort_range"]) - int(mysql_status_old["Sort_range"])
+        status_info.sort_scan = int(mysql_status_new["Sort_scan"]) - int(mysql_status_old["Sort_scan"])
+
         #2.---------------------------------------------------------获取innodb的相关数据-------------------------------------------------------------------
         innodb_info = self.__cache.get_innodb_infos(host_info.key)
         innodb_info.trxs = 0
         innodb_info.current_row_locks = 0
-        innodb_info.history_list_length = 0
+        #innodb_info.history_list_length = 0
         innodb_info.commit = status_info.commit
         innodb_info.rollback = status_info.rollback
         innodb_info.trx_count = status_info.trx_count
+
+        if(mysql_status_new.get("Innodb_history_list_length") != None):
+            #percona
+            innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
+        else:
+            #mysql 没有这个状态值
+            innodb_info.history_list_length = 0
 
         '''
         if(mysql_status_new.get("Innodb_history_list_length") != None):
@@ -158,10 +179,11 @@ class MonitorServer(threading.Thread):
 
         #innodb log row page waits
         innodb_info.innodb_log_waits = int(mysql_status_new["Innodb_log_waits"])
-        innodb_info.pool_wait_free = int(mysql_status_new["Innodb_buffer_pool_wait_free"])
+        innodb_info.innodb_buffer_pool_wait_free = int(mysql_status_new["Innodb_buffer_pool_wait_free"])
         innodb_info.innodb_row_lock_waits = int(mysql_status_new["Innodb_row_lock_waits"]) - int(mysql_status_old["Innodb_row_lock_waits"])
 
         #buffer pool page
+        innodb_info.page_data_count = int(mysql_status_new["Innodb_buffer_pool_pages_data"])
         innodb_info.page_dirty_count = int(mysql_status_new["Innodb_buffer_pool_pages_dirty"])
         innodb_info.page_free_count = int(mysql_status_new["Innodb_buffer_pool_pages_free"])
         innodb_info.page_total_count = int(mysql_status_new["Innodb_buffer_pool_pages_total"])
@@ -176,6 +198,7 @@ class MonitorServer(threading.Thread):
         innodb_info.rows_updated = int(mysql_status_new["Innodb_rows_updated"]) - int(mysql_status_old["Innodb_rows_updated"])
         innodb_info.rows_deleted = int(mysql_status_new["Innodb_rows_deleted"]) - int(mysql_status_old["Innodb_rows_deleted"])
         innodb_info.rows_inserted = int(mysql_status_new["Innodb_rows_inserted"]) - int(mysql_status_old["Innodb_rows_inserted"])
+        innodb_info.buffer_pool_write_requests = int(mysql_status_new["Innodb_buffer_pool_write_requests"]) - int(mysql_status_old["Innodb_buffer_pool_write_requests"])
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
@@ -199,9 +222,9 @@ class MonitorServer(threading.Thread):
                 repl_info.is_slave = 0
 
         #self.insert_status_log(status_info)
-        bb = time.time()
-        if(host_info.id == 1):
-            print(bb - aa - 1)
+        #bb2 = time.time()
+        #if(host_info.id == 1):
+        #    print("code", bb2 - aa - 1)
         self.__db_util.close(connection, cursor)
 
     def get_data_length(self, data_length):
@@ -214,12 +237,6 @@ class MonitorServer(threading.Thread):
                 return str(int(result)) + "K"
         else:
             return str(data_length) + "KB"
-
-    '''def get_dic_data(self, host_info, sql):
-        data = {}
-        for row in self.__db_util.fetchall(host_info, sql):
-             data[row.get("Variable_name")] = row.get("Value")
-        return data'''
 
     def get_dic_data(self, cursor, sql):
         data = {}

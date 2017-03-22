@@ -2,6 +2,7 @@
 
 from monitor import host_info
 
+
 MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
 
 #一天的秒数

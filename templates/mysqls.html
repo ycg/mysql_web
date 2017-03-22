@@ -1,0 +1,47 @@
+{% extends "home.html" %}
+{% block content %}
+    {% if(mysql_infos != None) %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span12">
+                <table class="table table-condensed table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                Remark
+                            </th>
+                            <th>
+                                Port
+                            </th>
+                            <th>
+                                User
+                            </th>
+                            <th>
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for data in mysql_infos %}
+                        <tr>
+                            <td>
+                                {{ data.remark }}
+                            </td>
+                            <td>
+                                {{ data.port }}
+                            </td>
+                            <td>
+                                {{ data.user }}
+                            </td>
+                            <td class="text-center">
+                                <a href="mysqls/{{ data.key }}">Details</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

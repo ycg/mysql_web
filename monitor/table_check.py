@@ -68,8 +68,8 @@ def analysis_table_data(host_info):
           "select sum(data_size), sum(index_size), sum(rows), sum(auto_increment), sum(file_size), sum(diff) from mysql_web.mysql_data_size_log" \
           "where host_id={0} group by `date`;".format(host_info.key)
 
-
+'''
 MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
 MySQL_Host.key = 1
 aa = get_table_infos(MySQL_Host)
-insert_table_data(MySQL_Host, aa)
+insert_table_data(MySQL_Host, aa)'''

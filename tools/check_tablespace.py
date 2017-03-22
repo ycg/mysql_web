@@ -38,8 +38,8 @@ def get_table_infos(args):
         table_info = TableInfo()
         table_info.schema = row["table_schema"]
         table_info.t_name = row["table_name"]
-        table_info.data_size = row["DATA_LENGTH"]
-        table_info.index_size = row["INDEX_LENGTH"]
+        table_info.data_size = row["DATA_LENGTH"] if row["DATA_LENGTH"] else 0
+        table_info.index_size = row["INDEX_LENGTH"] if row["INDEX_LENGTH"] else 0
         table_info.total_size = long(table_info.data_size) + long(table_info.index_size)
         table_infos.append(table_info)
     cursor.close()
@@ -74,6 +74,29 @@ def get_print_string(args, table_info):
         return str_format.format(table_info.schema, table_info.t_name, table_info.value, table_info.data_size,
                                  table_info.index_size, table_info.total_size, table_info.file_size)
 
+'''
+def get_all_table_file_size(args):
+    table_size = {}
+    host_client = paramiko.SSHClient()
+    host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    host_client.connect(args.host, port=22, username="root")
+    connection = MySQLdb.connect(host=args.host, port=args.port, user=args.user, passwd=args.password)
+    cursor = connection.cursor(cursorclass = MySQLdb.cursors.DictCursor)
+    cursor.execute("show databases;")
+    for row in cursor.fetchall():
+        db_name = row["Database"]
+        if(db_name == "mysql" or db_name == "information_schema" or db_name == "performance_schema"):
+            return
+        shell = "ls -al {0}/{1}/ | grep -E '(ibd$)' | awk \'{2}\'".format(args.data_dir, db_name, "{print $5, $9}")
+        stdin, stdout, stderr = host_client.exec_command(shell)
+        result = stdout.readlines()
+        if(len(result) > 0 and len(stderr) <= 0):
+            for value in result:
+                list_tmp = value.replace("\n", "").split(" ")
+    cursor.close()
+    connection.close()
+    host_client.close()'''
+
 def check_table_space(args):
     list_tmp = []
     table_infos = get_table_infos(args)
@@ -96,6 +119,7 @@ def check_table_space(args):
     host_client.close()
     save_file(args, sorted(list_tmp, cmp=lambda x,y:cmp(x.diff,y.diff), reverse=True))
 
+print("start...")
 check_table_space(check_arguments())
 print("table space check is ok.")
 
