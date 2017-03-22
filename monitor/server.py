@@ -61,7 +61,7 @@ class MonitorServer(threading.Thread):
                                                     "'max_connections', 'table_open_cache', 'table_open_cache_instances');")
         host_info.mysql_data_dir = mysql_variables["datadir"]
         host_info.mysql_pid_file = mysql_variables["pid_file"]
-
+        host_info.uptime = int(mysql_status_new["Uptime"]) / 60 / 60 / 24
 
         #1.---------------------------------------------------------获取mysql global status--------------------------------------------------------
         status_info = self.__cache.get_status_infos(host_info.key)
@@ -148,7 +148,6 @@ class MonitorServer(threading.Thread):
         innodb_info = self.__cache.get_innodb_infos(host_info.key)
         innodb_info.trxs = 0
         innodb_info.current_row_locks = 0
-        #innodb_info.history_list_length = 0
         innodb_info.commit = status_info.commit
         innodb_info.rollback = status_info.rollback
         innodb_info.trx_count = status_info.trx_count
@@ -173,6 +172,7 @@ class MonitorServer(threading.Thread):
 
         #innodb redo log info
         innodb_info.innodb_log_writes = int(mysql_status_new["Innodb_log_writes"]) - int(mysql_status_old["Innodb_log_writes"])
+        innodb_info.innodb_log_write_requests = int(mysql_status_new["Innodb_log_write_requests"]) - int(mysql_status_old["Innodb_log_write_requests"])
         innodb_info.innodb_os_log_pending_fsyncs = int(mysql_status_new["Innodb_os_log_pending_fsyncs"])
         innodb_info.innodb_os_log_pending_writes = int(mysql_status_new["Innodb_os_log_pending_writes"])
         innodb_info.innodb_os_log_written = int(mysql_status_new["Innodb_os_log_written"]) - int(mysql_status_old["Innodb_os_log_written"])
@@ -189,6 +189,7 @@ class MonitorServer(threading.Thread):
         innodb_info.page_total_count = int(mysql_status_new["Innodb_buffer_pool_pages_total"])
         innodb_info.page_dirty_pct = round(float(innodb_info.page_dirty_count) / float(innodb_info.page_total_count) * 100, 2)
         innodb_info.page_flush_persecond = int(mysql_status_new["Innodb_buffer_pool_pages_flushed"]) - int(mysql_status_old["Innodb_buffer_pool_pages_flushed"])
+        innodb_info.page_usage = round((1 - float(innodb_info.page_free_count) / float(innodb_info.page_total_count)) * 100, 2)
 
         #buffer pool update read insert delete
         innodb_info.buffer_pool_reads = int(mysql_status_new["Innodb_buffer_pool_reads"])

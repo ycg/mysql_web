@@ -424,4 +424,244 @@
         </div>
     </div>
     {% endif %}
+
+    {% if(data_innodb != None) %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="col-md-8">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+
+                            </th>
+                            <th colspan="4" rowspan="1" class="text-center">
+                                Innodb_Rows
+                            </th>
+                            <th colspan="7" rowspan="1" class="text-center">
+                                Pages
+                            </th>
+                            <th colspan="3" rowspan="1" class="text-center">
+                                Log
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th>
+                                Read
+                            </th>
+                            <th>
+                                Insert
+                            </th>
+                            <th>
+                                Update
+                            </th>
+                            <th>
+                                Delete
+                            </th>
+                            <th>
+                                Total
+                            </th>
+                            <th>
+                                Data
+                            </th>
+                            <th>
+                                Dirty
+                            </th>
+                            <th>
+                                Free
+                            </th>
+                            <th>
+                                Usage
+                            </th>
+                            <th>
+                                Waits
+                            </th>
+                            <th>
+                                Flushs
+                            </th>
+                            <th>
+                                Writes
+                            </th>
+                            <th>
+                                Waits
+                            </th>
+                            <th>
+                                Requests
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status in data_innodb %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.rows_read }}
+                            </td>
+                            <td>
+                                {{ status.rows_inserted }}
+                            </td>
+                            <td>
+                                {{ status.rows_updated }}
+                            </td>
+                            <td>
+                                {{ status.rows_deleted }}
+                            </td>
+                            <td>
+                                {{ status.page_total_count }}
+                            </td>
+                            <td>
+                                {{ status.page_data_count }}
+                            </td>
+                            <td>
+                                {{ status.page_dirty_count }}
+                            </td>
+                            <td>
+                                {{ status.page_free_count }}
+                            </td>
+                            <td>
+                                {{ status.page_usage }}
+                            </td>
+                            <td>
+                                {{ status.innodb_buffer_pool_wait_free }}
+                            </td>
+                            <td>
+                                {{ status.page_flush_persecond }}
+                            </td>
+                            <td>
+                                {{ status.innodb_log_writes }}
+                            </td>
+                            <td>
+                                {{ status.innodb_log_waits }}
+                            </td>
+                            <td>
+                                {{ status.innodb_log_write_requests }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if(data_repl != None) %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="col-md-12">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+
+                            </th>
+                            <th colspan="2" rowspan="1" class="text-center">
+                                Slave Status
+                            </th>
+                            <th colspan="2" rowspan="1" class="text-center">
+                                Master Log
+                            </th>
+                            <th colspan="2" rowspan="1" class="text-center">
+                                Slave Log
+                            </th>
+                            <th colspan="2" rowspan="1" class="text-center">
+                                GTID
+                            </th>
+                            <th colspan="3" rowspan="1" class="text-center">
+                                Pos Delay
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th>
+                                IO
+                            </th>
+                            <th>
+                                SQL
+                            </th>
+                            <th>
+                                M_Log
+                            </th>
+                            <th>
+                                M_Log_Pos
+                            </th>
+                            <th>
+                                S_Log
+                            </th>
+                            <th>
+                                S_Log_Pos
+                            </th>
+                            <th>
+                                Retrieved_GTID
+                            </th>
+                            <th>
+                                Executed_GTID
+                            </th>
+                            <th>
+                                Delay_Pos
+                            </th>
+                            <th>
+                                Seconds_Behind
+                            </th>
+                            <th>
+                                Error_Msg
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status in data_repl %}
+                            {% if(status.io_status and status.is_slave == 1) %}
+                                <tr>
+                                    <td>
+                                        {{ status.host_info.remark }}
+                                    </td>
+                                    <td>
+                                        {{ status.io_status }}
+                                    </td>
+                                    <td>
+                                        {{ status.sql_status }}
+                                    </td>
+                                    <td>
+                                        {{ status.master_log_file }}
+                                    </td>
+                                    <td>
+                                        {{ status.master_log_pos }}
+                                    </td>
+                                    <td>
+                                        {{ status.slave_log_file }}
+                                    </td>
+                                    <td>
+                                        {{ status.slave_log_pos }}
+                                    </td>
+                                    <td>
+                                        {{ status.slave_retrieved_gtid_set }}
+                                    </td>
+                                    <td>
+                                        {{ status.slave_execute_gtid_set }}
+                                    </td>
+                                    <td>
+                                        {{ status.delay_pos_count }}
+                                    </td>
+                                    <td>
+                                        {{ status.seconds_Behind_Master }}
+                                    </td>
+                                    <td>
+                                        {{ status.error_message }}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

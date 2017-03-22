@@ -74,7 +74,9 @@ def load_host_info():
 
 @app.route("/test")
 def test_chart():
-    return render_template("monitor_new.html", data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status))
+    return render_template("monitor_new.html", data_status=monitor_server.get_cache_by_type(server.MonitorEnum.Status),
+                                               data_innodb=monitor_server.get_cache_by_type(server.MonitorEnum.Innodb),
+                                               data_repl=monitor_server.get_cache_by_type(server.MonitorEnum.Replication))
 
 @app.route("/home")
 def home():

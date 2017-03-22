@@ -11,6 +11,15 @@
                                 Remark
                             </th>
                             <th>
+                                Uptime(Day)
+                            </th>
+                            <th>
+                                Version
+                            </th>
+                            <th>
+                                Branch
+                            </th>
+                            <th>
                                 Port
                             </th>
                             <th>
@@ -26,6 +35,15 @@
                         <tr>
                             <td>
                                 {{ data.remark }}
+                            </td>
+                            <td>
+                                {{ data.uptime }}
+                            </td>
+                            <td>
+                                {{ data.version }}
+                            </td>
+                            <td>
+                                {{ data.branch.name }}
                             </td>
                             <td>
                                 {{ data.port }}
