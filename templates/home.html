@@ -4,11 +4,41 @@
     <meta charset="UTF-8">
     <title>MySQL Web</title>
     <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
+    <script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>
     <script language="JavaScript">
+        var timer = ""
+        var my_url = "/mysql"
+
         function myrefresh(){
-            window.location.reload();
+            $(document).ready(function(){
+                htmlobj = $.ajax({url:my_url, async:false});
+                $("#data").html(htmlobj.responseText);
+            });
         }
-        setTimeout('myrefresh()', 3000);
+
+        function stop(parameter){
+            my_url = parameter
+            myrefresh()
+            stop_timer()
+        }
+
+        function start(parameter){
+            my_url = parameter
+            myrefresh()
+            start_timer()
+        }
+
+        function start_timer(){
+            stop_timer()
+            timer = setInterval(myrefresh, 3000)
+        }
+
+        function stop_timer(){
+            clearInterval(timer)
+        }
+
+        myrefresh()
+        start_timer()
     </script>
 </head>
 <body>
@@ -27,16 +57,22 @@
         <div class="row clearfix">
             <div class="col-md-2">
                 <div class="list-group">
-                    <a href="/mysqls" class="list-group-item"><span class="glyphicon glyphicon-cog">&nbsp;MySQL</span></a>
+                    <!--<a href="/mysqls" class="list-group-item"><span class="glyphicon glyphicon-cog">&nbsp;MySQL</span></a>
                     <a href="/status" class="list-group-item"><span class="glyphicon glyphicon-cog">&nbsp;Status</span></a>
                     <a href="/innodb" class="list-group-item"><span class="glyphicon glyphicon-file">&nbsp;INNODB</span></a>
                     <a href="/replication" class="list-group-item"><span class="glyphicon glyphicon-list-alt">&nbsp;Replication</span></a>
                     <a href="/host" class="list-group-item"><span class="glyphicon glyphicon-list-alt">&nbsp;Host</span></a>
                     <a href="/all" class="list-group-item"><span class="glyphicon glyphicon-align-right">&nbsp;ALL</span></a>
-                    <a href="/charts" class="list-group-item"><span class="glyphicon glyphicon-align-right">&nbsp;Charts</span></a>
+                    <a href="/charts" class="list-group-item"><span class="glyphicon glyphicon-align-right">&nbsp;Charts</span></a>-->
+
+                    <a href="javascript:void(0)" class="list-group-item" onclick=start("/mysql")><span class="glyphicon glyphicon-cog">&nbsp;MySQL</span></a>
+                    <a href="javascript:void(0)" class="list-group-item" onclick=start("/status")><span class="glyphicon glyphicon-cog">&nbsp;Status</span></a>
+                    <a href="javascript:void(0)" class="list-group-item" onclick=start("/innodb")><span class="glyphicon glyphicon-file">&nbsp;INNODB</span></a>
+                    <a href="javascript:void(0)" class="list-group-item" onclick=start("/replication")><span class="glyphicon glyphicon-list-alt">&nbsp;Replication</span></a>
+                    <a href="javascript:void(0)" class="list-group-item" onclick=stop("/slowlog")><span class="glyphicon glyphicon-list-alt">&nbsp;SlowLog</span></a>
                 </div>
             </div>
-            <div class="col-md-10">
+            <div class="col-md-10" id="data">
                 {% block content %} {% endblock %}
             </div>
         </div>

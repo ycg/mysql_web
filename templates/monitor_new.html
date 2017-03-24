@@ -8,8 +8,14 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th colspan="10" class="text-center">
+                            <th>
+
+                            </th>
+                            <th colspan="7" class="text-center">
                                 QPS TPS
+                            </th>
+                            <th colspan="2" class="text-center">
+                                Net
                             </th>
                         </tr>
                         <tr>
@@ -38,10 +44,10 @@
                                 Trxs
                             </th>
                             <th>
-                                Rec_B
+                                Receive
                             </th>
                             <th>
-                                Send_B
+                                Send
                             </th>
                         </tr>
                     </thead>
@@ -193,7 +199,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                      {% for status in data_status %}
+                        {% for status in data_status %}
                         <tr>
                             <td>
                                 {{ status.host_info.remark }}
@@ -428,7 +434,7 @@
     {% if(data_innodb != None) %}
     <div class="container-fluid">
         <div class="row-fluid">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
@@ -444,6 +450,10 @@
                             <th colspan="3" rowspan="1" class="text-center">
                                 Log
                             </th>
+                            <th colspan="5" rowspan="1" class="text-center">
+                                Row Lock
+                            </th>
+                            <th></th>
                         </tr>
                         <tr>
                             <th>
@@ -490,6 +500,24 @@
                             </th>
                             <th>
                                 Requests
+                            </th>
+                            <th>
+                                Locks
+                            </th>
+                            <th>
+                                Waits
+                            </th>
+                            <th>
+                                Times
+                            </th>
+                            <th>
+                                Avg
+                            </th>
+                            <th>
+                                Max
+                            </th>
+                            <th>
+
                             </th>
                         </tr>
                     </thead>
@@ -540,6 +568,24 @@
                             </td>
                             <td>
                                 {{ status.innodb_log_write_requests }}
+                            </td>
+                            <td>
+                                {{ status.current_row_locks }}
+                            </td>
+                            <td>
+                                {{ status.innodb_row_lock_waits }}
+                            </td>
+                            <td>
+                                {{ status.innodb_row_lock_time }}
+                            </td>
+                            <td>
+                                {{ status.innodb_row_lock_time_avg }}
+                            </td>
+                            <td>
+                                {{ status.innodb_row_lock_time_max }}
+                            </td>
+                             <td class="text-center">
+                                <a href="innodb/{{ status.host_info.key }}">Innodb Status</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -663,5 +709,290 @@
             </div>
         </div>
     </div>
+    {% endif %}
+
+    {% if(data_host != None) %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="col-md-12">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+
+                            </th>
+                            <th colspan="3" rowspan="1" class="text-center">
+                                Load
+                            </th>
+                            <th colspan="3" rowspan="1" class="text-center">
+                                MySQL
+                            </th>
+                            <th colspan="2" rowspan="1" class="text-center">
+                                Disk
+                            </th>
+                            <th colspan="4" rowspan="1" class="text-center">
+                                Memory
+                            </th>
+                            <th colspan="2" rowspan="1" class="text-center">
+                                Net
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                Host
+                            </th>
+                            <th>
+                                CPU_1
+                            </th>
+                            <th>
+                                CPU_5
+                            </th>
+                            <th>
+                                CPU_15
+                            </th>
+                            <th>
+                                CPU
+                            </th>
+                            <th>
+                                Memory
+                            </th>
+                            <th>
+                                Size
+                            </th>
+                            <th>
+                                Total
+                            </th>
+                            <th>
+                                Use
+                            </th>
+                            <th>
+                                Total
+                            </th>
+                            <th>
+                                Free
+                            </th>
+                            <th>
+                                SWAP_T
+                            </th>
+                            <th>
+                                SWAP_F
+                            </th>
+                            <th>
+                                Receive
+                            </th>
+                            <th>
+                                Send
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status in data_host %}
+                            <tr>
+                                <td>
+                                    {{ status.host_info.remark }}
+                                </td>
+                                <td>
+                                    {{ status.cpu_1 }}
+                                </td>
+                                <td>
+                                    {{ status.cpu_5 }}
+                                </td>
+                                <td>
+                                    {{ status.cpu_15 }}
+                                </td>
+                                <td>
+                                    {{ status.mysql_cpu }}
+                                </td>
+                                <td>
+                                    {{ status.mysql_memory }}
+                                </td>
+                                <td>
+                                    {{ status.mysql_data_size }}
+                                </td>
+                                <td>
+                                    {{ status.total_disk_value }}
+                                </td>
+                                <td>
+                                    {{ status.disk_value }}
+                                </td>
+                                <td>
+                                    {{ status.memory_total }}
+                                </td>
+                                <td>
+                                    {{ status.memory_free }}
+                                </td>
+                                <td>
+                                    {{ status.swap_total }}
+                                </td>
+                                <td>
+                                    {{ status.swap_free }}
+                                </td>
+                                <td>
+                                    {{ status.net_receive_byte }}
+                                </td>
+                                <td>
+                                    {{ status.net_send_byte }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if(data_engine_innodb != None) %}
+    <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span12">
+                    <table class="table table-condensed table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Buffer_Name
+                                </th>
+                                <th>
+                                    Total_P
+                                </th>
+                                <th>
+                                    Free_P
+                                </th>
+                                <th>
+                                    LRU_P
+                                </th>
+                                <th>
+                                    Old_P
+                                </th>
+                                <th>
+                                    Dirty_P
+                                </th>
+                                <th>
+                                    Pending_R
+                                </th>
+                                <th>
+                                    Read_Per
+                                </th>
+                                <th>
+                                    Create_Per
+                                </th>
+                                <th>
+                                    Write_Per
+                                </th>
+                                <th>
+                                    Hit
+                                </th>
+                                <th>
+                                    Unzip_LRU
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for info in data_engine_innodb.buffer_pool_infos.values() %}
+                            <tr>
+                                <td>
+                                    {{ info.name }}
+                                </td>
+                                <td>
+                                    {{ info.total_pages }}
+                                </td>
+                                <td >
+                                    {{ info.free_pages }}
+                                </td>
+                                <td >
+                                    {{ info.lru_pages }}
+                                </td>
+                                <td>
+                                    {{ info.old_pages }}
+                                </td>
+                                <td>
+                                    {{ info.dirty_pages }}
+                                </td>
+                                <td>
+                                    {{ info.pending_reads }}
+                                </td>
+                                <td>
+                                    {{ info.reads_per }}
+                                </td>
+                                <td>
+                                    {{ info.creates_per }}
+                                </td>
+                                <td>
+                                    {{ info.writes_per }}
+                                </td>
+                                <td>
+                                    {{ info.buffer_pool_hit }}
+                                </td>
+                                <td>
+                                    {{ info.unzip_lur }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="span12">
+                    <table class="table table-condensed table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Log_LSN
+                                </th>
+                                <th>
+                                    Log_Flush_LSN
+                                </th>
+                                <th>
+                                    Log_Flush_Diff
+                                </th>
+                                <th>
+                                    Page_Flush_LSN
+                                </th>
+                                <th>
+                                    Page_Flush_Diff
+                                </th>
+                                <th>
+                                    Checkpoint_LSN
+                                </th>
+                                <th>
+                                    Checkpoint_Diff
+                                </th>
+                                <th>
+                                    Undo_History_List_Len
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    {{ data_engine_innodb.log_lsn }}
+                                </td>
+                                <td>
+                                    {{ data_engine_innodb.log_flush_lsn }}
+                                </td>
+                                <td>
+                                    {{ data_engine_innodb.log_flush_diff }}
+                                </td>
+                                <td >
+                                    {{ data_engine_innodb.page_flush_lsn }}
+                                </td>
+                                <td>
+                                    {{ data_engine_innodb.page_flush_diff }}
+                                </td>
+                                <td >
+                                    {{ data_engine_innodb.checkpoint_lsn }}
+                                </td>
+                                <td>
+                                    {{ data_engine_innodb.checkpoint_diff }}
+                                </td>
+                                <td>
+                                    {{ data_engine_innodb.undo_history_list_len }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     {% endif %}
 {% endblock %}

@@ -3,10 +3,11 @@
 import time, threadpool, cache, threading, db_util, enum, settings, paramiko, collections, base_class
 
 class MonitorEnum(enum.Enum):
-    Host = 3
-    Status = 0
-    Innodb = 1
-    Replication = 2
+    mysql = 4
+    host = 3
+    status = 0
+    innodb = 1
+    replication = 2
 
 class MonitorServer(threading.Thread):
     __times = 1
@@ -147,11 +148,11 @@ class MonitorServer(threading.Thread):
         #2.---------------------------------------------------------获取innodb的相关数据-------------------------------------------------------------------
         innodb_info = self.__cache.get_innodb_infos(host_info.key)
         innodb_info.trxs = 0
-        innodb_info.current_row_locks = 0
         innodb_info.commit = status_info.commit
         innodb_info.rollback = status_info.rollback
         innodb_info.trx_count = status_info.trx_count
 
+        #unod list length
         if(mysql_status_new.get("Innodb_history_list_length") != None):
             #percona
             innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
@@ -159,16 +160,13 @@ class MonitorServer(threading.Thread):
             #mysql 没有这个状态值
             innodb_info.history_list_length = 0
 
-        '''
-        if(mysql_status_new.get("Innodb_history_list_length") != None):
-            #percona
-            innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
+        #row locks
         if(mysql_status_new.get("Innodb_current_row_locks") != None):
             #percona
             innodb_info.current_row_locks = mysql_status_new["Innodb_current_row_locks"]
         elif(mysql_status_new.get("Innodb_row_lock_current_waits") != None):
             #mysql
-            innodb_info.current_row_locks = mysql_status_new["Innodb_row_lock_current_waits"]'''
+            innodb_info.current_row_locks = mysql_status_new["Innodb_row_lock_current_waits"]
 
         #innodb redo log info
         innodb_info.innodb_log_writes = int(mysql_status_new["Innodb_log_writes"]) - int(mysql_status_old["Innodb_log_writes"])
@@ -181,6 +179,9 @@ class MonitorServer(threading.Thread):
         innodb_info.innodb_log_waits = int(mysql_status_new["Innodb_log_waits"])
         innodb_info.innodb_buffer_pool_wait_free = int(mysql_status_new["Innodb_buffer_pool_wait_free"])
         innodb_info.innodb_row_lock_waits = int(mysql_status_new["Innodb_row_lock_waits"]) - int(mysql_status_old["Innodb_row_lock_waits"])
+        innodb_info.innodb_row_lock_time = int(mysql_status_new["Innodb_row_lock_time"]) - int(mysql_status_old["Innodb_row_lock_time"])
+        innodb_info.innodb_row_lock_time_avg = int(mysql_status_new["Innodb_row_lock_time_avg"])
+        innodb_info.innodb_row_lock_time_max = int(mysql_status_new["Innodb_row_lock_time_max"])
 
         #buffer pool page
         innodb_info.page_data_count = int(mysql_status_new["Innodb_buffer_pool_pages_data"])
