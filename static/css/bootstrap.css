@@ -27,6 +27,11 @@ section,
 summary {
   display: block;
 }
+
+.my_bold{
+  font-weight: bold;
+}
+
 audio,
 canvas,
 progress,

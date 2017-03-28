@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#yum install openssl-devel  python-devel -y
+#yum install openssl-devel  python-devel libffi-devel -y
 #pip install flask threadpool pymysql DBUtils paramiko
 
 import enum
@@ -121,7 +121,7 @@ def get_innodb_data():
 
 @app.route("/innodb/<int:id>")
 def get_innodb_data_by_id(id):
-    return get_monitor_data(data_innodb=convert_object_to_list(mysql_cache.get_innodb_infos(id)))
+    return get_monitor_data(data_innodb=convert_object_to_list(mysql_cache.get_innodb_infos(id)), data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(id))
 
 @app.route("/replication")
 def get_replication_data():
@@ -148,6 +148,10 @@ def get_slow_logs():
 @app.route("/slowlog/<checksum>")
 def get_slow_log_detail(checksum):
     return render_template("slow_log.html", slow_list = None, slow_low_info=slow_log.get_slow_log_detail(checksum))
+
+@app.route("/os")
+def get_os_infos():
+    return get_monitor_data(data_host=mysql_cache.get_all_linux_infos())
 
 @app.route("/home")
 def home():

@@ -2,6 +2,7 @@ create database mysql_web;
 
 use mysql_web;
 
+#mysql账户信息表
 drop table host_infos;
 create table host_infos
 (
@@ -111,3 +112,14 @@ CREATE TABLE mysql_data_size_log
     `date` DATE NOT NULL,
     created_time TIMESTAMP NOT NULL DEFAULT NOW()
 ) COMMENT = 'mysql data size log';
+
+#查看历史mysql异常记录的数据信息
+DROP TABLE mysql_exception_log;
+CREATE TABLE mysql_exception_log
+(
+    id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    host_id MEDIUMINT NOT NULL,
+    exception_type tinyint unsigned not null,
+    log_text TEXT NOT NULL DEFAULT '',
+    created_time TIMESTAMP NOT NULL DEFAULT NOW()
+) COMMENT = 'mysql exception log'

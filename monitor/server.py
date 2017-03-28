@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import time, threadpool, cache, threading, db_util, enum, settings, paramiko, collections, base_class
+import time, threadpool, cache, threading, db_util, enum, settings, paramiko, collections, base_class, mysql_branch
 
 class MonitorEnum(enum.Enum):
     mysql = 4
@@ -38,10 +38,10 @@ class MonitorServer(threading.Thread):
             if(self.__times % settings.LINUX_UPDATE_INTERVAL == 0):
                 pass
                 #self.join_thread_pool(self.monitor_host_status)
-            if(self.__times % settings.TABLE_CHECK_INTERVAL == 0):
-                pass
-            if(self.__times % settings.INNODB_UPDATE_INTERVAL == 0):
-                self.join_thread_pool(self.read_innodb_status)
+            #if(self.__times % settings.TABLE_CHECK_INTERVAL == 0):
+            #    pass
+            #if(self.__times % settings.INNODB_UPDATE_INTERVAL == 0):
+            #    self.join_thread_pool(self.read_innodb_status)
             time.sleep(1)
             self.__times = self.__times + 1
 
@@ -52,7 +52,6 @@ class MonitorServer(threading.Thread):
         self.__thread_pool.poll()
 
     def get_mysql_status(self, host_info):
-        #aa = time.time()
         connection = self.__db_util.get_mysql_connection(host_info)
         cursor = connection.cursor()
         mysql_status_old = self.get_dic_data(cursor, "show global status;")
@@ -83,9 +82,6 @@ class MonitorServer(threading.Thread):
         if(mysql_status_new.get("Innodb_max_trx_id") != None):
             #percona
             status_info.trx_count = int(mysql_status_new["Innodb_max_trx_id"]) - int(mysql_status_old["Innodb_max_trx_id"])
-        else:
-            #mysql show engine innodb status
-            status_info.trx_count = 0
 
         #thread and connection
         status_info.connections = int(mysql_status_new["Connections"])
@@ -147,7 +143,6 @@ class MonitorServer(threading.Thread):
 
         #2.---------------------------------------------------------获取innodb的相关数据-------------------------------------------------------------------
         innodb_info = self.__cache.get_innodb_infos(host_info.key)
-        innodb_info.trxs = 0
         innodb_info.commit = status_info.commit
         innodb_info.rollback = status_info.rollback
         innodb_info.trx_count = status_info.trx_count
@@ -156,9 +151,8 @@ class MonitorServer(threading.Thread):
         if(mysql_status_new.get("Innodb_history_list_length") != None):
             #percona
             innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
-        else:
-            #mysql 没有这个状态值
-            innodb_info.history_list_length = 0
+        #mysql 没有这个状态值
+        #innodb_info.history_list_length = 0
 
         #row locks
         if(mysql_status_new.get("Innodb_current_row_locks") != None):
@@ -192,15 +186,27 @@ class MonitorServer(threading.Thread):
         innodb_info.page_flush_persecond = int(mysql_status_new["Innodb_buffer_pool_pages_flushed"]) - int(mysql_status_old["Innodb_buffer_pool_pages_flushed"])
         innodb_info.page_usage = round((1 - float(innodb_info.page_free_count) / float(innodb_info.page_total_count)) * 100, 2)
 
-        #buffer pool update read insert delete
-        innodb_info.buffer_pool_reads = int(mysql_status_new["Innodb_buffer_pool_reads"])
-        innodb_info.buffer_pool_read_requests = int(mysql_status_new["Innodb_buffer_pool_read_requests"])
-        innodb_info.buffer_pool_hit = (1 - innodb_info.buffer_pool_reads / innodb_info.buffer_pool_read_requests) * 100
+        #buffer pool rows
         innodb_info.rows_read = int(mysql_status_new["Innodb_rows_read"]) - int(mysql_status_old["Innodb_rows_read"])
         innodb_info.rows_updated = int(mysql_status_new["Innodb_rows_updated"]) - int(mysql_status_old["Innodb_rows_updated"])
         innodb_info.rows_deleted = int(mysql_status_new["Innodb_rows_deleted"]) - int(mysql_status_old["Innodb_rows_deleted"])
         innodb_info.rows_inserted = int(mysql_status_new["Innodb_rows_inserted"]) - int(mysql_status_old["Innodb_rows_inserted"])
+
+        #buffer pool
+        innodb_info.buffer_pool_hit = (1 - int(mysql_status_new["Innodb_buffer_pool_reads"]) / (int(mysql_status_new["Innodb_buffer_pool_read_requests"]) + int(mysql_status_new["Innodb_buffer_pool_reads"]))) * 100
         innodb_info.buffer_pool_write_requests = int(mysql_status_new["Innodb_buffer_pool_write_requests"]) - int(mysql_status_old["Innodb_buffer_pool_write_requests"])
+        innodb_info.buffer_pool_reads = int(mysql_status_new["Innodb_buffer_pool_reads"]) - int(mysql_status_old["Innodb_buffer_pool_reads"])
+        innodb_info.buffer_pool_read_requests = int(mysql_status_new["Innodb_buffer_pool_read_requests"]) - int(mysql_status_old["Innodb_buffer_pool_read_requests"])
+
+        #innodb data
+        innodb_info.innodb_data_read = int(mysql_status_new["Innodb_data_read"]) - int(mysql_status_old["Innodb_data_read"])
+        innodb_info.innodb_data_reads = int(mysql_status_new["Innodb_data_reads"]) - int(mysql_status_old["Innodb_data_reads"])
+        innodb_info.innodb_data_writes = int(mysql_status_new["Innodb_data_writes"]) - int(mysql_status_old["Innodb_data_writes"])
+        innodb_info.innodb_data_written = int(mysql_status_new["Innodb_data_written"]) - int(mysql_status_old["Innodb_data_written"])
+        innodb_info.innodb_data_fsyncs = int(mysql_status_new["Innodb_data_fsyncs"]) - int(mysql_status_old["Innodb_data_fsyncs"])
+        innodb_info.innodb_data_pending_fsyncs = int(mysql_status_new["Innodb_data_pending_fsyncs"])
+        innodb_info.innodb_data_pending_reads = int(mysql_status_new["Innodb_data_pending_reads"])
+        innodb_info.innodb_data_pending_writes = int(mysql_status_new["Innodb_data_pending_writes"])
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
@@ -224,10 +230,8 @@ class MonitorServer(threading.Thread):
                 repl_info.is_slave = 0
 
         #self.insert_status_log(status_info)
-        #bb2 = time.time()
-        #if(host_info.id == 1):
-        #    print("code", bb2 - aa - 1)
         self.__db_util.close(connection, cursor)
+        self.read_innodb_status(host_info)
 
     def get_data_length(self, data_length):
         value = float(1024)
@@ -271,7 +275,7 @@ class MonitorServer(threading.Thread):
         try:
             host_client = paramiko.SSHClient()
             host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            host_client.connect(host_info.ip, port=22, username="root")
+            host_client.connect(host_info.host, port=22, username="root")
 
             #监测CPU负载
             self.monitor_host_for_cpu(host_client, linux_info)
@@ -310,8 +314,9 @@ class MonitorServer(threading.Thread):
         linux_info.net_receive_old = linux_info.net_receive_new
         linux_info.net_send_new = net_send_byte
         linux_info.net_receive_new = net_receive_byte
-        linux_info.net_send_byte = linux_info.net_send_new - linux_info.net_send_old
-        linux_info.net_receive_byte = linux_info.net_receive_new - linux_info.net_receive_old
+
+        linux_info.net_send_byte = self.get_data_length(linux_info.net_send_new - linux_info.net_send_old)
+        linux_info.net_receive_byte = self.get_data_length(linux_info.net_receive_new - linux_info.net_receive_old)
 
     def monitor_host_for_disk(self, host_client, linux_info):
         id_tmp = 0
@@ -464,16 +469,26 @@ class MonitorServer(threading.Thread):
             info_tmp.latest_deadlock = info_tmp.latest_deadlock + line + "\n"
 
     def get_transactions_info(self, host_info, values):
-        #status_info = self.__cache.get_status_infos(host_info.key)
+        status_info = self.__cache.get_status_infos(host_info.key)
+        innodb_info = self.__cache.get_innodb_infos(host_info.key)
         info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
         for line in values:
             line_split = line.split(" ")
             split_value = line_split[len(line_split) - 1].replace(",", "")
             if(line.find("History list length") >= 0):
-                info_tmp.undo_history_list_len = split_value
+                #官方status也没有undo list值
+                if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
+                    info_tmp.undo_history_list_len = int(split_value)
+                    innodb_info.history_list_length = int(split_value)
             elif(line.find("Trx id counter") >= 0):
-                pass
-                #if(status_info)
+                #因为官方mysql版本没有Innodb_max_trx_id状态值
+                #需要去show engine innodb status去进行计算
+                if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
+                    status_info.old_trx_count = status_info.new_trx_count
+                    status_info.new_trx_count = int(split_value)
+                    status_info.trx_count = (status_info.new_trx_count - status_info.old_trx_count) / settings.INNODB_UPDATE_INTERVAL
+                    innodb_info.trx_count = status_info.trx_count
+                    info_tmp.trx_count = status_info.trx_count
 
     def get_innodb_status_infos(self, host_info):
         flag_list = []
