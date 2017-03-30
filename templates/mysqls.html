@@ -1,65 +1,62 @@
-{% extends "home.html" %}
-{% block content %}
-    {% if(mysql_infos != None) %}
-    <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span12">
-                <table class="table table-condensed table-hover table-bordered">
-                    <thead>
-                        <tr>
-                            <th>
-                                Remark
-                            </th>
-                            <th>
-                                Uptime(Day)
-                            </th>
-                            <th>
-                                Version
-                            </th>
-                            <th>
-                                Branch
-                            </th>
-                            <th>
-                                Port
-                            </th>
-                            <th>
-                                User
-                            </th>
-                            <th>
+{% if(mysql_infos != None) %}
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <table class="table table-condensed table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            Remark
+                        </th>
+                        <th>
+                            Uptime(Day)
+                        </th>
+                        <th>
+                            Version
+                        </th>
+                        <th>
+                            Branch
+                        </th>
+                        <th>
+                            Port
+                        </th>
+                        <th>
+                            User
+                        </th>
+                        <th>
 
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for data in mysql_infos %}
-                        <tr>
-                            <td>
-                                {{ data.remark }}
-                            </td>
-                            <td>
-                                {{ data.uptime }}
-                            </td>
-                            <td>
-                                {{ data.version }}
-                            </td>
-                            <td>
-                                {{ data.branch.name }}
-                            </td>
-                            <td>
-                                {{ data.port }}
-                            </td>
-                            <td>
-                                {{ data.user }}
-                            </td>
-                            <td class="text-center">
-                                <a href="mysqls/{{ data.key }}">Details</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for data in mysql_infos %}
+                    <tr>
+                        <td>
+                            {{ data.remark }}
+                        </td>
+                        <td>
+                            {{ data.uptime }}
+                        </td>
+                        <td>
+                            {{ data.version }}
+                        </td>
+                        <td>
+                            {{ data.branch.name }}
+                        </td>
+                        <td>
+                            {{ data.port }}
+                        </td>
+                        <td>
+                            {{ data.user }}
+                        </td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" onclick=start("/mysql/{{ data.key }}")>Details</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-    {% endif %}
-{% endblock %}
+</div>
+{% endif %}

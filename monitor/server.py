@@ -94,6 +94,11 @@ class MonitorServer(threading.Thread):
         status_info.aborted_clients = int(mysql_status_new["Aborted_clients"]) - int(mysql_status_old["Aborted_clients"])
         status_info.aborted_connects = int(mysql_status_new["Aborted_connects"]) - int(mysql_status_old["Aborted_connects"])
 
+        #监控time>1的线程数量
+        result = self.__db_util.fetchone(host_info, "select count(1) as t_count from information_schema.processlist where state <> '' and length(info) > 0 and time > 1;")
+        if(len(result) > 0):
+            status_info.thread_waits_count = int(result["t_count"])
+
         #binlog cache
         status_info.binlog_cache_use = int(mysql_status_new["Binlog_cache_use"])
         status_info.binlog_cache_disk_use = int(mysql_status_new["Binlog_cache_disk_use"])

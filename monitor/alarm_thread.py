@@ -54,3 +54,41 @@ class AlarmThread(threading.Thread):
             sql = "SELECT concat(ID, '\t', user, '\t', host, '\t', db, '\t', time, '\t', state, '\t', info, '\n') as process_data " \
                   "FROM information_schema.processlist where length(info) > 0"
             db_util.DBUtil.fetchall(sql)
+
+class ExceptionType(enum.Enum):
+    Repl_Delay = 1
+    Repl_Fail = 2
+
+class ExceptionLevel(enum.Enum):
+    Prompt = 1
+    General = 2
+    Serious = 3
+    Fatal = 4
+
+#实现告警日志记录
+#根据mysql各种状态值进行计算
+class AlarmLog(threading.Thread):
+    alarm_list = []
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.setDaemon(True)
+
+    def run(self):
+        while(True):
+            time.sleep(settings.UPDATE_INTERVAL)
+
+    def check_os_status(self):
+        pass
+
+    def check_mysql_status(self):
+        pass
+
+    def check_innodb_status(self):
+        pass
+
+    def check_replication_status(self):
+        pass
+
+    def insert_alarm_log(self, sql):
+        pass

@@ -119,8 +119,9 @@ def check_table_space(args):
     host_client.close()
     save_file(args, sorted(list_tmp, cmp=lambda x,y:cmp(x.diff,y.diff), reverse=True))
 
-print("start...")
-check_table_space(check_arguments())
-print("table space check is ok.")
+if(__name__ == "__main__"):
+    print("start...")
+    check_table_space(check_arguments())
+    print("table space check is ok.")
 
 

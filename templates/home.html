@@ -10,10 +10,14 @@
         var my_url = "/mysql"
 
         function myrefresh(){
-            $(document).ready(function(){
+            /*$(document).ready(function(){
                 htmlobj = $.ajax({url:my_url, async:false});
                 $("#data").html(htmlobj.responseText);
-            });
+            });*/
+
+            $.get(my_url, "", function(data){
+                $("#data").html(data);
+            })
         }
 
         function stop(parameter, idName){
@@ -32,7 +36,7 @@
 
         function start_timer(){
             stop_timer()
-            timer = setInterval(myrefresh, 3000)
+            timer = setInterval(myrefresh, {{ interval }})
         }
 
         function stop_timer(){
@@ -72,23 +76,6 @@
         <div class="row clearfix">
             <div class="col-md-2 row">
                 <div id="myTab" class="list-group">
-                    <!--<a href="/mysqls" class="list-group-item"><span class="glyphicon glyphicon-cog">&nbsp;MySQL</span></a>
-                    <a href="/status" class="list-group-item"><span class="glyphicon glyphicon-cog">&nbsp;Status</span></a>
-                    <a href="/innodb" class="list-group-item"><span class="glyphicon glyphicon-file">&nbsp;INNODB</span></a>
-                    <a href="/replication" class="list-group-item"><span class="glyphicon glyphicon-list-alt">&nbsp;Replication</span></a>
-                    <a href="/host" class="list-group-item"><span class="glyphicon glyphicon-list-alt">&nbsp;Host</span></a>
-                    <a href="/all" class="list-group-item"><span class="glyphicon glyphicon-align-right">&nbsp;ALL</span></a>
-                    <a href="/charts" class="list-group-item"><span class="glyphicon glyphicon-align-right">&nbsp;Charts</span></a>-->
-
-                    <!--<ul class="nav nav-tabs">
-                      <li><a href="javascript:void(0)" data-toggle="tab" class="active" onclick=start("/mysql")> MySQL</a></li>
-                      <li><a href="javascript:void(0)" data-toggle="tab" onclick=start("/status")> Status</a></li>
-                      <li><a href="javascript:void(0)" data-toggle="tab" onclick=start("/innodb")> INNODB</a></li>
-                      <li><a href="javascript:void(0)" data-toggle="tab" onclick=start("/replication")></i> Replication</a></li>
-                      <li><a href="javascript:void(0)" data-toggle="tab" onclick=stop("/slowlog")> SlowLog</a></li>
-                    </ul>-->
-
-
                     <a href="javascript:void(0)" id="mysql" class="list-group-item active" onclick=start("/mysql","mysql")><span class="glyphicon glyphicon-home"> MySQL</span></a>
                     <a href="javascript:void(0)" id="status" class="list-group-item" onclick=start("/status","status")><span class="glyphicon glyphicon-cog"> Status</span></a>
                     <a href="javascript:void(0)" id="innodb" class="list-group-item" onclick=start("/innodb","innodb")><span class="glyphicon glyphicon-file"> INNODB</span></a>

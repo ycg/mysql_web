@@ -308,4 +308,5 @@ interactive_timeout = 300
 connect_timeout = 20
 """)
 
-mysql_install(check_arguments())
+if(__name__ == "__main__"):
+    mysql_install(check_arguments())

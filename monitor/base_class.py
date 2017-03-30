@@ -5,6 +5,7 @@ class BaseClass(object):
     history_list_length = 0
     net_send_new = 0
     net_receive_new = 0
+    thread_waits_count = 0
 
     def __init__(self, host_info):
         self.host_info = host_info

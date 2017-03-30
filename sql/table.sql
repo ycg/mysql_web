@@ -114,12 +114,19 @@ CREATE TABLE mysql_data_size_log
 ) COMMENT = 'mysql data size log';
 
 #查看历史mysql异常记录的数据信息
+DROP TABLE mysql_exception;
+CREATE TABLE mysql_exception
+(
+    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    host_id MEDIUMINT NOT NULL,
+    exception_type tinyint unsigned not null,
+    level TINYINT UNSIGNED NOT NULL,
+    created_time TIMESTAMP NOT NULL DEFAULT NOW()
+) COMMENT = 'mysql exception';
+
 DROP TABLE mysql_exception_log;
 CREATE TABLE mysql_exception_log
 (
-    id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    host_id MEDIUMINT NOT NULL,
-    exception_type tinyint unsigned not null,
-    log_text TEXT NOT NULL DEFAULT '',
-    created_time TIMESTAMP NOT NULL DEFAULT NOW()
-) COMMENT = 'mysql exception log'
+    id INT UNSIGNED NOT NULL PRIMARY KEY,
+    log_text TEXT NOT NULL DEFAULT ''
+) COMMENT = 'mysql exception log';
