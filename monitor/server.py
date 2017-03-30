@@ -38,6 +38,7 @@ class MonitorServer(threading.Thread):
             if(self.__times % settings.LINUX_UPDATE_INTERVAL == 0):
                 pass
                 #self.join_thread_pool(self.monitor_host_status)
+                #self.join_thread_pool(self.monitor_host_for_cpu_and_io)
             #if(self.__times % settings.TABLE_CHECK_INTERVAL == 0):
             #    pass
             #if(self.__times % settings.INNODB_UPDATE_INTERVAL == 0):
@@ -283,7 +284,7 @@ class MonitorServer(threading.Thread):
             host_client.connect(host_info.host, port=22, username="root")
 
             #监测CPU负载
-            self.monitor_host_for_cpu(host_client, linux_info)
+            self.monitor_host_for_cpu_load(host_client, linux_info)
             #监测网卡流量
             self.monitor_host_for_net(host_client, linux_info)
             #监测硬盘空间
@@ -296,7 +297,67 @@ class MonitorServer(threading.Thread):
             if (host_client != None):
                 host_client.close()
 
-    def monitor_host_for_cpu(self, host_client, linux_info):
+    def monitor_host_for_cpu_and_io(self, host_info):
+        host_client = None
+        linux_info = self.__cache.get_linux_info(host_info.key)
+        try:
+            host_client = paramiko.SSHClient()
+            host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            host_client.connect(host_info.host, port=22, username="root")
+
+            #获取cpu和io数据的标记位
+            stdin, stdout, stderr = host_client.exec_command("iostat 1 2")
+            result_list = stdout.readlines()
+            io_flag = "Device"
+            cpu_flag = "avg-cpu"
+            number = 1
+            io_flag_index = 0
+            cpu_flag_index = 0
+            for line in result_list:
+                if(line.find(io_flag) >= 0):
+                    io_flag_index = number
+                elif(line.find(cpu_flag) >= 0):
+                    cpu_flag_index = number
+                number = number + 1
+
+            io_list = result_list[io_flag_index:]
+            cpu_list = result_list[cpu_flag_index:]
+
+            #解析io数据
+            io_tps = 0
+            io_read = 0
+            io_write = 0
+            for str in io_list:
+                io_tmp = self.remove_empty_string(str)
+                if(len(io_tmp) > 0):
+                    io_tps = io_tps + float(io_tmp[1])
+                    io_read = io_read + float(io_tmp[2])
+                    io_write = io_write + float(io_tmp[3])
+            linux_info.io_tps = io_tps
+            linux_info.io_read = io_read
+            linux_info.io_write = io_write
+
+            #解析cpu数据，因为cpu只有一行数据
+            cpu_tmp = self.remove_empty_string(cpu_list[0])
+            linux_info.cpu_user = float(cpu_tmp[0])
+            linux_info.cpu_nice = float(cpu_tmp[1])
+            linux_info.cpu_system = float(cpu_tmp[2])
+            linux_info.cpu_iowait = float(cpu_tmp[3])
+            linux_info.cpu_steal = float(cpu_tmp[4])
+            linux_info.cpu_idle = float(cpu_tmp[5])
+        finally:
+            if (host_client != None):
+                host_client.close()
+
+    def remove_empty_string(self, str):
+        result = []
+        st_list = str.replace("\n", "").split(" ")
+        for value in st_list:
+            if(len(value) > 0):
+                result.append(value)
+        return result
+
+    def monitor_host_for_cpu_load(self, host_client, linux_info):
         stdin, stdout, stderr = host_client.exec_command("cat /proc/loadavg")
         cpu_value = stdout.readlines()[0].split()
         linux_info.cpu_1 = cpu_value[0]
@@ -380,8 +441,8 @@ class MonitorServer(threading.Thread):
             if (int(values[0]) == linux_info.mysql_pid):
                 if(float(values[8]) >= 1):
                     #防止获取的CPU为0的情况
-                    linux_info.mysql_cpu = values[8]
-                linux_info.mysql_memory = values[9]
+                    linux_info.mysql_cpu = float(values[8])
+                linux_info.mysql_memory = float(values[9])
                 break
 
         #监测MySQL数据目录大小

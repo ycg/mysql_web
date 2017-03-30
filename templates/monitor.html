@@ -860,19 +860,22 @@
 
                         </th>
                         <th colspan="3" rowspan="1" class="text-center">
-                            Load Avg
+                            CPU Load Avg
                         </th>
-                        <th colspan="3" rowspan="1" class="text-center">
-                            MySQL
+                         <th colspan="5" rowspan="1" class="text-center">
+                            CPU
                         </th>
                         <th colspan="2" rowspan="1" class="text-center">
                             Disk
                         </th>
-                        <th colspan="4" rowspan="1" class="text-center">
+                        <th colspan="3" rowspan="1" class="text-center">
+                            IO
+                        </th>
+                        <th colspan="2" rowspan="1" class="text-center">
                             Memory
                         </th>
                         <th colspan="2" rowspan="1" class="text-center">
-                            Net
+                            SWAP
                         </th>
                     </tr>
                     <tr>
@@ -880,22 +883,28 @@
                             Host
                         </th>
                         <th>
-                            CPU_1
+                            1
                         </th>
                         <th>
-                            CPU_5
+                            5
                         </th>
                         <th>
-                            CPU_15
+                            15
                         </th>
                         <th>
-                            CPU
+                            User
                         </th>
                         <th>
-                            Memory
+                            Sys
                         </th>
                         <th>
-                            Size
+                            Nice
+                        </th>
+                        <th>
+                            Ldle
+                        </th>
+                        <th>
+                            Iowait
                         </th>
                         <th>
                             Total
@@ -904,22 +913,25 @@
                             Use
                         </th>
                         <th>
-                            Total
+                            QPS
                         </th>
                         <th>
-                            Free
+                            Read
                         </th>
                         <th>
-                            SWAP_T
+                            Write
                         </th>
-                        <th>
-                            SWAP_F
+                        <th title="memory total">
+                            T
                         </th>
-                        <th>
-                            Receive
+                        <th title="memory free">
+                            F
                         </th>
-                        <th>
-                            Send
+                        <th title="swap total">
+                            T
+                        </th>
+                        <th title="swap free">
+                            F
                         </th>
                     </tr>
                 </thead>
@@ -938,20 +950,35 @@
                             <td>
                                 {{ status.cpu_15 }}
                             </td>
-                            <td>
-                                {{ status.mysql_cpu }}
+                            <td {% if(status.cpu_user > 80) %} class="text-danger" {% endif %}>
+                                {{ status.cpu_user }}
+                            </td>
+                            <td {% if(status.cpu_system > 20) %} class="text-danger" {% endif %}>
+                                {{ status.cpu_system }}
                             </td>
                             <td>
-                                {{ status.mysql_memory }}
+                                {{ status.cpu_nice }}
+                            </td>
+                            <td {% if(status.cpu_idle < 70) %} class="text-danger" {% endif %}>
+                                {{ status.cpu_idle }}
                             </td>
                             <td>
-                                {{ status.mysql_data_size }}
+                                {{ status.cpu_iowait }}
                             </td>
                             <td>
                                 {{ status.total_disk_value }}
                             </td>
                             <td>
                                 {{ status.disk_value }}
+                            </td>
+                            <td>
+                                {{ status.io_tps }}
+                            </td>
+                            <td>
+                                {{ status.io_read }}
+                            </td>
+                            <td>
+                                {{ status.io_write }}
                             </td>
                             <td>
                                 {{ status.memory_total }}
@@ -964,6 +991,61 @@
                             </td>
                             <td {% if(status.swap_free > 0) %} class="text-danger" {% endif %}>
                                 {{ status.swap_free }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+
+                        </th>
+                        <th colspan="3" rowspan="1" class="text-center">
+                            MySQL
+                        </th>
+                        <th colspan="2" rowspan="1" class="text-center">
+                            Net
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            Host
+                        </th>
+                        <th>
+                            CPU
+                        </th>
+                        <th>
+                            Mem
+                        </th>
+                        <th>
+                            Size
+                        </th>
+                        <th>
+                            Rec
+                        </th>
+                        <th>
+                            Send
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for status in data_host %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td {% if(status.mysql_cpu > 500) %} class="text-danger" {% endif %}>
+                                {{ status.mysql_cpu }}
+                            </td>
+                            <td {% if(status.mysql_memory > 80) %} class="text-danger" {% endif %}>
+                                {{ status.mysql_memory }}
+                            </td>
+                            <td>
+                                {{ status.mysql_data_size }}
                             </td>
                             <td>
                                 {{ status.net_receive_byte }}
