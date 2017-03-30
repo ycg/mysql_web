@@ -546,6 +546,8 @@ class MonitorServer(threading.Thread):
                 if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
                     info_tmp.undo_history_list_len = int(split_value)
                     innodb_info.history_list_length = int(split_value)
+                else:
+                    info_tmp.undo_history_list_len = innodb_info.history_list_length
             elif(line.find("Trx id counter") >= 0):
                 #因为官方mysql版本没有Innodb_max_trx_id状态值
                 #需要去show engine innodb status去进行计算
