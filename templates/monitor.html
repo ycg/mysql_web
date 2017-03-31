@@ -449,7 +449,7 @@
                             Innodb_Rows
                         </th>
                         <th colspan="7" rowspan="1" class="text-center">
-                            Pages
+                            Buffer Pool Pages
                         </th>
                         <th colspan="5" rowspan="1" class="text-center">
                             Row Lock
@@ -674,7 +674,7 @@
                         <td>
                             {{ status.buffer_pool_read_requests }}
                         </td>
-                        <td>
+                        <td {% if(status.buffer_pool_write_requests > 5000) %} class="text-danger" {% endif %}>
                             {{ status.buffer_pool_write_requests }}
                         </td>
                         <td {% if(status.buffer_pool_hit < 90) %} class="text-danger" {% endif %}>
@@ -724,6 +724,60 @@
                         </td>
                         <td {% if(status.history_list_length > 5000) %} class="text-danger" {% endif %}>
                             {{ status.history_list_length }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="col-md-4">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+
+                        </th>
+                        <th colspan="4" rowspan="1" class="text-center">
+                            Innodb Page
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            Host
+                        </th>
+                        <th>
+                            Size(K)
+                        </th>
+                        <th>
+                            Create
+                        </th>
+                        <th>
+                            Read
+                        </th>
+                        <th>
+                            Write
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for status in data_innodb %}
+                    <tr>
+                        <td>
+                            {{ status.host_info.remark }}
+                        </td>
+                        <td>
+                            {{ status.innodb_page_size }}
+                        </td>
+                        <td>
+                            {{ status.innodb_pages_created }}
+                        </td>
+                        <td>
+                            {{ status.innodb_pages_read }}
+                        </td>
+                        <td>
+                            {{ status.innodb_pages_written }}
                         </td>
                     </tr>
                     {% endfor %}
@@ -1212,6 +1266,29 @@
                 </tbody>
             </table>
         </div>
+
+        {% if(data_engine_innodb.latest_deadlock != None) %}
+        <div class="col-md-12">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center">
+                            Latest Deadlock
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {% for line in data_engine_innodb.latest_deadlock %}
+                                {{ line }} </br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endif %}

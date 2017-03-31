@@ -214,6 +214,12 @@ class MonitorServer(threading.Thread):
         innodb_info.innodb_data_pending_reads = int(mysql_status_new["Innodb_data_pending_reads"])
         innodb_info.innodb_data_pending_writes = int(mysql_status_new["Innodb_data_pending_writes"])
 
+        #innodb page
+        innodb_info.innodb_page_size = int(mysql_status_new["Innodb_page_size"]) / 1024
+        innodb_info.innodb_pages_read = int(mysql_status_new["Innodb_pages_read"]) - int(mysql_status_old["Innodb_pages_read"])
+        innodb_info.innodb_pages_created = int(mysql_status_new["Innodb_pages_created"]) - int(mysql_status_old["Innodb_pages_created"])
+        innodb_info.innodb_pages_written = int(mysql_status_new["Innodb_pages_written"]) - int(mysql_status_old["Innodb_pages_written"])
+
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
         if(result != None):
@@ -530,9 +536,9 @@ class MonitorServer(threading.Thread):
     def get_latest_deadlock(self, host_info, values):
         info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
         if(len(values) > 0):
-            info_tmp.latest_deadlock = ""
-        for line in values:
-            info_tmp.latest_deadlock = info_tmp.latest_deadlock + line + "\n"
+            info_tmp.latest_deadlock = values
+        else:
+            info_tmp.latest_deadlock = None
 
     def get_transactions_info(self, host_info, values):
         status_info = self.__cache.get_status_infos(host_info.key)
