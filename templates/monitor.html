@@ -813,6 +813,9 @@
                         <th colspan="3" rowspan="1" class="text-center">
                             Pos Delay
                         </th>
+                        <th>
+
+                        </th>
                     </tr>
                     <tr>
                         <th>
@@ -850,6 +853,8 @@
                         </th>
                         <th>
                             Error_Msg
+                        </th>
+                        <th>
                         </th>
                     </tr>
                 </thead>
@@ -892,6 +897,9 @@
                                 </td>
                                 <td>
                                     {{ status.error_message }}
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0)" onclick=start("/replication/{{ status.host_info.key }}","repl")>Details</a>
                                 </td>
                             </tr>
                         {% endif %}
@@ -1289,6 +1297,33 @@
             </table>
         </div>
         {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% if(slave_status != None) %}
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="col-md-12">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="3" rowspan="1" class="text-center">
+                            Show Slave Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {% for key, value in slave_status.items() %}
+                                {{ key }} : {{ value }} </br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endif %}

@@ -5,7 +5,7 @@
 
 import enum, settings
 from flask import Flask, render_template, request, app, redirect
-from monitor import cache, server, slow_log
+from monitor import cache, server, slow_log, mysql_status
 
 app = Flask(__name__)
 
@@ -50,7 +50,7 @@ def get_replication_data():
 
 @app.route("/replication/<int:id>")
 def get_replication_data_by_id(id):
-    return get_monitor_data(data_repl=convert_object_to_list(mysql_cache.get_repl_info(id)))
+    return get_monitor_data(slave_status=mysql_status.get_show_slave_status(id))
 
 def convert_object_to_list(obj):
     list_tmp = None
@@ -59,8 +59,8 @@ def convert_object_to_list(obj):
         list_tmp.append(obj)
     return list_tmp
 
-def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None, data_host=None):
-    return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl, data_host=data_host)
+def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None, data_host=None, slave_status=None):
+    return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl, data_host=data_host, slave_status=slave_status)
 
 @app.route("/slowlog")
 def get_slow_logs():

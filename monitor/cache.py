@@ -83,6 +83,9 @@ class Cache(object):
     def get_mysql_web_host_info(self):
         return self.__mysql_web_host_info
 
+    def get_host_info(self, key):
+        return self.get_value_for_key(self.__host_infos, key)
+
     def get_repl_info(self, key):
         return self.get_value_for_key(self.__repl_infos, key)
 
