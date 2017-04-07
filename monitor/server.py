@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import time, threadpool, cache, threading, db_util, enum, settings, paramiko, collections, base_class, mysql_branch
+import time, threadpool, cache, threading, db_util, enum, settings, paramiko, collections, base_class, mysql_branch, tablespace
 
 class MonitorEnum(enum.Enum):
     mysql = 4
@@ -34,23 +34,21 @@ class MonitorServer(threading.Thread):
     def run(self):
         while (True):
             if(self.__times % settings.UPDATE_INTERVAL == 0):
-                self.join_thread_pool(self.get_mysql_status)
+                self.__cache.join_thread_pool(self.get_mysql_status)
             if(self.__times % settings.LINUX_UPDATE_INTERVAL == 0):
                 pass
-                #self.join_thread_pool(self.monitor_host_status)
-                #self.join_thread_pool(self.monitor_host_for_cpu_and_io)
-            #if(self.__times % settings.TABLE_CHECK_INTERVAL == 0):
-            #    pass
-            #if(self.__times % settings.INNODB_UPDATE_INTERVAL == 0):
-            #    self.join_thread_pool(self.read_innodb_status)
+                #self.__cache.join_thread_pool(self.monitor_host_status)
+                #self.__cache.join_thread_pool(self.monitor_host_for_cpu_and_io)
+            if(self.__times % settings.TABLE_CHECK_INTERVAL == 0):
+               self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
             time.sleep(1)
             self.__times = self.__times + 1
 
-    def join_thread_pool(self, method_name):
+    '''def join_thread_pool(self, method_name):
         requests = threadpool.makeRequests(method_name, list(self.__cache.get_all_host_infos()), None)
         for request in requests:
             self.__thread_pool.putRequest(request)
-        self.__thread_pool.poll()
+        self.__thread_pool.poll()'''
 
     def get_mysql_status(self, host_info):
         connection = self.__db_util.get_mysql_connection(host_info)
@@ -244,6 +242,10 @@ class MonitorServer(threading.Thread):
         #self.insert_status_log(status_info)
         self.__db_util.close(connection, cursor)
         self.read_innodb_status(host_info)
+
+        host_info.tps = status_info.tps
+        host_info.qps = status_info.qps
+        host_info.trxs = innodb_info.trx_count
 
     def get_data_length(self, data_length):
         value = float(1024)

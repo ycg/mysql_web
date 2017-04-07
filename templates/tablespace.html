@@ -1,0 +1,73 @@
+{% if(table_status != None) %}
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="col-md-12">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="8" rowspan="1" class="text-center">
+                            {{ server_name }}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>
+                            Schema
+                        </th>
+                        <th>
+                            Table_Name
+                        </th>
+                        <th>
+                            Rows
+                        </th>
+                        <th>
+                            Data_S
+                        </th>
+                        <th>
+                            Index_S
+                        </th>
+                        <th>
+                            Total_S
+                        </th>
+                        <th>
+                            File_S
+                        </th>
+                        <th>
+                            Free
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for status in table_status %}
+                    <tr>
+                        <td>
+                            {{ status.schema }}
+                        </td>
+                        <td>
+                            {{ status.t_name }}
+                        </td>
+                        <td>
+                            {{ status.rows }}
+                        </td>
+                        <td >
+                            {{ status.data_size }}
+                        </td>
+                        <td>
+                            {{ status.index_size }}
+                        </td>
+                        <td >
+                            {{ status.total_size }}
+                        </td>
+                        <td>
+                            {{ status.file_size }}
+                        </td>
+                        <td>
+                            {{ status.diff }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -1,4 +1,10 @@
-{% if(mysql_infos != None) %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span12">
@@ -28,9 +34,6 @@
                         </th>
                         <th>
                             User
-                        </th>
-                        <th>
-
                         </th>
                         <th>
 
@@ -67,9 +70,6 @@
                         <td class="text-center">
                             <a href="javascript:void(0)" onclick=start("/mysql/{{ data.key }}")>Details</a>
                         </td>
-                        <td class="text-center">
-                            <a href="javascript:void(0)" onclick=stop("/tablespace/{{ data.key }}")>Tablespace</a>
-                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -77,4 +77,5 @@
         </div>
     </div>
 </div>
-{% endif %}
+</body>
+</html>

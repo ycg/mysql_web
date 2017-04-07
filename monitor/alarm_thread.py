@@ -3,7 +3,7 @@
 #实现邮件告警，以及数据库健康检查状态的report发送
 #告警，包括CPU，内存，线程数，qps和tps等等
 
-import threading, time, cache, mail_util, enum, db_util, settings
+import threading, time, cache, mail_util, enum, db_util, settings, mysql_status, base_class
 
 class AlarmEnum(enum.Enum):
     ReplStatus = 0
@@ -55,21 +55,19 @@ class AlarmThread(threading.Thread):
                   "FROM information_schema.processlist where length(info) > 0"
             db_util.DBUtil.fetchall(sql)
 
+@enum.unique
 class ExceptionType(enum.Enum):
     Repl_Delay = 1
     Repl_Fail = 2
 
+@enum.unique
 class ExceptionLevel(enum.Enum):
     Prompt = 1
     General = 2
     Serious = 3
     Fatal = 4
 
-#实现告警日志记录
-#根据mysql各种状态值进行计算
 class AlarmLog(threading.Thread):
-    alarm_list = []
-
     def __init__(self):
         threading.Thread.__init__(self)
         self.setDaemon(True)
@@ -77,18 +75,34 @@ class AlarmLog(threading.Thread):
     def run(self):
         while(True):
             time.sleep(settings.UPDATE_INTERVAL)
+            cache.Cache().join_thread_pool(self.check_status)
 
-    def check_os_status(self):
+    def check_status(self, host_info):
+        self.check_os_status(cache.Cache().get_linux_info(host_info.key))
+        self.check_mysql_status(cache.Cache().get_status_infos(host_info.key))
+        self.check_innodb_status(cache.Cache().get_innodb_infos(host_info.key))
+        self.check_replication_status(cache.Cache().get_repl_info(host_info.key))
+
+    def check_os_status(self, os_info):
         pass
 
-    def check_mysql_status(self):
+    def check_mysql_status(self, status_info):
         pass
 
-    def check_innodb_status(self):
+    def check_innodb_status(self, innodb_info):
         pass
 
-    def check_replication_status(self):
+    def check_replication_status(self, repl_info):
         pass
+        '''if(repl_info.io_status != "Yes" or repl_info.sql_status != "Yes"):
+            log_text = ""
+            result = mysql_status.get_show_slave_status(repl_info.host_info.key)
+            for key, value in result.items():
+                log_text = key + ":" + value + "\n"
+            self.insert_alarm_log(repl_info.host_info.key, ExceptionType.Repl_Fail.value, ExceptionLevel.Serious.value, log_text)'''
 
-    def insert_alarm_log(self, sql):
-        pass
+    def insert_alarm_log(self, host_id, type, level, log_text):
+        conn, cur = db_util.DBUtil().get_conn_and_cur(settings.MySQL_Host)
+        cur.execute("insert into mysql_web.mysql_exception(host_id, exception_type, level) VALUES ({0}, {1}, {2});".format(host_id, type, level))
+        cur.execute("insert into mysql_web.mysql_exception_log(id, log_text) VALUES ({0}, '{1}');".format(cur.lastrowid, log_text))
+        db_util.DBUtil().close(conn, cur)

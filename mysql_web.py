@@ -5,7 +5,7 @@
 
 import enum, settings
 from flask import Flask, render_template, request, app, redirect
-from monitor import cache, server, slow_log, mysql_status
+from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace
 
 app = Flask(__name__)
 
@@ -14,7 +14,7 @@ mysql_cache.load_all_host_infos()
 monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
-#alarm_thread.AlarmThread().start()
+alarm_thread.AlarmLog().start()
 
 @app.route("/mysql")
 def get_mysql_data():
@@ -77,6 +77,27 @@ def get_os_infos():
 @app.route("/home")
 def home():
     return render_template("home.html", interval=settings.UPDATE_INTERVAL * 1000)
+
+@app.route("/tablespace")
+def get_tablespace():
+    host_info = mysql_cache.get_host_info(1)
+    return render_template("tablespace.html", table_status=tablespace.get_tablespace_infos(host_info), server_name=host_info.remark)
+
+@app.route("/tablespace/<int:id>")
+def get_tablespace_by_id(id):
+    host_info = mysql_cache.get_host_info(id)
+    return render_template("tablespace.html", table_status=tablespace.get_tablespace_infos(host_info), server_name=host_info.remark)
+
+
+@app.route("/home/chart")
+def chart():
+    data="[1996-01-02, 22], [1997-02-08, 36], [1996-01-02, 37], [1996-01-02, 45], [1996-01-02, 50], [1996-01-02, 30], [1996-01-02, 61], [1996-01-02, 61], [1996-01-02, 62], [1996-01-02, 66], [1996-01-02, 73]"
+    data="[aaa, 22], [bbb, 36], [1996-01-02, 37], [1996-01-02, 45], [1996-01-02, 50], [1996-01-02, 30], [1996-01-02, 61], [1996-01-02, 61], [1996-01-02, 62], [1996-01-02, 66], [1996-01-02, 73]"
+    return render_template("chart.html", p_data=data)
+
+@app.route("/home/binlog")
+def get_test():
+    return render_template("binlog.html")
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=int("5000"))

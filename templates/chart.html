@@ -1,35 +1,37 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script type="text/javascript" src={{ url_for("static", filename="js/Chart.min.js") }} ></script>
+        <script type="text/javascript" src={{ url_for("static", filename="js/jscharts.js") }} ></script>
     </head>
     <body>
-        <canvas id="myChart" height="200" width="500"></canvas>
-        <script type="text/javascript">
-            var ctx = document.getElementById("myChart").getContext("2d");
+        <div id="tps">
+            Loading TPS
+        </div>
 
-            // 线型图
-            var LineChart = {
-                //labels: ["Ruby", "jQuery", "Java", "ASP.Net", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP", "PHP"],
-                labels: [1000, 2000, 3000, 8000, 1000, 6000,1000, 2000, 3000, 8000, 1000, 6000,1000, 2000, 3000, 8000, 1000, 6000],
-                //20, 30, 40, 50, 10, 20, 30, 40, 50, 100, 30, 40, 50, 10, 20, 30, 40, 50, 100],
-                datasets: [{
-                    fillColor: "rgba(151,249,190,0.5)",
-                    strokeColor: "rgba(255,255,255,1)",
-                    pointColor: "rgba(220,220,220,1)",
-                    pointStrokeColor: "#fff",
-                    data: [1000, 2000, 3000, 8000, 1000, 6000,1000, 2000, 3000, 8000, 1000, 6000,1000, 2000, 3000, 8000, 1000, 6000]
-                            //[10, 20, 30, 40, 50, 10, 20, 30, 40, 50, 100, 30, 40, 50, 10, 20, 30, 40, 50, 100]
-                    }
-                    /*{
-                    fillColor: "rgba(252,147,65,0.5)",
-                    strokeColor: "rgba(255,255,255,1)",
-                    pointColor: "rgba(173,173,173,1)",
-                    pointStrokeColor: "#fff",
-                    data: [28, 68, 40, 19, 96, 28, 68, 40, 19, 96, 55]}*/
-                ]
+        <script type="text/javascript">
+            var myData = new Array(["1996-06-10 21:10:00", 22], ["1997-01-02 21:10:00", 36], ["1997-01-02 21:10:00", 37], ["1997-01-02 21:10:00", 45], ["1997-01-02 21:10:00", 50], ["1997-01-02 21:10:00", 30], ["1997-01-02 21:10:00", 61], ["1997-01-02 21:10:00", 61], ["1997-01-02 21:10:00", 62], ["1997-01-02 21:10:00", 66], ["1997-01-02 21:10:00", 73]);
+            var myData = new Array(["21:10:00", 22], ["21:10:00", 36], ["21:10:00", 37], ["21:10:00", 45], ["21:10:00", 50], ["21:10:00", 30], ["21:10:00", 61], ["21:10:00", 61], ["21:10:00", 62], ["21:10:00", 66], ["21:10:00", 73]);
+	        var myChart = new JSChart('tps', 'line');
+            //alert({{ p_data }})
+            //var myData = new Array({{ p_data }})
+
+            var josn = {"JSChart" : {  "datasets" : [  {  "type" : "line", "data" : [  {  "unit" : "Unit_1",  "value" : "20"  },  {  "unit" : "Unit_2",  "value" : "10"  },  {  "unit" : "Unit_3", "value" : "30" },  {  "unit" : "Unit_4", "value" : "10"},  {  "unit" : "Unit_5",  "value" : "5"  }  ]  }  ]  }  }
+            function setAttribute(obj_chart, data_json, title){
+                obj_chart.setTitle(title)
+                obj_chart.setAxisNameX('');
+        	    obj_chart.setAxisNameY('');
+                obj_chart.setDataJSON(data_json)
+                obj_chart.draw()
             }
-            new Chart(ctx).Line(LineChart);
+
+            myChart.setDataArray(myData);
+            myChart.setAxisNameX('');
+        	myChart.setAxisNameY('');
+            myChart.setTitle("TPS")
+            myChart.setSize(1000, 400)
+            myChart.draw()
+
+
         </script>
     </body>
 </html>

@@ -102,18 +102,18 @@ CREATE TABLE mysql_data_size_log
     id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     host_id MEDIUMINT NOT NULL,
     `schema` VARCHAR(50) NOT NULL DEFAULT '',
-    table_name VARCHAR(50) NOT NULL DEFAULT '',
+    table_name VARCHAR(80) NOT NULL DEFAULT '',
     data_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
     index_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
     rows INT UNSIGNED NOT NULL DEFAULT 0,
-    auto_increment INT UNSIGNED NOT NULL DEFAULT 0,
+    auto_increment BIGINT UNSIGNED NOT NULL DEFAULT 0,
     file_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
-    diff INT UNSIGNED NOT NULL DEFAULT 0,
+    free_size INT UNSIGNED NOT NULL DEFAULT 0,
     `date` DATE NOT NULL,
     created_time TIMESTAMP NOT NULL DEFAULT NOW()
 ) COMMENT = 'mysql data size log';
 
-#查看历史mysql异常记录的数据信息
+#异常记录表
 DROP TABLE mysql_exception;
 CREATE TABLE mysql_exception
 (
@@ -124,6 +124,7 @@ CREATE TABLE mysql_exception
     created_time TIMESTAMP NOT NULL DEFAULT NOW()
 ) COMMENT = 'mysql exception';
 
+#异常信息详细表
 DROP TABLE mysql_exception_log;
 CREATE TABLE mysql_exception_log
 (

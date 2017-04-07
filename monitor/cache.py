@@ -1,8 +1,10 @@
-import base_class, host_info, collections, db_util, settings, mysql_branch
+import base_class, host_info, collections, db_util, settings, mysql_branch, threadpool
 
 class Cache(object):
     __number = False
     __instance = None
+    __thread_pool = None
+    __tablespace = collections.OrderedDict()
     __host_infos = collections.OrderedDict()
     __repl_infos = collections.OrderedDict()
     __linux_infos = collections.OrderedDict()
@@ -19,6 +21,8 @@ class Cache(object):
         return Cache.__instance
 
     def load_all_host_infos(self):
+        if(self.__thread_pool == None):
+            self.__thread_pool = threadpool.ThreadPool(settings.THREAD_POOL_SIZE)
         sql = "select host_id, host, port, user, password, remark, is_master, is_slave, master_id, is_deleted from mysql_web.host_infos;"
         for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
             host_id = row["host_id"]
@@ -38,6 +42,7 @@ class Cache(object):
             host_info_temp.master_id = row["master_id"]
             host_info_temp.key = host_info_temp.id
             if(row["is_deleted"] == 1):
+                self.remove_key(self.__tablespace, host_id)
                 self.remove_key(self.__host_infos, host_id)
                 self.remove_key(self.__repl_infos, host_id)
                 self.remove_key(self.__status_infos, host_id)
@@ -46,6 +51,8 @@ class Cache(object):
                 self.remove_key(self.__linux_infos, host_id)
                 self.remove_key(self.__innodb_status_infos, host_id)
             else:
+                if(self.__repl_infos.has_key(host_id) == False):
+                    self.__tablespace[host_id] = {}
                 if(self.__repl_infos.has_key(host_id) == False):
                     self.__repl_infos[host_id] = base_class.BaseClass(host_info_temp)
                 if(self.__linux_infos.has_key(host_id) == False):
@@ -59,7 +66,15 @@ class Cache(object):
                     self.__innodb_status_infos[host_id].buffer_pool_infos = collections.OrderedDict()
 
         self.check_mysql_server_version_and_branch()
-        return "load all host infos ok."
+        result = "load all host infos ok."
+        print(result)
+        return result
+
+    def join_thread_pool(self, method_name):
+        requests = threadpool.makeRequests(method_name, list(self.get_all_host_infos()), None)
+        for request in requests:
+            self.__thread_pool.putRequest(request)
+        self.__thread_pool.poll()
 
     def remove_key(self, dic, key):
         if(dic.has_key(key) == True):
