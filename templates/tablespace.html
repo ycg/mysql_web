@@ -6,7 +6,7 @@
                 <thead>
                     <tr>
                         <th colspan="8" rowspan="1" class="text-center">
-                            {{ server_name }}
+                            {{ table_status.host_info.remark }}
                         </th>
                     </tr>
                     <tr>
@@ -37,7 +37,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for status in table_status %}
+                    {% for status in table_status.detail %}
                     <tr>
                         <td>
                             {{ status.schema }}

@@ -52,7 +52,7 @@ class Cache(object):
                 self.remove_key(self.__innodb_status_infos, host_id)
             else:
                 if(self.__repl_infos.has_key(host_id) == False):
-                    self.__tablespace[host_id] = {}
+                    self.__tablespace[host_id] = base_class.BaseClass(host_info_temp)
                 if(self.__repl_infos.has_key(host_id) == False):
                     self.__repl_infos[host_id] = base_class.BaseClass(host_info_temp)
                 if(self.__linux_infos.has_key(host_id) == False):
@@ -95,6 +95,9 @@ class Cache(object):
     def get_all_linux_infos(self):
         return self.__linux_infos.values()
 
+    def get_all_tablespace_infos(self):
+        return self.__tablespace.values()
+
     def get_mysql_web_host_info(self):
         return self.__mysql_web_host_info
 
@@ -112,6 +115,9 @@ class Cache(object):
 
     def get_innodb_infos(self, key):
         return self.get_value_for_key(self.__innodb_infos, key)
+
+    def get_tablespace_info(self, key):
+        return self.get_value_for_key(self.__tablespace, key)
 
     def get_engine_innodb_status_infos(self, key):
         return self.get_value_for_key(self.__innodb_status_infos, key)

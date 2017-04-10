@@ -52,6 +52,17 @@ def get_replication_data():
 def get_replication_data_by_id(id):
     return get_monitor_data(slave_status=mysql_status.get_show_slave_status(id))
 
+@app.route("/tablespace")
+def get_tablespace():
+    tablespace_status=mysql_cache.get_all_tablespace_infos()
+    if(len(tablespace_status) > 50):
+        tablespace_status = tablespace_status[0:50]
+    return get_monitor_data(tablespace_status=tablespace_status)
+
+@app.route("/tablespace/<int:id>")
+def get_tablespace_by_id(id):
+    return render_template("tablespace.html", table_status=mysql_cache.get_tablespace_info(id))
+
 def convert_object_to_list(obj):
     list_tmp = None
     if(obj != None):
@@ -59,8 +70,8 @@ def convert_object_to_list(obj):
         list_tmp.append(obj)
     return list_tmp
 
-def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None, data_host=None, slave_status=None):
-    return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl, data_host=data_host, slave_status=slave_status)
+def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None, data_host=None, slave_status=None, tablespace_status=None):
+    return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl, data_host=data_host, slave_status=slave_status, tablespace_status=tablespace_status)
 
 @app.route("/slowlog")
 def get_slow_logs():
@@ -78,16 +89,10 @@ def get_os_infos():
 def home():
     return render_template("home.html", interval=settings.UPDATE_INTERVAL * 1000)
 
-@app.route("/tablespace")
-def get_tablespace():
-    host_info = mysql_cache.get_host_info(1)
-    return render_template("tablespace.html", table_status=tablespace.get_tablespace_infos(host_info), server_name=host_info.remark)
-
-@app.route("/tablespace/<int:id>")
-def get_tablespace_by_id(id):
-    host_info = mysql_cache.get_host_info(id)
-    return render_template("tablespace.html", table_status=tablespace.get_tablespace_infos(host_info), server_name=host_info.remark)
-
+@app.route("/mytest")
+def test_tablespace():
+    monitor_server.test_get_tablespace_infos()
+    return "aaaaaaaaa"
 
 @app.route("/home/chart")
 def chart():

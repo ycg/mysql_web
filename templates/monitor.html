@@ -1327,3 +1327,72 @@
     </div>
 </div>
 {% endif %}
+
+{% if(tablespace_status != None) %}
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="col-md-12">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            Host
+                        </th>
+                        <th>
+                            Rows_T
+                        </th>
+                        <th>
+                            Data_T
+                        </th>
+                        <th>
+                            Index_T
+                        </th>
+                        <th>
+                            File_T
+                        </th>
+                        <th>
+                            Free_T
+                        </th>
+                        <th>
+                            Last Update Time
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for status in tablespace_status %}
+                    <tr>
+                        <td>
+                            {{ status.host_info.remark }}
+                        </td>
+                        <td>
+                            {{ status.rows_total }}
+                        </td>
+                        <td>
+                            {{ status.data_total }}
+                        </td>
+                        <td >
+                            {{ status.index_total }}
+                        </td>
+                        <td>
+                            {{ status.file_total }}
+                        </td>
+                        <td >
+                            {{ status.free_total }}
+                        </td>
+                        <td>
+                            {{ status.last_update_time }}
+                        </td>
+                        <td class="text-center">
+                            <a href="javascript:void(0)" onclick=stop("/tablespace/{{ status.host_info.key }}","tablespace")>Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}

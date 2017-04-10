@@ -108,7 +108,7 @@ CREATE TABLE mysql_data_size_log
     rows INT UNSIGNED NOT NULL DEFAULT 0,
     auto_increment BIGINT UNSIGNED NOT NULL DEFAULT 0,
     file_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
-    free_size INT UNSIGNED NOT NULL DEFAULT 0,
+    free_size BIGINT NOT NULL DEFAULT 0,
     `date` DATE NOT NULL,
     created_time TIMESTAMP NOT NULL DEFAULT NOW()
 ) COMMENT = 'mysql data size log';

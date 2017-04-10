@@ -44,11 +44,8 @@ class MonitorServer(threading.Thread):
             time.sleep(1)
             self.__times = self.__times + 1
 
-    '''def join_thread_pool(self, method_name):
-        requests = threadpool.makeRequests(method_name, list(self.__cache.get_all_host_infos()), None)
-        for request in requests:
-            self.__thread_pool.putRequest(request)
-        self.__thread_pool.poll()'''
+    def test_get_tablespace_infos(self):
+        self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
 
     def get_mysql_status(self, host_info):
         connection = self.__db_util.get_mysql_connection(host_info)

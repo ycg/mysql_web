@@ -115,7 +115,6 @@ def check_table_space(args):
             list_tmp.append(table_info)
             print(get_print_string(args, table_info))
 
-
     host_client.close()
     save_file(args, sorted(list_tmp, cmp=lambda x,y:cmp(x.diff,y.diff), reverse=True))
 

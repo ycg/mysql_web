@@ -86,6 +86,24 @@ def create_slave_for_mysqldump(args):
     print("\n-------------------------------6.create slave is ok----------------------------------------")
 
 def create_slave_for_xtrabackup(args):
+    #1.全量备份
+    shell = "innobackupex --defaults-file={0} --no-timestamp " \
+            "--host={1} --user={2} --password='{3}' --port={4} /slave_bak/" \
+            .format("/etc/my.cnf", args.master_host, args.master_user, args.master_password, args.master_port)
+
+    #2.scp数据拷贝到目标机器
+    shell = "scp /slave_bak/ root@{0}:/slave_bak/".format(args.host)
+
+    #3.在目标机器进行恢复操作
+    shell = "innobackupex  --defaults-file=/etc/my.cnf  --apply-log --use-momery=2G /slave_bak/"
+
+    #4.拷贝数据到目标目录，如果不想改，需要修改配置文件数据目录路径
+    shell = "mv /slave_bak/ /mysql_data/"
+
+    #5.启动数据库
+    shell = "mysqld --defaults-file=/etc/my.cnf &"
+
+    #6.change master操作，需要分为POS和GTID设置
     pass
 
 def change_master(args):
