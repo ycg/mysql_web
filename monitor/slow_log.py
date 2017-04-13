@@ -5,6 +5,17 @@ def get_slow_log_top_20():
              from db1.mysql_slow_query_review t1
              left join db1.mysql_slow_query_review_history t2 on t1.checksum = t2.checksum
              order by t2.Query_time_sum desc limit 20;"""
+    sql = """select * from
+             (
+                select t1.checksum, t1.first_seen, t1.last_seen, left(t1.fingerprint, 100) as fingerprint,
+                (
+                    select ifnull(sum(ts_cnt), 0) from db1.general_log_review_history where checksum= t1.checksum
+                ) as ts_cnt,
+                (
+                    select ifnull(sum(Query_time_sum), 0) from db1.general_log_review_history where checksum= t1.checksum
+                ) as Query_time_sum
+                from db1.mysql_slow_query_review t1
+             ) t2 order by Query_time_sum desc limit 20;"""
     slow_list = []
     for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         slow_info = base_class.BaseClass(None)
@@ -13,7 +24,7 @@ def get_slow_log_top_20():
         slow_info.query_time_sum = row["Query_time_sum"]
         slow_info.first_seen = row["first_seen"]
         slow_info.last_seen = row["last_seen"]
-        slow_info.fingerprint = row["fingerprint"]
+        slow_info.fingerprint = row["fingerprint"].decode("utf-8")
         slow_list.append(slow_info)
     return slow_list
 
@@ -49,7 +60,7 @@ def get_slow_log_detail(checksum):
         slow_log_detail.rows_examined_pct_95 = row["Rows_examined_pct_95"]
         slow_log_detail.first_seen = row["first_seen"]
         slow_log_detail.last_seen = row["last_seen"]
-        slow_log_detail.fingerprint = row["fingerprint"]
-        slow_log_detail.sample = row["sample"]
+        slow_log_detail.fingerprint = row["fingerprint"].decode("utf-8")
+        slow_log_detail.sample = row["sample"].decode("utf-8")
     return slow_log_detail
 

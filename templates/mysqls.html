@@ -65,10 +65,10 @@
                             {{ data.user }}
                         </td>
                         <td class="text-center">
-                            <a href="javascript:void(0)" onclick=start("/mysql/{{ data.key }}")>Details</a>
+                            <a href="javascript:void(0)" onclick=start("/mysql/{{ data.key }}","mysql")>Details</a>
                         </td>
                         <td class="text-center">
-                            <a href="javascript:void(0)" onclick=stop("/tablespace/{{ data.key }}")>Tablespace</a>
+                            <a href="javascript:void(0)" onclick=stop("/tablespace/{{ data.key }}","tablespace")>Tablespace</a>
                         </td>
                     </tr>
                 {% endfor %}

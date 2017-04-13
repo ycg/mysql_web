@@ -131,3 +131,17 @@ CREATE TABLE mysql_exception_log
     id INT UNSIGNED NOT NULL PRIMARY KEY,
     log_text TEXT NOT NULL DEFAULT ''
 ) COMMENT = 'mysql exception log';
+
+#执行sql日志表
+CREATE DATABASE backup;
+DROP TABLE execute_sql_log;
+CREATE TABLE execute_sql_log
+(
+    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    host_id MEDIUMINT UNSIGNED NOT NULL,
+    is_backup TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    backup_name VARCHAR(50) NOT NULL DEFAULT '',
+    `sql` TEXT NOT NULL DEFAULT '',
+    `comment` VARCHAR(100) NOT NULL DEFAULT '',
+    created_time TIMESTAMP NOT NULL DEFAULT now()
+);

@@ -1,0 +1,69 @@
+<div class="container-fluid">
+    <div class="row clearfix">
+        <form action="/autoreview" method="post" class="form-horizontal" role="form" onsubmit="return commit_sql()">
+            <div class="col-md-8 column">
+                <textarea name="sql_content" class="form-control"
+                          placeholder="请在此提交SQL，请以分号结尾。例如：use test; create table t1(id int)engine=innodb;" rows=20
+                          required></textarea>
+            </div>
+
+            <div class="col-md-4 column">
+                <div class="form-group">
+                    <input id="comment" type="text" name="workflow_name" class="form-control" data-name="上线单名称"
+                           placeholder="请输入上线单名称，如:XX项目会员功能建表" required>
+                </div>
+                <div class="form-group">
+                    <select id="cluster_name" name="cluster_name"
+                            class="selectpicker show-tick form-control bs-select-hidden" data-name="要上线的集群"
+                            data-placeholder="请选择要上线的集群:" required>
+                        <option disabled="" selected="selected">请选择要上线的集群:</option>
+                        {% for info in host_infos %}
+                            <option value="{{ info.key }}">{{ info.remark }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="basic" name="is_backup" class="selectpicker show-tick form-control bs-select-hidden"
+                            data-name="是否选择备份" data-placeholder="请选择是否要备份:" required>
+                        <option disabled="" selected="selected">请选择是否要备份:</option>
+                        <option value="1">是</option>
+                        <option value="0">否</option>
+                    </select>
+                </div>
+                <!--<div class="form-group">
+                    <select id="basic" name="review_man" class="selectpicker show-tick form-control bs-select-hidden"
+                            data-name="审核人" data-placeholder="请选择RD审核人:" required>
+                        <option disabled="" selected="selected">请选择审核人:</option>
+                    </select>
+                </div>-->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">提交SQL</button>
+                    <!--<button class="btn btn-primary" data-toggle="modal" data-target="#myModal" onclick="commit_sql()">提交SQL</button>-->
+                    <button type="reset" class="btn btn-default">清空重填</button>
+                </div>
+            </div>
+        </form>
+        <div class="form-group">
+            <button class="btn btn-primary" onclick="commit_sql()">提交SQL</button>
+            <!--<button class="btn btn-primary" data-toggle="modal" data-target="#myModal" onclick="commit_sql()">提交SQL</button>-->
+            <button type="reset" class="btn btn-default">清空重填</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Result</h4>
+            </div>
+            <div class="modal-body">
+                <p id="msg">One fine body…</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

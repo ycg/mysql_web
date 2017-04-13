@@ -41,6 +41,12 @@ function check_slow_log()
     --history h=$db_host,D=$db_database,t=mysql_slow_query_review_history  \
     --no-report --limit=100% \
     --filter=" \$event->{add_column} = length(\$event->{arg})" $slow_log_file > /tmp/slowquery.log
+
+    echo "================check slow log [$slow_log_file] ok===================="
+    if [ -f "$slow_log_file" ]; then
+        rm -rf "$slow_log_file"
+        echo "remove $slow_log_file ok."
+    fi
 }
 
 if [ ! -d "$slow_log_dir" ]; then
@@ -49,8 +55,6 @@ fi
 
 while true
 do
-    echo "check slow log ok"
     check_slow_log
-    echo "check ok"
-    sleep 10m
+    sleep 5m
 done

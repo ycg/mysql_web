@@ -55,7 +55,7 @@
                                 {{ info.fingerprint }}
                             </td>
                             <td>
-                                <a href="javascript:void(0)" onclick=stop("/slowlog/{{ info.checksum }}")>Details</a>
+                                <a href="javascript:void(0)" onclick=stop("/slowlog/{{ info.checksum }}","slowlog")>Details</a>
                             </td>
                         </tr>
                     {% endfor %}

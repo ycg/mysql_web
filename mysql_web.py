@@ -5,7 +5,7 @@
 
 import enum, settings
 from flask import Flask, render_template, request, app, redirect
-from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace
+from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql
 
 app = Flask(__name__)
 
@@ -54,14 +54,23 @@ def get_replication_data_by_id(id):
 
 @app.route("/tablespace")
 def get_tablespace():
-    tablespace_status=mysql_cache.get_all_tablespace_infos()
-    if(len(tablespace_status) > 50):
-        tablespace_status = tablespace_status[0:50]
-    return get_monitor_data(tablespace_status=tablespace_status)
+    return get_monitor_data(tablespace_status=mysql_cache.get_all_tablespace_infos())
 
 @app.route("/tablespace/<int:id>")
 def get_tablespace_by_id(id):
-    return render_template("tablespace.html", table_status=mysql_cache.get_tablespace_info(id))
+    return render_template("tablespace.html", table_status=mysql_cache.get_tablespace_info(id).detail[0:50], host_info=mysql_cache.get_host_info(id))
+
+@app.route("/general/<int:page_number>")
+def get_general_log_by_page_number(page_number):
+    if(page_number <= 5):
+        page_list = range(1, 10)
+    else:
+        page_list = range(page_number-5, page_number + 6)
+    return render_template("general_log.html", general_logs=general_log.get_general_logs_by_page_index(page_number), page_number=page_number, page_list=page_list)
+
+@app.route("/general/<int:page_number>/detail/<checksum>")
+def get_general_log_detail(page_number, checksum):
+    return render_template("general_log_detail.html", page_number=page_number, general_log_detail=general_log.get_general_log_detail(checksum))
 
 def convert_object_to_list(obj):
     list_tmp = None
@@ -85,6 +94,19 @@ def get_slow_log_detail(checksum):
 def get_os_infos():
     return get_monitor_data(data_host=mysql_cache.get_all_linux_infos())
 
+@app.route("/sql")
+def execute_sql_home():
+    return render_template("execute_sql.html", host_infos=mysql_cache.get_all_host_infos())
+
+@app.route("/autoreview", methods=['GET', 'POST'])
+def execute_sql_for_commit():
+    print(request.form)
+    return execute_sql.execute_sql_test(request.form["cluster_name"], request.form["sql_content"], request.form["workflow_name"])
+
+@app.route("/testsql", methods=['GET', 'POST'])
+def test_sql():
+    return "execute sql ok."
+
 @app.route("/home")
 def home():
     return render_template("home.html", interval=settings.UPDATE_INTERVAL * 1000)
@@ -98,11 +120,13 @@ def test_tablespace():
 def chart():
     data="[1996-01-02, 22], [1997-02-08, 36], [1996-01-02, 37], [1996-01-02, 45], [1996-01-02, 50], [1996-01-02, 30], [1996-01-02, 61], [1996-01-02, 61], [1996-01-02, 62], [1996-01-02, 66], [1996-01-02, 73]"
     data="[aaa, 22], [bbb, 36], [1996-01-02, 37], [1996-01-02, 45], [1996-01-02, 50], [1996-01-02, 30], [1996-01-02, 61], [1996-01-02, 61], [1996-01-02, 62], [1996-01-02, 66], [1996-01-02, 73]"
-    return render_template("chart.html", p_data=data)
+    #return render_template("chart.html", p_data=data)
+    return render_template("test.html")
 
 @app.route("/home/binlog")
 def get_test():
     return render_template("binlog.html")
 
 if __name__ == '__main__':
+    #app.run(threaded=True)
     app.run(debug=True, host="0.0.0.0", port=int("5000"))
