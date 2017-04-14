@@ -43,7 +43,7 @@ function stop_general_log()
 
 function check_general_log()
 {
-    echo "----------------------------------check general log------------------------------------------------"
+	echo "----------------------------------check general log------------------------------------------------"
 	general_log_file=`$mysql_client -h$mysql_host -P$mysql_port -u$mysql_user -p$mysql_password -e "show global variables like 'general_log_file';" | grep log | awk '{print $2}'`
 	$pt_query_digest --type=genlog \
 	--user=$db_user --password=$db_password --port=$db_port --charset=utf8 \
