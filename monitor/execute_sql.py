@@ -1,21 +1,30 @@
-import db_util, cache, settings
+# -*- coding: utf-8 -*-
 
-def execute_sql_test(host_id, sql, comment):
+import db_util, cache, settings, base_class, json, traceback, pymysql
+
+def execute_sql_test(host_id, sql, comment, is_backup):
+    result = base_class.BaseClass(None)
+    result.error = ""
+    result.success = ""
     conn, cur = None, None
     try:
-        conn, cur = db_util.DBUtil().get_conn_and_cur(settings.MySQL_Host)
-        #conn, cur = db_util.DBUtil().get_conn_and_cur(cache.Cache().get_host_info(host_id))
-        cur.execute("start transaction;")
+        host_info = cache.Cache().get_host_info(int(host_id))
+        conn = pymysql.connect(host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password, db="mysql", charset="utf8")
+        cur = conn.cursor()
         cur.execute(sql)
-        cur.execute("commit;")
-        insert_execute_sql_log(host_id, sql, comment)
-        return "execute sql ok."
-    except Exception, e:
-        return repr(e)
-    finally:
+        result.success = "execute sql ok."
         db_util.DBUtil().close(conn, cur)
+        insert_execute_sql_log(host_id, sql, comment, is_backup=is_backup)
+    except Exception, e:
+        traceback.print_exc()
+        result.error = str(e)
+        db_util.DBUtil().close(conn, cur)
+    return json.dumps(result, default=lambda o: o.__dict__)
 
 def insert_execute_sql_log(host_id, sql, comment, is_backup=0, backup_name=""):
-    sql = "insert into execute_sql_log (host_id, is_backup, backup_name, `sql`, `comment`) VALUES ({0}, {1}, '{2}', '{3}', '{4}')" \
-          .format(host_id, is_backup, backup_name, sql, comment)
-    db_util.DBUtil().execute(settings, sql)
+    sql = "insert into mysql_web.execute_sql_log " \
+          "(host_id, is_backup, backup_name, `sql`, `comment`) " \
+          "VALUES " \
+          "(%s, %s, '%s', '%s', '%s')" % (host_id, is_backup, backup_name, pymysql.escape_string(sql), pymysql.escape_string(comment))
+    db_util.DBUtil().execute(settings.MySQL_Host, sql);
+

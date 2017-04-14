@@ -141,7 +141,7 @@ CREATE TABLE execute_sql_log
     host_id MEDIUMINT UNSIGNED NOT NULL,
     is_backup TINYINT UNSIGNED NOT NULL DEFAULT 0,
     backup_name VARCHAR(50) NOT NULL DEFAULT '',
-    `sql` TEXT NOT NULL DEFAULT '',
+    `sql` TEXT NOT NULL,
     `comment` VARCHAR(100) NOT NULL DEFAULT '',
     created_time TIMESTAMP NOT NULL DEFAULT now()
 );

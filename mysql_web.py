@@ -3,7 +3,7 @@
 #yum install openssl-devel  python-devel libffi-devel -y
 #pip install flask threadpool pymysql DBUtils paramiko
 
-import enum, settings
+import enum, settings, sys
 from flask import Flask, render_template, request, app, redirect
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql
 
@@ -15,6 +15,9 @@ monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
 alarm_thread.AlarmLog().start()
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 @app.route("/mysql")
 def get_mysql_data():
@@ -100,14 +103,14 @@ def execute_sql_home():
 
 @app.route("/autoreview", methods=['GET', 'POST'])
 def execute_sql_for_commit():
-    print(request.form)
-    return execute_sql.execute_sql_test(request.form["cluster_name"], request.form["sql_content"], request.form["workflow_name"])
+    #print(request.form)
+    return execute_sql.execute_sql_test(request.form["cluster_name"], request.form["sql_content"], request.form["workflow_name"], request.form["is_backup"])
 
 @app.route("/testsql", methods=['GET', 'POST'])
 def test_sql():
     return "execute sql ok."
 
-@app.route("/home")
+@app.route("/home", methods=['GET', 'POST'])
 def home():
     return render_template("home.html", interval=settings.UPDATE_INTERVAL * 1000)
 
