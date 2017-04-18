@@ -1,0 +1,94 @@
+<div class="container-fluid">
+    <div class="row clearfix">
+        <form id="user_form" action="/user/query" method="post" target="nm_iframe" class="row" role="form">
+            <div class="col-md-2 form-group">
+                <select id="server_id" name="server_id" class="selectpicker show-tick form-control bs-select-hidden" required>
+                    <option value="0" disabled="" selected="selected">Select MySQL Server</option>
+                    {% for info in host_infos %}
+                        {% if(info.is_master == 1) %}
+                            <option value="{{ info.key }}">{{ info.remark }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 form-group">
+                <input id="user_name" name="user_name" type="text" class="form-control" placeholder="user name"/>
+            </div>
+            <div class="col-md-2 form-group">
+                <input id="ip" name="ip" type="text" class="form-control" placeholder="IP"/>
+            </div>
+            <div class="col-md-2 form-group">
+                <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp;
+                <button type="reset" class="btn btn-default" onclick="remove_user_table()">清除</button>
+            </div>
+            <div class="col-md-4 form-group">
+                <button class="btn btn-default" style="float: right" onclick="add_user()">添加用户</button>
+            </div>
+        </form>
+
+        <!--<div class="row">
+            <div class="col-md-5">
+                <div id="tree"></div>
+            </div>
+        </div>-->
+
+
+        <div class="row">
+            <div class="col-md-12" id="user_table">
+            </div>
+        </div>
+    </div>
+
+    <iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Privileges Detail</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="msg">One fine body…</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src={{ url_for("static", filename="js/bootstrap-treeview.min.js") }} type="text/javascript"></script>
+
+<script language="JavaScript">
+    /*
+    $.get("/user/db", "", function (data) {
+        $('#tree').treeview(
+            {
+                data: data,
+                showCheckbox: true
+            }
+        );
+    })*/
+
+    $(document).ready(function() {
+        $("#user_form").ajaxForm(function(data){
+            $("#user_table").html(data);
+        });
+    });
+
+    function remove_user_table(){
+        $("#user_table").html("")
+    }
+
+    function add_user() {
+    }
+
+    function get_user_priv_detail(request_url) {
+        $.get(request_url, "", function (data) {
+            $("#msg").html(data);
+            $("#myModal").modal("show");
+        })
+    }
+</script>

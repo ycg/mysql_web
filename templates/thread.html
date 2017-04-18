@@ -1,0 +1,40 @@
+<div class="row">
+    <div class="col-md-2">
+        <select id="server_id" name="server_id" class="selectpicker show-tick form-control bs-select-hidden" required>
+            <option value="0" disabled="" selected="selected">Select MySQL Server</option>
+            {% for info in host_infos %}
+                <option value="{{ info.key }}">{{ info.remark }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary" onclick="set_host_id()">查询</button>
+    </div>
+</div>
+</br>
+<div class="row">
+    <div class="col-md-8" id="thread_table">
+    </div>
+</div>
+
+<script language="JavaScript">
+    timer = ""
+    host_id = 0
+
+    function set_host_id(){
+        host_id = $("#server_id option:selected").val()
+    }
+
+    function get_thread_infos() {
+        if(host_id <= 0){
+            return false
+        }
+        request_url = "/thread/" + host_id
+        $.get(request_url, "", function (data) {
+            $("#thread_table").html(data);
+        })
+    }
+
+    timer = setInterval(get_thread_infos, 2000)
+
+</script>

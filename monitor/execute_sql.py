@@ -18,7 +18,10 @@ def execute_sql_test(host_id, sql, comment, is_backup):
     except Exception, e:
         traceback.print_exc()
         result.error = str(e)
-        db_util.DBUtil().close(conn, cur)
+        try:
+            db_util.DBUtil().close(conn, cur)
+        except Exception:
+            pass
     return json.dumps(result, default=lambda o: o.__dict__)
 
 def insert_execute_sql_log(host_id, sql, comment, is_backup=0, backup_name=""):

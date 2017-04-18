@@ -113,6 +113,9 @@ class MonitorServer(threading.Thread):
         status_info.handler_read_last = int(mysql_status_new["Handler_read_last"]) - int(mysql_status_old["Handler_read_last"])
         status_info.handler_read_rnd = int(mysql_status_new["Handler_read_rnd"]) - int(mysql_status_old["Handler_read_rnd"])
         status_info.handler_read_rnd_next = int(mysql_status_new["Handler_read_rnd_next"]) - int(mysql_status_old["Handler_read_rnd_next"])
+        status_info.handler_update = int(mysql_status_new["Handler_update"]) - int(mysql_status_old["Handler_update"])
+        status_info.handler_write = int(mysql_status_new["Handler_write"]) - int(mysql_status_old["Handler_write"])
+        status_info.handler_delete = int(mysql_status_new["Handler_delete"]) - int(mysql_status_old["Handler_delete"])
 
         #open table cache
         status_info.table_open_cache = int(mysql_variables["table_open_cache"])

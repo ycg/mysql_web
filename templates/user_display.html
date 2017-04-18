@@ -1,0 +1,61 @@
+<table class="table table-hover table-bordered">
+    <thead>
+    <tr>
+        <th>
+            User
+        </th>
+        <th>
+            Host
+        </th>
+        <th>
+            Select
+        </th>
+        <th>
+            Insert
+        </th>
+        <th>
+            Update
+        </th>
+        <th>
+            Delete
+        </th>
+        <th>
+
+        </th>
+        <th>
+
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for status in user_infos %}
+        <tr>
+            <td>
+                {{ status.user }}
+            </td>
+            <td>
+                {{ status.host }}
+            </td>
+            <td>
+                {{ status.select }}
+            </td>
+            <td>
+                {{ status.insert }}
+            </td>
+            <td>
+                {{ status.update }}
+            </td>
+            <td>
+                {{ status.delete }}
+            </td>
+            <td class="text-center">
+                <a href="javascript:void(0)" id="user" onclick=get_user_priv_detail("/user/detail/{{ host_id }}/{{ status.user }}/{{ status.host }}")>Detail</a>
+            </td>
+            <td>
+                Drop
+                <!--<a href="/user/drop/{{ host_id }}/{{ status.user }}/{{ status.host }}">Drop</a>-->
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

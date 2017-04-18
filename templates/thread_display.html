@@ -1,0 +1,45 @@
+<table class="table table-hover table-bordered">
+    <thead>
+    <tr>
+        <th>
+            User
+        </th>
+        <th>
+            Host
+        </th>
+        <th>
+            Command
+        </th>
+        <th>
+            Count
+        </th>
+        <th>
+            State
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for status in thread_infos %}
+        <tr>
+            <td>
+                {{ status.user }}
+            </td>
+            <td>
+                {{ status.host }}
+            </td>
+            <td {% if(status.command != "Sleep") %} class="text-danger" {% endif %}>
+                {{ status.command }}
+            </td>
+            <td>
+                {{ status.count }}
+            </td>
+            <td>
+                {{ status.state }}
+            </td>
+            <td>
+                {{ status.sql }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

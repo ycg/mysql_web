@@ -9,10 +9,10 @@ def get_slow_log_top_20():
              (
                 select t1.checksum, t1.first_seen, t1.last_seen, left(t1.fingerprint, 100) as fingerprint,
                 (
-                    select ifnull(sum(ts_cnt), 0) from db1.general_log_review_history where checksum= t1.checksum
+                    select round(sum(ifnull(ts_cnt, 0)), 2) from db1.mysql_slow_query_review_history where checksum= t1.checksum
                 ) as ts_cnt,
                 (
-                    select ifnull(sum(Query_time_sum), 0) from db1.general_log_review_history where checksum= t1.checksum
+                    select round(sum(ifnull(Query_time_sum, 0)), 2) from db1.mysql_slow_query_review_history where checksum= t1.checksum
                 ) as Query_time_sum
                 from db1.mysql_slow_query_review t1
              ) t2 order by Query_time_sum desc limit 20;"""
