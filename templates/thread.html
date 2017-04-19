@@ -8,33 +8,46 @@
         </select>
     </div>
     <div class="col-md-2">
+        <select id="query_type" name="query_type" class="selectpicker show-tick form-control bs-select-hidden" required>
+            <option value="1" selected="selected">ALL</option>
+            <option value="2">Sleep</option>
+            <option value="3">Not Sleep</option>
+        </select>
+    </div>
+    <div class="col-md-2">
         <button class="btn btn-primary" onclick="set_host_id()">查询</button>
+        &nbsp;&nbsp;<button class="btn btn-default">停止</button>
     </div>
 </div>
 </br>
 <div class="row">
-    <div class="col-md-8" id="thread_table">
+    <div class="col-md-12" id="thread_table">
     </div>
 </div>
 
 <script language="JavaScript">
     timer = ""
     host_id = 0
+    query_type = 1
 
     function set_host_id(){
         host_id = $("#server_id option:selected").val()
+        query_type = $("#query_type option:selected").val()
     }
 
     function get_thread_infos() {
         if(host_id <= 0){
             return false
         }
-        request_url = "/thread/" + host_id
+        request_url = "/thread/" + host_id + "/" + query_type
         $.get(request_url, "", function (data) {
             $("#thread_table").html(data);
         })
     }
 
-    timer = setInterval(get_thread_infos, 2000)
+    function stop_time() {
+        clearInterval(timer)
+    }
 
+    timer = setInterval(get_thread_infos, 2000)
 </script>

@@ -16,9 +16,6 @@ monitor_server.load()
 monitor_server.start()
 alarm_thread.AlarmLog().start()
 
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 #region mysql api
 
 @app.route("/mysql")
@@ -99,6 +96,8 @@ def get_general_log_detail(page_number, checksum):
 
 #endregion
 
+#region common methon
+
 def convert_object_to_list(obj):
     list_tmp = None
     if(obj != None):
@@ -108,6 +107,8 @@ def convert_object_to_list(obj):
 
 def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None, data_host=None, slave_status=None, tablespace_status=None):
     return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl, data_host=data_host, slave_status=slave_status, tablespace_status=tablespace_status)
+
+#endregion
 
 #region slow log api
 
@@ -125,26 +126,21 @@ def get_slow_log_detail(checksum):
 def get_os_infos():
     return get_monitor_data(data_host=mysql_cache.get_all_linux_infos())
 
+#region execute sql api
+
 @app.route("/sql")
 def execute_sql_home():
     return render_template("execute_sql.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/autoreview", methods=['GET', 'POST'])
 def execute_sql_for_commit():
-    #print(request.form)
     return execute_sql.execute_sql_test(request.form["cluster_name"], request.form["sql_content"], request.form["workflow_name"], request.form["is_backup"])
 
-@app.route("/testsql", methods=['GET', 'POST'])
-def test_sql():
-    return "execute sql ok."
+#endregion
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     return render_template("home.html", interval=settings.UPDATE_INTERVAL * 1000)
-
-@app.route("/mytest")
-def test_tablespace():
-    return render_template("user.html", user_infos=user.MySQLUser(1).get_all_users(), host_id=1, host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/home/chart")
 def chart():
@@ -197,12 +193,11 @@ def drop_user(host_id, name, ip):
 def thread_home():
     return render_template("thread.html", host_infos=mysql_cache.get_all_host_infos())
 
-@app.route("/thread/<int:host_id>")
-def get_thread_infos(host_id):
-    return render_template("thread_display.html", thread_infos=thread.get_all_thread(host_id))
+@app.route("/thread/<int:host_id>/<int:query_type>")
+def get_thread_infos(host_id, query_type):
+    return render_template("thread_display.html", thread_infos=thread.get_all_thread(host_id, query_type))
 
 #endregion
 
 if __name__ == '__main__':
-    #app.run(threaded=True)
     app.run(debug=True, host="0.0.0.0", port=int("5000"))

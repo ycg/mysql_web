@@ -57,7 +57,7 @@ class DBUtil(object):
         if(cursor != None):
             cursor.close()
         if(connection != None):
-            #connection.commit()
+            connection.commit()
             connection.close()
 
     def execute_for_db(self, host_info, sql):
