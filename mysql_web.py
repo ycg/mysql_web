@@ -72,12 +72,7 @@ def get_replication_data_by_id(id):
 
 @app.route("/tablespace")
 def get_tablespace():
-    #return get_monitor_data(tablespace_status=mysql_cache.get_all_tablespace_infos())
     return render_template("tablespace.html", host_infos=mysql_cache.get_all_host_infos())
-
-@app.route("/tablespace/<int:id>")
-def get_tablespace_by_id(id):
-    return render_template("tablespace.html", table_status=mysql_cache.get_tablespace_info(id).detail[0:50], host_info=mysql_cache.get_host_info(id))
 
 @app.route("/tablespace/check/invoke")
 def execute_check_tablespace():
@@ -142,10 +137,6 @@ def get_slow_log_detail(checksum):
 
 #endregion
 
-@app.route("/os")
-def get_os_infos():
-    return get_monitor_data(data_host=mysql_cache.get_all_linux_infos())
-
 #region execute sql api
 
 @app.route("/sql")
@@ -157,6 +148,12 @@ def execute_sql_for_commit():
     return execute_sql.execute_sql_test(request.form["cluster_name"], request.form["sql_content"], request.form["workflow_name"], request.form["is_backup"])
 
 #endregion
+
+#region other api
+
+@app.route("/os")
+def get_os_infos():
+    return get_monitor_data(data_host=mysql_cache.get_all_linux_infos())
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
@@ -172,6 +169,8 @@ def chart():
 @app.route("/home/binlog")
 def get_test():
     return render_template("binlog.html")
+
+#endregion
 
 #region user web api
 
