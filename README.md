@@ -10,6 +10,14 @@ mysql monitor web
 8.支持收集慢查询监控
 9.支持对thread进行完整分析
 
+完成的脚本：
+1.一键安装数据库脚本
+2.使用mysqlbinlog进行binlog的备份脚本
+3.支持基于pymysqlreplication的二进制解析脚本
+4.支持慢查询收集脚本
+5.支持检查表空间脚本
+6.基于mysqldump的创建从库脚本
+
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/111.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/112.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/113.png)
