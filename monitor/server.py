@@ -44,7 +44,7 @@ class MonitorServer(threading.Thread):
             time.sleep(1)
             self.__times = self.__times + 1
 
-    def test_get_tablespace_infos(self):
+    def invoke_check_tablespace_method(self):
         self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
 
     def get_mysql_status(self, host_info):

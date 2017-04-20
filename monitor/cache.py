@@ -51,7 +51,7 @@ class Cache(object):
                 self.remove_key(self.__linux_infos, host_id)
                 self.remove_key(self.__innodb_status_infos, host_id)
             else:
-                if(self.__repl_infos.has_key(host_id) == False):
+                if(self.__tablespace.has_key(host_id) == False):
                     self.__tablespace[host_id] = base_class.BaseClass(host_info_temp)
                 if(self.__repl_infos.has_key(host_id) == False):
                     self.__repl_infos[host_id] = base_class.BaseClass(host_info_temp)

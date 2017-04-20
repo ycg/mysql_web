@@ -61,8 +61,7 @@ class DBUtil(object):
             connection.close()
 
     def execute_for_db(self, host_info, sql):
-        connection = self.get_mysql_connection(host_info)
-        cursor = connection.cursor()
+        connection, cursor = self.get_conn_and_cur(host_info)
         cursor.execute(sql)
         return connection, cursor
 

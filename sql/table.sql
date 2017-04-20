@@ -132,6 +132,18 @@ CREATE TABLE mysql_exception_log
     log_text TEXT NOT NULL DEFAULT ''
 ) COMMENT = 'mysql exception log';
 
+#慢日志和查询日志pt工具对应的表配置
+CREATE TABLE slow_general_log_config
+(
+    host_id MEDIUMINT UNSIGNED NOT NULL PRIMARY KEY ,
+    slow_log_db VARCHAR(50) NOT NULL DEFAULT '',
+    slow_log_table VARCHAR(50) NOT NULL DEFAULT '',
+    general_log_db VARCHAR(50) NOT NULL DEFAULT '',
+    general_log_table VARCHAR(50) NOT NULL DEFAULT '',
+    created_time TIMESTAMP NOT NULL DEFAULT now(),
+    updated_time TIMESTAMP NOT NULL DEFAULT current_timestamp on UPDATE CURRENT_TIMESTAMP
+);
+
 #执行sql日志表
 CREATE DATABASE backup;
 DROP TABLE execute_sql_log;
@@ -145,3 +157,4 @@ CREATE TABLE execute_sql_log
     `comment` VARCHAR(100) NOT NULL DEFAULT '',
     created_time TIMESTAMP NOT NULL DEFAULT now()
 );
+

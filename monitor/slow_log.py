@@ -1,5 +1,12 @@
 import db_util, base_class, settings
 
+query_type = {}
+query_type[1] = "sql_count"
+query_type[2] = "query_sum"
+query_type[3] = "lock_sum"
+query_type[4] = "rows_sent_count"
+query_type[5] = "rows_exam_sum"
+
 def get_slow_log_top_20():
     sql = """select t1.checksum, t2.ts_cnt, t2.Query_time_sum, t1.first_seen, t1.last_seen, left(t1.fingerprint, 100) as fingerprint
              from db1.mysql_slow_query_review t1
@@ -17,7 +24,7 @@ def get_slow_log_top_20():
                 from db1.mysql_slow_query_review t1
              ) t2 order by Query_time_sum desc limit 20;"""
     slow_list = []
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
         slow_info = base_class.BaseClass(None)
         slow_info.checksum = row["checksum"]
         slow_info.count = int(row["ts_cnt"])
@@ -38,7 +45,7 @@ def get_slow_log_detail(checksum):
              left join db1.mysql_slow_query_review_history t2 on t1.checksum = t2.checksum
              where t1.checksum='{0}' limit 1;""".format(checksum)
     slow_log_detail = None
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
         slow_log_detail = base_class.BaseClass(None)
         slow_log_detail.checksum = row["checksum"]
         slow_log_detail.count = int(row["ts_cnt"])
@@ -64,3 +71,37 @@ def get_slow_log_detail(checksum):
         slow_log_detail.sample = row["sample"].decode("utf-8")
     return slow_log_detail
 
+def get_all_slow_infos(host_id, query_type_id):
+    sql = """select * from
+             (
+                 select t1.checksum, sum(ifnull(t2.ts_cnt, 0)) as sql_count, t1.is_reviewed, t1.first_seen, t1.last_seen, t1.id, t1.fingerprint,
+                 round(sum(Query_time_sum), 2) as query_sum, round(sum(Lock_time_sum), 2) as lock_sum,
+                 sum(Rows_sent_sum) as rows_sent_count, sum(Rows_examined_sum) as rows_exam_sum
+                 from db1.mysql_slow_query_review t1
+                 left join db1.mysql_slow_query_review_history t2 on t1.checksum = t2.checksum
+                 group by t1.checksum
+             ) t3 order by {0} desc limit 50;"""
+    if(query_type_id <= 0):
+        sql = sql.format(query_type[1])
+    else:
+        sql = sql.format(query_type[query_type_id])
+    slow_list = []
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+        slow_info = base_class.BaseClass(None)
+        slow_info.id = row["id"]
+        slow_info.checksum = row["checksum"]
+        slow_info.sql_count = int(row["sql_count"])
+        slow_info.is_reviewed = row["is_reviewed"]
+        slow_info.first_seen = row["first_seen"]
+        slow_info.last_seen = row["last_seen"]
+        slow_info.fingerprint = row["fingerprint"].decode("utf-8")
+        if(len(slow_info.fingerprint) > 80):
+            slow_info.display_sql = slow_info.fingerprint[0:80] + "..."
+        else:
+            slow_info.display_sql = slow_info.fingerprint
+        slow_info.query_sum = row["query_sum"]
+        slow_info.lock_sum = row["lock_sum"]
+        slow_info.rows_sent_count = int(row["rows_sent_count"])
+        slow_info.rows_exam_sum = int(row["rows_exam_sum"])
+        slow_list.append(slow_info)
+    return slow_list

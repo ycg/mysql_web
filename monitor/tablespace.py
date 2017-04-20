@@ -1,5 +1,11 @@
 import paramiko, db_util, settings, cache, time
 
+KB = 1024
+K = KB * 1024
+M = K * 1024
+G = M * 1024
+T = G * 1024
+
 class TableInfo():
     diff = 0
     value = 0
@@ -26,20 +32,19 @@ def get_table_infos(host_info):
         table_info.total_size = long(table_info.data_size) + long(table_info.index_size)
         table_name = row["table_schema"] + "." + row["table_name"]
         table_infos[table_name] = table_info
-        if(host_info.key == 9):
-            print(table_name)
     return table_infos
 
 def get_data_length(data_length):
-    value = float(1024)
-    if(data_length > value):
-        result = round(data_length / value, 0)
-        if(result > value):
-            return str(int(round(result / value, 0))) + "M"
-        else:
-            return str(int(result)) + "K"
-    else:
+    if(data_length < KB):
         return str(data_length) + "KB"
+    elif(data_length < K):
+        return str(data_length / KB) + "K"
+    elif(data_length < M):
+        return str(data_length / K) + "M"
+    elif(data_length < G):
+        return str(round(float(data_length) / float(M), 2)) + "G"
+    elif(data_length < T):
+        return str(round(float(data_length) / float(G), 2)) + "T"
 
 def get_tablespace_infos(host_info):
     print(host_info.remark, "start check tablespace")
@@ -92,6 +97,10 @@ def sum_tablespace_info(host_info, table_infos):
     tablespace_info.index_total = get_data_length(index_total)
     tablespace_info.file_total = get_data_length(file_total)
     tablespace_info.free_total = get_data_length(free_total)
+    tablespace_info.data_total_o = data_total
+    tablespace_info.index_total_o = index_total
+    tablespace_info.file_total_o = file_total
+    tablespace_info.free_total_o = free_total
     tablespace_info.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
 def get_table_name_and_file_size(value):
@@ -116,6 +125,34 @@ def insert_tablespace_data(host_info, table_infos):
                                               table_info.rows_o, table_info.auto_increment, table_info.file_size_o, table_info.free_size))
     sql = sql + ','.join(value_list) + ";"
     db_util.DBUtil().execute(settings.MySQL_Host, sql)
+
+def sort_tablespace(sort_type):
+    infos = cache.Cache().get_all_tablespace_infos()
+    if(sort_type == 1):
+        return sorted(infos, cmp=lambda x,y:cmp(x.rows_total, y.rows_total), reverse=True)
+    elif(sort_type == 2):
+        return sorted(infos, cmp=lambda x,y:cmp(x.data_total_o, y.data_total_o), reverse=True)
+    elif(sort_type == 3):
+        return sorted(infos, cmp=lambda x,y:cmp(x.index_total_o, y.index_total_o), reverse=True)
+    elif(sort_type == 5):
+        return sorted(infos, cmp=lambda x,y:cmp(x.file_total_o, y.file_total_o), reverse=True)
+    else:
+        return sorted(infos, cmp=lambda x,y:cmp(x.free_total_o, y.free_total_o), reverse=True)
+
+def sort_tablespace_by_host_id(host_id, sort_type):
+    infos = cache.Cache().get_tablespace_info(host_id).detail
+    if(sort_type == 1):
+        return sorted(infos, cmp=lambda x,y:cmp(x.rows_o, y.rows_o), reverse=True)
+    elif(sort_type == 2):
+        return sorted(infos, cmp=lambda x,y:cmp(x.data_size_o, y.data_size_o), reverse=True)
+    elif(sort_type == 3):
+        return sorted(infos, cmp=lambda x,y:cmp(x.index_size_o, y.index_size_o), reverse=True)
+    elif(sort_type == 4):
+        return sorted(infos, cmp=lambda x,y:cmp(x.total_size_o, y.total_size_o), reverse=True)
+    elif(sort_type == 5):
+        return sorted(infos, cmp=lambda x,y:cmp(x.file_size_o, y.file_size_o), reverse=True)
+    else:
+        return sorted(infos, cmp=lambda x,y:cmp(x.free_size, y.free_size), reverse=True)
 
 '''
 def analysis_table_data(host_info):

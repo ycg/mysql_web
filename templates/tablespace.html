@@ -1,73 +1,46 @@
-{% if(table_status != None) %}
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <table class="table table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th colspan="8" rowspan="1" class="text-center">
-                            {{ host_info.remark }}
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Schema
-                        </th>
-                        <th>
-                            Table_Name
-                        </th>
-                        <th>
-                            Rows
-                        </th>
-                        <th>
-                            Data_S
-                        </th>
-                        <th>
-                            Index_S
-                        </th>
-                        <th>
-                            Total_S
-                        </th>
-                        <th>
-                            File_S
-                        </th>
-                        <th>
-                            Free
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in table_status %}
-                    <tr>
-                        <td>
-                            {{ status.schema }}
-                        </td>
-                        <td>
-                            {{ status.t_name }}
-                        </td>
-                        <td>
-                            {{ status.rows }}
-                        </td>
-                        <td >
-                            {{ status.data_size }}
-                        </td>
-                        <td>
-                            {{ status.index_size }}
-                        </td>
-                        <td >
-                            {{ status.total_size }}
-                        </td>
-                        <td>
-                            {{ status.file_size }}
-                        </td>
-                        <td>
-                            {{ status.diff }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="row">
+    <div class="col-md-2">
+        <select id="server_id" name="server_id" class="selectpicker show-tick form-control bs-select-hidden" required>
+            <option value="0" selected="selected">ALL</option>
+            {% for info in host_infos %}
+                <option value="{{ info.key }}">{{ info.remark }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="sort_type" name="sort_type" class="selectpicker show-tick form-control bs-select-hidden" required>
+            <option value="1" selected="selected">Rows Count</option>
+            <option value="2">Data Size</option>
+            <option value="3">Index Size</option>
+            <option value="4">Total Size</option>
+            <option value="5">File Size</option>
+            <option value="6">Free Size</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary" onclick="select_sort_type_and_host_id()">Query</button>
     </div>
 </div>
-{% endif %}
+<br>
+<div class="row">
+    <div class="col-md-8" id="tablespace_info"></div>
+</div>
+
+<script language="JavaScript">
+    host_id = 0
+    sort_type_id = 1;
+
+    function select_sort_type_and_host_id() {
+        host_id = $("#server_id option:selected").val()
+        sort_type_id = $("#sort_type option:selected").val()
+        query_tablespace_info()
+    }
+
+    function query_tablespace_info() {
+        $.get("/tablespace/sort/" + host_id + "/" + sort_type_id, "", function (data) {
+            $("#tablespace_info").html(data);
+        })
+    }
+
+    query_tablespace_info()
+</script>

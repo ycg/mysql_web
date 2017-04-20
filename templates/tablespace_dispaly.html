@@ -1,0 +1,114 @@
+{% if(tablespace_status != None) %}
+    <table class="table table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>
+                Table_Name
+            </th>
+            <th>
+                Rows
+            </th>
+            <th>
+                Data
+            </th>
+            <th>
+                Index
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                File
+            </th>
+            <th>
+                Free
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for status in tablespace_status %}
+            <tr>
+                <td>
+                    {{ status.schema }}.{{ status.t_name }}
+                </td>
+                <td>
+                    {{ status.rows }}
+                </td>
+                <td>
+                    {{ status.data_size }}
+                </td>
+                <td>
+                    {{ status.index_size }}
+                </td>
+                <td>
+                    {{ status.total_size }}
+                </td>
+                <td>
+                    {{ status.file_size }}
+                </td>
+                <td>
+                    {{ status.diff }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+
+{% if(host_tablespace_infos != None) %}
+    <table class="table table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>
+                Host
+            </th>
+            <th>
+                Rows_T
+            </th>
+            <th>
+                Data_T
+            </th>
+            <th>
+                Index_T
+            </th>
+            <th>
+                File_T
+            </th>
+            <th>
+                Free_T
+            </th>
+            <th>
+                Last Update Time
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for status in host_tablespace_infos %}
+            <tr>
+                <td>
+                    {{ status.host_info.remark }}
+                </td>
+                <td>
+                    {{ status.rows_total }}
+                </td>
+                <td>
+                    {{ status.data_total }}
+                </td>
+                <td>
+                    {{ status.index_total }}
+                </td>
+                <td>
+                    {{ status.file_total }}
+                </td>
+                <td>
+                    {{ status.free_total }}
+                </td>
+                <td>
+                    {{ status.last_update_time }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

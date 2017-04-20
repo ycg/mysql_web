@@ -1,0 +1,70 @@
+{% if(slow_log_infos != None) %}
+    <table class="table table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Fingerprint
+            </th>
+            <th>
+                Count
+            </th>
+            <th title="Query_time_sum">
+                Query_S
+            </th>
+            <th title="Lock_time_sum">
+                Lock_S
+            </th>
+            <th title="Rows_sent_sum">
+                Rows_S
+            </th>
+            <th title="Rows_examined_sum">
+                Rows_E_C
+            </th>
+            <th>
+                First
+            </th>
+            <th>
+                Last
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for status in slow_log_infos %}
+            <tr>
+                <td>
+                    {{ status.id }}
+                </td>
+                <td title="{{ status.fingerprint }}">
+                    {{ status.display_sql }}
+                </td>
+                <td>
+                    {{ status.sql_count }}
+                </td>
+                <td>
+                    {{ status.query_sum }}
+                </td>
+                <td>
+                    {{ status.lock_sum }}
+                </td>
+                <td>
+                    {{ status.rows_sent_count }}
+                </td>
+                <td>
+                    {{ status.rows_exam_sum }}
+                </td>
+                <td>
+                    {{ status.first_seen }}
+                </td>
+                <td>
+                    {{ status.last_seen }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    No Data
+{% endif %}

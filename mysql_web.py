@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#yum install openssl-devel  python-devel libffi-devel -y
+#yum install openssl-devel python-devel libffi-devel -y
 #pip install flask threadpool pymysql DBUtils paramiko
 
 import enum, settings, sys
@@ -72,11 +72,27 @@ def get_replication_data_by_id(id):
 
 @app.route("/tablespace")
 def get_tablespace():
-    return get_monitor_data(tablespace_status=mysql_cache.get_all_tablespace_infos())
+    #return get_monitor_data(tablespace_status=mysql_cache.get_all_tablespace_infos())
+    return render_template("tablespace.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/tablespace/<int:id>")
 def get_tablespace_by_id(id):
     return render_template("tablespace.html", table_status=mysql_cache.get_tablespace_info(id).detail[0:50], host_info=mysql_cache.get_host_info(id))
+
+@app.route("/tablespace/check/invoke")
+def execute_check_tablespace():
+    monitor_server.invoke_check_tablespace_method()
+    return "invoke ok, please wait."
+
+@app.route("/tablespace/sort/<int:host_id>/<int:sort_type>")
+def sort_tablespace(host_id, sort_type):
+    if(host_id <= 0):
+        return render_template("tablespace_dispaly.html", host_tablespace_infos=tablespace.sort_tablespace(sort_type), tablespace_status=None)
+    else:
+        table_list = tablespace.sort_tablespace_by_host_id(host_id, sort_type)
+        if(len(table_list) > 50):
+            table_list = table_list[0:50]
+        return render_template("tablespace_dispaly.html", host_tablespace_infos=None, tablespace_status=table_list)
 
 #endregion
 
@@ -113,8 +129,12 @@ def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_en
 #region slow log api
 
 @app.route("/slowlog")
-def get_slow_logs():
-    return render_template("slow_log.html", slow_list = slow_log.get_slow_log_top_20(), slow_low_info=None)
+def slow_log_home():
+    return render_template("slow_log_new.html")
+
+@app.route("/slowlog/<int:query_type_id>")
+def get_slow_logs(query_type_id):
+    return render_template("slow_log_display.html", slow_log_infos=slow_log.get_all_slow_infos(0, query_type_id))
 
 @app.route("/slowlog/<checksum>")
 def get_slow_log_detail(checksum):
