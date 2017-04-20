@@ -1,6 +1,7 @@
 #! /bin/bash
 
 #注意如果SQL比较长需要修改sample字段为mediumtext
+#alter table table1 modify sample mediumtext not null;
 #ALTER TABLE `db1`.`general_log_review` ADD COLUMN `is_reviewed` TINYINT UNSIGNED NOT NULL DEFAULT 0;
 
 #1.general_log存放的数据库地址

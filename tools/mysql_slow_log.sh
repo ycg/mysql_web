@@ -4,6 +4,17 @@
 #需要安装pt-tools工具包，然后把脚本设置为后台执行
 #注意如果SQL比较长需要修改sample字段为mediumtext
 
+#alter table table1 modify sample mediumtext not null;
+#alter table table1 add column created_time timestamp not null default now(),
+#add column updated_time timestamp not null default current_timestamp on update current_timestamp,
+#ADD COLUMN `is_reviewed` TINYINT UNSIGNED NOT NULL DEFAULT 0;
+
+#ALTER TABLE `db1`.`mysql_slow_query_review`
+#CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+#DROP PRIMARY KEY,
+#ADD PRIMARY KEY (`id`),
+#ADD UNIQUE INDEX `checksum_UNIQUE` (`checksum` ASC);
+
 #1.slow log存放的地址
 db_host=""
 db_port=3306
@@ -47,6 +58,7 @@ function check_slow_log()
         rm -rf "$slow_log_file"
         echo "remove $slow_log_file ok."
     fi
+    echo ""
 }
 
 if [ ! -d "$slow_log_dir" ]; then
