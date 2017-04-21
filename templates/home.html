@@ -10,44 +10,36 @@
     <script language="JavaScript">
         var timer = ""
         var my_url = "/mysql"
-
         function myrefresh(){
             /*$(document).ready(function(){
                 htmlobj = $.ajax({url:my_url, async:false});
                 $("#data").html(htmlobj.responseText);
             });*/
-
             $.get(my_url, "", function(data){
                 $("#data").html(data);
             })
         }
-
         function stop(parameter, idName){
             myActive(idName)
             my_url = parameter
             myrefresh()
             stop_timer()
         }
-
         function start(parameter, idName){
             myActive(idName)
             my_url = parameter
             myrefresh()
             start_timer()
         }
-
         function start_timer(){
             stop_timer()
             timer = setInterval(myrefresh, {{ interval }})
         }
-
         function stop_timer(){
             clearInterval(timer)
         }
-
         myrefresh()
         start_timer()
-
         function myActive(idName){
             if(idName == ""){
                 return
@@ -65,8 +57,8 @@
 <body>
     <div class="container-fluid">
 
-        <div class="row clearfix">
-            <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12 text-center">
                 <nav class="navbar navbar-default" role="navigation">
                     <div class="navbar-text center">
                         <h2>MySQL Web</h2>
@@ -75,26 +67,24 @@
             </div>
         </div>
 
-        <div class="row clearfix">
-            <div class="col-md-2 row">
+        <div class="row">
+            <div class="col-md-2">
                 <div id="myTab" class="list-group">
                     <a href="javascript:void(0)" id="mysql" class="list-group-item active" onclick=start("/mysql","mysql")><span class="glyphicon glyphicon-home"> MySQL</span></a>
                     <a href="javascript:void(0)" id="status" class="list-group-item" onclick=start("/status","status")><span class="glyphicon glyphicon-cog"> Status</span></a>
                     <a href="javascript:void(0)" id="innodb" class="list-group-item" onclick=start("/innodb","innodb")><span class="glyphicon glyphicon-file"> INNODB</span></a>
-                    <a href="javascript:void(0)" id="repl" class="list-group-item" onclick=start("/replication","repl")><span class="glyphicon glyphicon-list-alt"> Replication</span></a>
-                    <a href="javascript:void(0)" id="os" class="list-group-item" onclick=start("/os","os")><span class="glyphicon glyphicon-list-alt"> OS</span></a>
-                    <a href="javascript:void(0)" id="slowlog" class="list-group-item" onclick=stop("/slowlog","slowlog")><span class="glyphicon glyphicon-list-alt"> SlowLog</span></a>
-                    <a href="javascript:void(0)" id="tablespace" class="list-group-item" onclick=stop("/tablespace","tablespace")><span class="glyphicon glyphicon-list-alt"> Tablespace</span></a>
-                    <a href="javascript:void(0)" id="sql" class="list-group-item" onclick=stop("/sql","sql")><span class="glyphicon glyphicon-list-alt"> SQLExecute</span></a>
-                    <a href="javascript:void(0)" id="general" class="list-group-item" onclick=stop("/general/1","general")><span class="glyphicon glyphicon-list-alt"> GeneralLog</span></a>
-                    <a href="javascript:void(0)" id="user" class="list-group-item" onclick=stop("/user","user")><span class="glyphicon glyphicon-list-alt"> User</span></a>
-                    <a href="javascript:void(0)" id="thread" class="list-group-item" onclick=stop("/thread","thread")><span class="glyphicon glyphicon-list-alt"> Thread</span></a>
+                    <a href="javascript:void(0)" id="repl" class="list-group-item" onclick=start("/replication","repl")><span class="glyphicon glyphicon-filter"> Replication</span></a>
+                    <a href="javascript:void(0)" id="os" class="list-group-item" onclick=start("/os","os")><span class="glyphicon glyphicon-user"> OS</span></a>
+                    <a href="javascript:void(0)" id="slowlog" class="list-group-item" onclick=stop("/slowlog","slowlog")><span class="glyphicon glyphicon-log-in"> SlowLog</span></a>
+                    <a href="javascript:void(0)" id="tablespace" class="list-group-item" onclick=stop("/tablespace","tablespace")><span class="glyphicon glyphicon-barcode"> Tablespace</span></a>
+                    <a href="javascript:void(0)" id="sql" class="list-group-item" onclick=stop("/sql","sql")><span class="glyphicon glyphicon-apple"> SQLExecute</span></a>
+                    <a href="javascript:void(0)" id="general" class="list-group-item" onclick=stop("/general/1","general")><span class="glyphicon glyphicon-check"> GeneralLog</span></a>
+                    <a href="javascript:void(0)" id="user" class="list-group-item" onclick=stop("/user","user")><span class="glyphicon glyphicon-user"> User</span></a>
+                    <a href="javascript:void(0)" id="thread" class="list-group-item" onclick=stop("/thread","thread")><span class="glyphicon glyphicon-download"> Thread</span></a>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-10" id="data">
-                    {% block content %} {% endblock %}
-                </div>
+            <div class="col-md-10" id="data">
+                {% block content %} {% endblock %}
             </div>
         </div>
     </div>

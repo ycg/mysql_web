@@ -2,7 +2,8 @@
     <div class="row clearfix">
         <form id="user_form" action="/user/query" method="post" target="nm_iframe" class="row" role="form">
             <div class="col-md-2 form-group">
-                <select id="server_id" name="server_id" class="selectpicker show-tick form-control bs-select-hidden" required>
+                <select id="server_id" name="server_id" class="selectpicker show-tick form-control bs-select-hidden"
+                        required>
                     <option value="0" disabled="" selected="selected">Select MySQL Server</option>
                     {% for info in host_infos %}
                         {% if(info.is_master == 1) %}
@@ -18,7 +19,8 @@
                 <input id="ip" name="ip" type="text" class="form-control" placeholder="IP"/>
             </div>
             <div class="col-md-2 form-group">
-                <button type="submit" class="btn btn-primary">查询</button>&nbsp;&nbsp;
+                <button type="submit" class="btn btn-primary">查询</button>
+                &nbsp;&nbsp;
                 <button type="reset" class="btn btn-default" onclick="remove_user_table()">清除</button>
             </div>
             <div class="col-md-4 form-group">
@@ -34,7 +36,7 @@
 
 
         <div class="row">
-            <div class="col-md-12" id="user_table">
+            <div class="col-md-7" id="user_table">
             </div>
         </div>
     </div>
@@ -57,32 +59,77 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="test" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="myModalLabel">新增</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="txt_departmentname">部门名称</label>
+                        <input type="text" name="txt_departmentname" class="form-control" id="txt_departmentname"
+                               placeholder="部门名称">
+                    </div>
+                    <div class="form-group">
+                        <label for="txt_parentdepartment">上级部门</label>
+                        <input type="text" name="txt_parentdepartment" class="form-control" id="txt_parentdepartment"
+                               placeholder="上级部门">
+                    </div>
+                    <div class="form-group">
+                        <label for="txt_departmentlevel">部门级别</label>
+                        <input type="text" name="txt_departmentlevel" class="form-control" id="txt_departmentlevel"
+                               placeholder="部门级别">
+                    </div>
+                    <div class="form-group">
+                        <label for="txt_statu">描述</label>
+                        <input type="text" name="txt_statu" class="form-control" id="txt_statu" placeholder="状态">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><span
+                            class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭
+                    </button>
+                    <button type="button" id="btn_submit" class="btn btn-primary" data-dismiss="modal"><span
+                            class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>保存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src={{ url_for("static", filename="js/bootstrap-treeview.min.js") }} type="text/javascript"></script>
 
 <script language="JavaScript">
     /*
-    $.get("/user/db", "", function (data) {
-        $('#tree').treeview(
-            {
-                data: data,
-                showCheckbox: true
-            }
-        );
-    })*/
+     $.get("/user/db", "", function (data) {
+     $('#tree').treeview(
+     {
+     data: data,
+     showCheckbox: true
+     }
+     );
+     })*/
 
-    $(document).ready(function() {
-        $("#user_form").ajaxForm(function(data){
+    $(document).ready(function () {
+        $("#user_form").ajaxForm(function (data) {
             $("#user_table").html(data);
         });
     });
 
-    function remove_user_table(){
+    function remove_user_table() {
         $("#user_table").html("")
     }
 
     function add_user() {
+        $("#myModalLabel").text("新增");
+        $('#test').modal({backdrop: 'static', keyboard: false});
     }
 
     function get_user_priv_detail(request_url) {

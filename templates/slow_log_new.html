@@ -23,6 +23,19 @@
     <div class="col-md-12" id="slow_log"></div>
 </div>
 
+<div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">提示</h4>
+            </div>
+            <div class="modal-body">
+                加载中，请稍候。。。
+            </div>
+        </div>
+    </div>
+</div>
+
 <script language="JavaScript">
     query_type_id = 1;
 
@@ -32,8 +45,10 @@
     }
 
     function query_slow_log() {
+        $("#loading").modal("show")
         $.get("/slowlog/" + query_type_id, "", function (data) {
             $("#slow_log").html(data);
+            $("#loading").modal("hide")
         })
     }
 

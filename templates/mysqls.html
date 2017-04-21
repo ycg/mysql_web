@@ -1,80 +1,80 @@
 {% if(mysql_infos != None) %}
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="span12">
-            <table class="table table-condensed table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th>
-                            Remark
-                        </th>
-                        <th>
-                            QPS
-                        </th>
-                        <th>
-                            TPS
-                        </th>
-                        <th>
-                            Trxs
-                        </th>
-                        <th>
-                            Uptime(Day)
-                        </th>
-                        <th>
-                            Version
-                        </th>
-                        <th>
-                            Port
-                        </th>
-                        <th>
-                            User
-                        </th>
-                        <th>
+<table class="table table-condensed table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Remark
+            </th>
+            <th>
+                Running
+            </th>
+            <th>
+                QPS
+            </th>
+            <th>
+                TPS
+            </th>
+            <th>
+                Trxs
+            </th>
+            <th>
+                Uptime(Day)
+            </th>
+            <th>
+                Version
+            </th>
+            <th>
+                Port
+            </th>
+            <th>
+                User
+            </th>
+            <th>
 
-                        </th>
-                        <th>
+            </th>
+            <th>
 
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for data in mysql_infos %}
-                    <tr>
-                        <td>
-                            {{ data.remark }}
-                        </td>
-                        <td>
-                            {{ data.qps }}
-                        </td>
-                        <td>
-                            {{ data.tps }}
-                        </td>
-                        <td>
-                            {{ data.trxs }}
-                        </td>
-                        <td>
-                            {{ data.uptime }}
-                        </td>
-                        <td>
-                            {{ data.version }}-{{ data.branch.name }}
-                        </td>
-                        <td>
-                            {{ data.port }}
-                        </td>
-                        <td>
-                            {{ data.user }}
-                        </td>
-                        <td class="text-center">
-                            <a href="javascript:void(0)" onclick=start("/mysql/{{ data.key }}","mysql")>Details</a>
-                        </td>
-                        <td class="text-center">
-                            <a href="javascript:void(0)" onclick=stop("/tablespace/{{ data.key }}","tablespace")>Tablespace</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for data in mysql_infos %}
+        <tr>
+            <td>
+                {{ data.remark }}
+            </td>
+            <td class="text-success">
+                Yes
+            </td>
+            <td>
+                {{ data.qps }}
+            </td>
+            <td>
+                {{ data.tps }}
+            </td>
+            <td>
+                {{ data.trxs }}
+            </td>
+            <td>
+                {{ data.uptime }}
+            </td>
+            <td>
+                {{ data.version }}-{{ data.branch.name }}
+            </td>
+            <td>
+                {{ data.port }}
+            </td>
+            <td>
+                {{ data.user }}
+            </td>
+            <td class="text-center">
+                <a href="javascript:void(0)" onclick=start("/mysql/{{ data.key }}","mysql")>Details</a>
+            </td>
+            <td class="text-center">
+                <a href="javascript:void(0)" onclick=stop("/tablespace/{{ data.key }}","tablespace")>Tablespace</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endif %}

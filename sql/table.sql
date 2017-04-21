@@ -133,13 +133,17 @@ CREATE TABLE mysql_exception_log
 ) COMMENT = 'mysql exception log';
 
 #慢日志和查询日志pt工具对应的表配置
-CREATE TABLE slow_general_log_config
+drop TABLE slow_general_log_table_config;
+CREATE TABLE slow_general_log_table_config
 (
     host_id MEDIUMINT UNSIGNED NOT NULL PRIMARY KEY ,
     slow_log_db VARCHAR(50) NOT NULL DEFAULT '',
     slow_log_table VARCHAR(50) NOT NULL DEFAULT '',
+    slow_log_table_history VARCHAR(50) NOT NULL DEFAULT '',
     general_log_db VARCHAR(50) NOT NULL DEFAULT '',
     general_log_table VARCHAR(50) NOT NULL DEFAULT '',
+    general_log_table_history VARCHAR(50) NOT NULL DEFAULT '',
+    is_deleted TINYINT UNSIGNED NOT NULL DEFAULT 0,
     created_time TIMESTAMP NOT NULL DEFAULT now(),
     updated_time TIMESTAMP NOT NULL DEFAULT current_timestamp on UPDATE CURRENT_TIMESTAMP
 );

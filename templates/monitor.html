@@ -1,1398 +1,1372 @@
 {% if(data_status != None) %}
-<div class="container-fluid">
-    <div class="row-fluid">
-        <!--QPS TPS-->
-        <div class="col-md-6">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>
+<div class="row">
+    <!--QPS TPS-->
+    <div class="col-md-6">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
 
-                        </th>
-                        <th colspan="7" class="text-center">
-                            QPS TPS
-                        </th>
-                        <th colspan="2" class="text-center">
-                            Net
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            Select
-                        </th>
-                        <th>
-                            Insert
-                        </th>
-                        <th>
-                            Update
-                        </th>
-                        <th>
-                            Delete
-                        </th>
-                        <th>
-                            QPS
-                        </th>
-                        <th>
-                            TPS
-                        </th>
-                        <th>
-                            Trxs
-                        </th>
-                        <th>
-                            Receive
-                        </th>
-                        <th>
-                            Send
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_status %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td>
-                            {{ status.select_count }}
-                        </td>
-                        <td>
-                            {{ status.insert_count }}
-                        </td>
-                        <td>
-                            {{ status.update_count }}
-                        </td>
-                        <td>
-                            {{ status.delete_count }}
-                        </td>
-                        <td {% if(status.qps > 10000) %} class="text-danger" {% endif %}>
-                            {{ status.qps }}
-                        </td>
-                        <td>
-                            {{ status.tps }}
-                        </td>
-                        <td>
-                            {{ status.trx_count }}
-                        </td>
-                        <td>
-                            {{ status.send_bytes }}
-                        </td>
-                        <td>
-                            {{ status.receive_bytes }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <!--Thread-->
-        <div class="col-md-6">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th colspan="9" class="text-center">
-                            Thread Cache
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th title="thread count">
-                            Threads
-                        </th>
-                        <th title="current running threads">
-                            T_R
-                        </th>
-                        <th title="thread wait count for time > 1">
-                            T_W
-                        </th>
-                        <th title="thread cache hit">
-                            T_C_H
-                        </th>
-                        <th>
-                            C_Per
-                        </th>
-                        <th title="connection usage">
-                            C_Usage
-                        </th>
-                        <th title="aborted clients">
-                            A_Cli
-                        </th>
-                        <th title="aborted connections">
-                            A_Conn
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_status %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td>
-                            {{ status.threads_count }}
-                        </td>
-                        <td>
-                            {{ status.threads_run_count }}
-                        </td>
-                        <td {% if(status.thread_waits_count > 0) %} class="text-danger" {% endif %}>
-                            {{ status.thread_waits_count }}
-                        </td>
-                        <td>
-                            {{ status.thread_cache_hit }}
-                        </td>
-                        <td>
-                            {{ status.connections_per }}
-                        </td>
-                        <td>
-                            {{ status.connections_usage_rate }}
-                        </td>
-                        <td>
-                            {{ status.aborted_clients }}
-                        </td>
-                        <td>
-                            {{ status.aborted_connects }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </th>
+                    <th colspan="7" class="text-center">
+                        QPS TPS
+                    </th>
+                    <th colspan="2" class="text-center">
+                        Net
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        Select
+                    </th>
+                    <th>
+                        Insert
+                    </th>
+                    <th>
+                        Update
+                    </th>
+                    <th>
+                        Delete
+                    </th>
+                    <th>
+                        QPS
+                    </th>
+                    <th>
+                        TPS
+                    </th>
+                    <th>
+                        Trxs
+                    </th>
+                    <th>
+                        Receive
+                    </th>
+                    <th>
+                        Send
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_status %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td>
+                        {{ status.select_count }}
+                    </td>
+                    <td>
+                        {{ status.insert_count }}
+                    </td>
+                    <td>
+                        {{ status.update_count }}
+                    </td>
+                    <td>
+                        {{ status.delete_count }}
+                    </td>
+                    <td {% if(status.qps > 10000) %} class="text-danger" {% endif %}>
+                        {{ status.qps }}
+                    </td>
+                    <td>
+                        {{ status.tps }}
+                    </td>
+                    <td>
+                        {{ status.trx_count }}
+                    </td>
+                    <td>
+                        {{ status.send_bytes }}
+                    </td>
+                    <td>
+                        {{ status.receive_bytes }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div class="row-fluid">
-        <!--Handler-->
-        <div class="col-md-7">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th colspan="9" class="text-center">
-                            Handler
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            Commit
-                        </th>
-                        <th title="rollback">
-                            Roll
-                        </th>
-                        <th>
-                            R_Key
-                        </th>
-                        <th>
-                            R_Next
-                        </th>
-                        <th>
-                            R_First
-                        </th>
-                        <th>
-                            R_Last
-                        </th>
-                        <th>
-                            R_Rnd
-                        </th>
-                        <th>
-                            R_Rnd_Next
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_status %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td>
-                            {{ status.handler_commit }}
-                        </td>
-                        <td {% if(status.handler_rollback > 0) %} class="text-danger" {% endif %}>
-                            {{ status.handler_rollback }}
-                        </td>
-                        <td>
-                            {{ status.handler_read_key }}
-                        </td>
-                        <td>
-                            {{ status.handler_read_next }}
-                        </td>
-                        <td>
-                            {{ status.handler_read_first }}
-                        </td>
-                        <td>
-                            {{ status.handler_read_last }}
-                        </td>
-                        <td>
-                            {{ status.handler_read_rnd }}
-                        </td>
-                        <td>
-                            {{ status.handler_read_rnd_next }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <!--Table Open Cache-->
-        <div class="col-md-5">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th colspan="6" class="text-center">
-                            Table Open Cache
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            Open_T
-                        </th>
-                        <th>
-                            Opened_T
-                        </th>
-                        <th>
-                            Hits
-                        </th>
-                        <th>
-                            Misses
-                        </th>
-                        <th>
-                            Overflows
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_status %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td>
-                            {{ status.open_tables }}
-                        </td>
-                        <td {% if(status.openend_tables > 0) %} class="text-danger" {% endif %}>
-                            {{ status.openend_tables }}
-                        </td>
-                        <td>
-                            {{ status.table_open_cache_hits }}
-                        </td>
-                        <td {% if(status.table_open_cache_misses > 0) %} class="text-danger" {% endif %}>
-                            {{ status.table_open_cache_misses }}
-                        </td>
-                        <td {% if(status.table_open_cache_overflows > 0) %} class="text-danger" {% endif %}>
-                            {{ status.table_open_cache_overflows }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <!--Thread-->
+    <div class="col-md-6">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th colspan="9" class="text-center">
+                        Thread Cache
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th title="thread count">
+                        Threads
+                    </th>
+                    <th title="current running threads">
+                        T_R
+                    </th>
+                    <th title="thread wait count for time > 1">
+                        T_W
+                    </th>
+                    <th title="thread cache hit">
+                        T_C_H
+                    </th>
+                    <th>
+                        C_Per
+                    </th>
+                    <th title="connection usage">
+                        C_Usage
+                    </th>
+                    <th title="aborted clients">
+                        A_Cli
+                    </th>
+                    <th title="aborted connections">
+                        A_Conn
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_status %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td>
+                        {{ status.threads_count }}
+                    </td>
+                    <td>
+                        {{ status.threads_run_count }}
+                    </td>
+                    <td {% if(status.thread_waits_count > 0) %} class="text-danger" {% endif %}>
+                        {{ status.thread_waits_count }}
+                    </td>
+                    <td>
+                        {{ status.thread_cache_hit }}
+                    </td>
+                    <td>
+                        {{ status.connections_per }}
+                    </td>
+                    <td>
+                        {{ status.connections_usage_rate }}
+                    </td>
+                    <td>
+                        {{ status.aborted_clients }}
+                    </td>
+                    <td>
+                        {{ status.aborted_connects }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div class="row-fluid">
-        <!--Tmp Table Binlog Table Lock-->
-        <div class="col-md-6">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th colspan="7" class="text-center">
-                            Tmp Table Binlog Table Lock
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th title="create tmp files">
-                            Tmp_F
-                        </th>
-                        <th title="create tmp tables">
-                            Tmp_T
-                        </th>
-                        <th title="create disk tmp tables">
-                            Tmp_D_T
-                        </th>
-                        <th title="binlog cache hit">
-                            B_C_H
-                        </th>
-                        <th title="table locks immediate">
-                            T_L_I
-                        </th>
-                        <th title="table locks waited">
-                            T_L_W
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_status %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td {% if(status.create_tmp_files > 0) %} class="text-danger" {% endif %}>
-                            {{ status.create_tmp_files }}
-                        </td>
-                        <td {% if(status.create_tmp_table_count > 500) %} class="text-danger" {% endif %}>
-                            {{ status.create_tmp_table_count }}
-                        </td>
-                        <td {% if(status.create_tmp_disk_table_count > 0) %} class="text-danger" {% endif %}>
-                            {{ status.create_tmp_disk_table_count }}
-                        </td>
-                        <td {% if(status.binlog_cache_hit > 0 and status.binlog_cache_hit < 100) %} class="text-danger" {% endif %}>
-                            {{ status.binlog_cache_hit }}
-                        </td>
-                        <td>
-                            {{ status.table_locks_immediate }}
-                        </td>
-                        <td {% if(status.table_locks_waited > 0) %} class="text-danger" {% endif %}>
-                            {{ status.table_locks_waited }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <!--Select Sort-->
-        <div class="col-md-6">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th colspan="9" class="text-center">
-                            Select Sort
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th title="select full join">
-                            Sel_F_J
-                        </th>
-                        <th title="select scan table">
-                            Sel_S
-                        </th>
-                        <th title="select full range join">
-                            Sel_F_R_J
-                        </th>
-                        <th title="select range check">
-                            Sel_R_C
-                        </th>
-                        <th title="select range">
-                            Sel_R
-                        </th>
-                        <th title="sort merge passes">
-                            Sort_M_P
-                        </th>
-                        <th title="sort range">
-                            Sort_R
-                        </th>
-                        <th title="sort scan">
-                            Sort_S
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_status %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td {% if(status.select_full_join > 0) %} class="text-danger" {% endif %}>
-                            {{ status.select_full_join }}
-                        </td>
-                        <td>
-                            {{ status.select_scan }}
-                        </td>
-                        <td>
-                            {{ status.select_full_range_join }}
-                        </td>
-                        <td>
-                            {{ status.select_range_check }}
-                        </td>
-                        <td>
-                            {{ status.select_range }}
-                        </td>
-                        <td {% if(status.sort_merge_passes > 0) %} class="text-danger" {% endif %}>
-                            {{ status.sort_merge_passes }}
-                        </td>
-                        <td>
-                            {{ status.sort_range }}
-                        </td>
-                        <td>
-                            {{ status.sort_scan }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+</div>
+<div class="row">
+    <!--Handler-->
+    <div class="col-md-7">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th colspan="9" class="text-center">
+                        Handler
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        Commit
+                    </th>
+                    <th title="rollback">
+                        Roll
+                    </th>
+                    <th>
+                        R_Key
+                    </th>
+                    <th>
+                        R_Next
+                    </th>
+                    <th>
+                        R_First
+                    </th>
+                    <th>
+                        R_Last
+                    </th>
+                    <th>
+                        R_Rnd
+                    </th>
+                    <th>
+                        R_Rnd_Next
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_status %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td>
+                        {{ status.handler_commit }}
+                    </td>
+                    <td {% if(status.handler_rollback > 0) %} class="text-danger" {% endif %}>
+                        {{ status.handler_rollback }}
+                    </td>
+                    <td>
+                        {{ status.handler_read_key }}
+                    </td>
+                    <td>
+                        {{ status.handler_read_next }}
+                    </td>
+                    <td>
+                        {{ status.handler_read_first }}
+                    </td>
+                    <td>
+                        {{ status.handler_read_last }}
+                    </td>
+                    <td>
+                        {{ status.handler_read_rnd }}
+                    </td>
+                    <td>
+                        {{ status.handler_read_rnd_next }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!--Table Open Cache-->
+    <div class="col-md-5">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th colspan="6" class="text-center">
+                        Table Open Cache
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        Open_T
+                    </th>
+                    <th>
+                        Opened_T
+                    </th>
+                    <th>
+                        Hits
+                    </th>
+                    <th>
+                        Misses
+                    </th>
+                    <th>
+                        Overflows
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_status %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td>
+                        {{ status.open_tables }}
+                    </td>
+                    <td {% if(status.openend_tables > 0) %} class="text-danger" {% endif %}>
+                        {{ status.openend_tables }}
+                    </td>
+                    <td>
+                        {{ status.table_open_cache_hits }}
+                    </td>
+                    <td {% if(status.table_open_cache_misses > 0) %} class="text-danger" {% endif %}>
+                        {{ status.table_open_cache_misses }}
+                    </td>
+                    <td {% if(status.table_open_cache_overflows > 0) %} class="text-danger" {% endif %}>
+                        {{ status.table_open_cache_overflows }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <!--Tmp Table Binlog Table Lock-->
+    <div class="col-md-6">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th colspan="7" class="text-center">
+                        Tmp Table Binlog Table Lock
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th title="create tmp files">
+                        Tmp_F
+                    </th>
+                    <th title="create tmp tables">
+                        Tmp_T
+                    </th>
+                    <th title="create disk tmp tables">
+                        Tmp_D_T
+                    </th>
+                    <th title="binlog cache hit">
+                        B_C_H
+                    </th>
+                    <th title="table locks immediate">
+                        T_L_I
+                    </th>
+                    <th title="table locks waited">
+                        T_L_W
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_status %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td {% if(status.create_tmp_files > 0) %} class="text-danger" {% endif %}>
+                        {{ status.create_tmp_files }}
+                    </td>
+                    <td {% if(status.create_tmp_table_count > 500) %} class="text-danger" {% endif %}>
+                        {{ status.create_tmp_table_count }}
+                    </td>
+                    <td {% if(status.create_tmp_disk_table_count > 0) %} class="text-danger" {% endif %}>
+                        {{ status.create_tmp_disk_table_count }}
+                    </td>
+                    <td {% if(status.binlog_cache_hit > 0 and status.binlog_cache_hit < 100) %} class="text-danger" {% endif %}>
+                        {{ status.binlog_cache_hit }}
+                    </td>
+                    <td>
+                        {{ status.table_locks_immediate }}
+                    </td>
+                    <td {% if(status.table_locks_waited > 0) %} class="text-danger" {% endif %}>
+                        {{ status.table_locks_waited }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!--Select Sort-->
+    <div class="col-md-6">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th colspan="9" class="text-center">
+                        Select Sort
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th title="select full join">
+                        Sel_F_J
+                    </th>
+                    <th title="select scan table">
+                        Sel_S
+                    </th>
+                    <th title="select full range join">
+                        Sel_F_R_J
+                    </th>
+                    <th title="select range check">
+                        Sel_R_C
+                    </th>
+                    <th title="select range">
+                        Sel_R
+                    </th>
+                    <th title="sort merge passes">
+                        Sort_M_P
+                    </th>
+                    <th title="sort range">
+                        Sort_R
+                    </th>
+                    <th title="sort scan">
+                        Sort_S
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_status %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td {% if(status.select_full_join > 0) %} class="text-danger" {% endif %}>
+                        {{ status.select_full_join }}
+                    </td>
+                    <td>
+                        {{ status.select_scan }}
+                    </td>
+                    <td>
+                        {{ status.select_full_range_join }}
+                    </td>
+                    <td>
+                        {{ status.select_range_check }}
+                    </td>
+                    <td>
+                        {{ status.select_range }}
+                    </td>
+                    <td {% if(status.sort_merge_passes > 0) %} class="text-danger" {% endif %}>
+                        {{ status.sort_merge_passes }}
+                    </td>
+                    <td>
+                        {{ status.sort_range }}
+                    </td>
+                    <td>
+                        {{ status.sort_scan }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endif %}
 
 {% if(data_innodb != None) %}
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
 
-                        </th>
-                        <th colspan="4" rowspan="1" class="text-center">
-                            Innodb_Rows
-                        </th>
-                        <th colspan="7" rowspan="1" class="text-center">
-                            Buffer Pool Pages
-                        </th>
-                        <th colspan="5" rowspan="1" class="text-center">
-                            Row Lock
-                        </th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            Read
-                        </th>
-                        <th>
-                            Insert
-                        </th>
-                        <th>
-                            Update
-                        </th>
-                        <th>
-                            Delete
-                        </th>
-                        <th>
-                            Total
-                        </th>
-                        <th>
-                            Data
-                        </th>
-                        <th>
-                            Dirty
-                        </th>
-                        <th>
-                            Free
-                        </th>
-                        <th>
-                            Usage
-                        </th>
-                        <th title="buffer pool page wait free">
-                            Waits
-                        </th>
-                        <th>
-                            Flushs
-                        </th>
-                        <th>
-                            Locks
-                        </th>
-                        <th>
-                            Waits
-                        </th>
-                        <th>
-                            Times
-                        </th>
-                        <th>
-                            Avg
-                        </th>
-                        <th>
-                            Max
-                        </th>
-                        <th>
+                    </th>
+                    <th colspan="4" rowspan="1" class="text-center">
+                        Innodb_Rows
+                    </th>
+                    <th colspan="7" rowspan="1" class="text-center">
+                        Buffer Pool Pages
+                    </th>
+                    <th colspan="5" rowspan="1" class="text-center">
+                        Row Lock
+                    </th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        Read
+                    </th>
+                    <th>
+                        Insert
+                    </th>
+                    <th>
+                        Update
+                    </th>
+                    <th>
+                        Delete
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                    <th>
+                        Data
+                    </th>
+                    <th>
+                        Dirty
+                    </th>
+                    <th>
+                        Free
+                    </th>
+                    <th>
+                        Usage
+                    </th>
+                    <th title="buffer pool page wait free">
+                        Waits
+                    </th>
+                    <th>
+                        Flushs
+                    </th>
+                    <th>
+                        Locks
+                    </th>
+                    <th>
+                        Waits
+                    </th>
+                    <th>
+                        Times
+                    </th>
+                    <th>
+                        Avg
+                    </th>
+                    <th>
+                        Max
+                    </th>
+                    <th>
 
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_innodb %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td>
-                            {{ status.rows_read }}
-                        </td>
-                        <td>
-                            {{ status.rows_inserted }}
-                        </td>
-                        <td>
-                            {{ status.rows_updated }}
-                        </td>
-                        <td>
-                            {{ status.rows_deleted }}
-                        </td>
-                        <td>
-                            {{ status.page_total_count }}
-                        </td>
-                        <td>
-                            {{ status.page_data_count }}
-                        </td>
-                        <td>
-                            {{ status.page_dirty_count }}
-                        </td>
-                        <td>
-                            {{ status.page_free_count }}
-                        </td>
-                        <td>
-                            {{ status.page_usage }}
-                        </td>
-                        <td {% if(status.innodb_buffer_pool_wait_free > 0) %} class="text-danger" {% endif %}>
-                            {{ status.innodb_buffer_pool_wait_free }}
-                        </td>
-                        <td>
-                            {{ status.page_flush_persecond }}
-                        </td>
-                        <td>
-                            {{ status.current_row_locks }}
-                        </td>
-                        <td>
-                            {{ status.innodb_row_lock_waits }}
-                        </td>
-                        <td {% if(status.innodb_row_lock_time > 0) %} class="text-danger" {% endif %}>
-                            {{ status.innodb_row_lock_time }}
-                        </td>
-                        <td>
-                            {{ status.innodb_row_lock_time_avg }}
-                        </td>
-                        <td>
-                            {{ status.innodb_row_lock_time_max }}
-                        </td>
-                         <td class="text-center">
-                            <a href="javascript:void(0)" onclick=start("/innodb/{{ status.host_info.key }}","") href="/innodb/{{ status.host_info.key }}">Innodb Status</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_innodb %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td>
+                        {{ status.rows_read }}
+                    </td>
+                    <td>
+                        {{ status.rows_inserted }}
+                    </td>
+                    <td>
+                        {{ status.rows_updated }}
+                    </td>
+                    <td>
+                        {{ status.rows_deleted }}
+                    </td>
+                    <td>
+                        {{ status.page_total_count }}
+                    </td>
+                    <td>
+                        {{ status.page_data_count }}
+                    </td>
+                    <td>
+                        {{ status.page_dirty_count }}
+                    </td>
+                    <td>
+                        {{ status.page_free_count }}
+                    </td>
+                    <td>
+                        {{ status.page_usage }}
+                    </td>
+                    <td {% if(status.innodb_buffer_pool_wait_free > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_buffer_pool_wait_free }}
+                    </td>
+                    <td>
+                        {{ status.page_flush_persecond }}
+                    </td>
+                    <td>
+                        {{ status.current_row_locks }}
+                    </td>
+                    <td>
+                        {{ status.innodb_row_lock_waits }}
+                    </td>
+                    <td {% if(status.innodb_row_lock_time > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_row_lock_time }}
+                    </td>
+                    <td>
+                        {{ status.innodb_row_lock_time_avg }}
+                    </td>
+                    <td>
+                        {{ status.innodb_row_lock_time_max }}
+                    </td>
+                     <td class="text-center">
+                        <a href="javascript:void(0)" onclick=start("/innodb/{{ status.host_info.key }}","") href="/innodb/{{ status.host_info.key }}">Innodb Status</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
 
-                        </th>
-                        <th colspan="4" rowspan="1" class="text-center">
-                            Buffer Pool
-                        </th>
-                        <th colspan="3" rowspan="1" class="text-center">
-                            Log
-                        </th>
-                        <th colspan="3" rowspan="1" class="text-center">
-                            OS Log
-                        </th>
-                        <th colspan="8" rowspan="1" class="text-center">
-                            Innodb Data
-                        </th>
-                        <th>
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            Read
-                        </th>
-                        <th>
-                            R_Reqs
-                        </th>
-                        <th title="write requests">
-                            W_Reqs
-                        </th>
-                        <th>
-                            Hit
-                        </th>
-                        <th>
-                            Writes
-                        </th>
-                        <th>
-                            Waits
-                        </th>
-                        <th title="log write requests">
-                            W_Req
-                        </th>
-                        <th title="os log pending fsync">
-                            P_F
-                        </th>
-                        <th title="os log pending wirete">
-                            P_W
-                        </th>
-                        <th title="os log write">
-                            Written
-                        </th>
-                        <th>
-                            Reads
-                        </th>
-                        <th>
-                            Writes
-                        </th>
-                        <th>
-                            Read
-                        </th>
-                        <th>
-                            Written
-                        </th>
-                        <th>
-                            Fsyncs
-                        </th>
-                        <th title="innodb data pending fsyncs">
-                            P_F
-                        </th>
-                        <th title="innodb data pending reads">
-                            P_R
-                        </th>
-                        <th title="innodb data pending writes">
-                            P_W
-                        </th>
-                        <th title="undo log history length">
-                            Undo
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_innodb %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td {% if(status.buffer_pool_reads > 0) %} class="text-danger" {% endif %}>
-                            {{ status.buffer_pool_reads }}
-                        </td>
-                        <td>
-                            {{ status.buffer_pool_read_requests }}
-                        </td>
-                        <td {% if(status.buffer_pool_write_requests > 5000) %} class="text-danger" {% endif %}>
-                            {{ status.buffer_pool_write_requests }}
-                        </td>
-                        <td {% if(status.buffer_pool_hit < 90) %} class="text-danger" {% endif %}>
-                            {{ status.buffer_pool_hit }}
-                        </td>
-                        <td>
-                            {{ status.innodb_log_writes }}
-                        </td>
-                        <td {% if(status.innodb_log_waits > 0) %} class="text-danger" {% endif %}>
-                            {{ status.innodb_log_waits }}
-                        </td>
-                        <td>
-                            {{ status.innodb_log_write_requests }}
-                        </td>
-                        <td {% if(status.innodb_os_log_pending_fsyncs > 0) %} class="text-danger" {% endif %}>
-                            {{ status.innodb_os_log_pending_fsyncs }}
-                        </td>
-                        <td {% if(status.innodb_os_log_pending_writes > 0) %} class="text-danger" {% endif %}>
-                            {{ status.innodb_os_log_pending_writes }}
-                        </td>
-                        <td>
-                            {{ status.innodb_os_log_written }}
-                        </td>
-                        <td>
-                            {{ status.innodb_data_reads }}
-                        </td>
-                        <td>
-                            {{ status.innodb_data_writes }}
-                        </td>
-                        <td>
-                            {{ status.innodb_data_read }}
-                        </td>
-                        <td>
-                            {{ status.innodb_data_written }}
-                        </td>
-                        <td>
-                            {{ status.innodb_data_fsyncs }}
-                        </td>
-                        <td {% if(status.innodb_data_pending_fsyncs > 0) %} class="text-danger" {% endif %}>
-                            {{ status.innodb_data_pending_fsyncs }}
-                        </td>
-                        <td {% if(status.innodb_data_pending_reads > 0) %} class="text-danger" {% endif %}>
-                            {{ status.innodb_data_pending_reads }}
-                        </td>
-                        <td {% if(status.innodb_data_pending_writes > 0) %} class="text-danger" {% endif %}>
-                            {{ status.innodb_data_pending_writes }}
-                        </td>
-                        <td {% if(status.history_list_length > 5000) %} class="text-danger" {% endif %}>
-                            {{ status.history_list_length }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </th>
+                    <th colspan="4" rowspan="1" class="text-center">
+                        Buffer Pool
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        Log
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        OS Log
+                    </th>
+                    <th colspan="8" rowspan="1" class="text-center">
+                        Innodb Data
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        Read
+                    </th>
+                    <th>
+                        R_Reqs
+                    </th>
+                    <th title="write requests">
+                        W_Reqs
+                    </th>
+                    <th>
+                        Hit
+                    </th>
+                    <th>
+                        Writes
+                    </th>
+                    <th>
+                        Waits
+                    </th>
+                    <th title="log write requests">
+                        W_Req
+                    </th>
+                    <th title="os log pending fsync">
+                        P_F
+                    </th>
+                    <th title="os log pending wirete">
+                        P_W
+                    </th>
+                    <th title="os log write">
+                        Written
+                    </th>
+                    <th>
+                        Reads
+                    </th>
+                    <th>
+                        Writes
+                    </th>
+                    <th>
+                        Read
+                    </th>
+                    <th>
+                        Written
+                    </th>
+                    <th>
+                        Fsyncs
+                    </th>
+                    <th title="innodb data pending fsyncs">
+                        P_F
+                    </th>
+                    <th title="innodb data pending reads">
+                        P_R
+                    </th>
+                    <th title="innodb data pending writes">
+                        P_W
+                    </th>
+                    <th title="undo log history length">
+                        Undo
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_innodb %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td {% if(status.buffer_pool_reads > 0) %} class="text-danger" {% endif %}>
+                        {{ status.buffer_pool_reads }}
+                    </td>
+                    <td>
+                        {{ status.buffer_pool_read_requests }}
+                    </td>
+                    <td {% if(status.buffer_pool_write_requests > 5000) %} class="text-danger" {% endif %}>
+                        {{ status.buffer_pool_write_requests }}
+                    </td>
+                    <td {% if(status.buffer_pool_hit < 90) %} class="text-danger" {% endif %}>
+                        {{ status.buffer_pool_hit }}
+                    </td>
+                    <td>
+                        {{ status.innodb_log_writes }}
+                    </td>
+                    <td {% if(status.innodb_log_waits > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_log_waits }}
+                    </td>
+                    <td>
+                        {{ status.innodb_log_write_requests }}
+                    </td>
+                    <td {% if(status.innodb_os_log_pending_fsyncs > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_os_log_pending_fsyncs }}
+                    </td>
+                    <td {% if(status.innodb_os_log_pending_writes > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_os_log_pending_writes }}
+                    </td>
+                    <td>
+                        {{ status.innodb_os_log_written }}
+                    </td>
+                    <td>
+                        {{ status.innodb_data_reads }}
+                    </td>
+                    <td>
+                        {{ status.innodb_data_writes }}
+                    </td>
+                    <td>
+                        {{ status.innodb_data_read }}
+                    </td>
+                    <td>
+                        {{ status.innodb_data_written }}
+                    </td>
+                    <td>
+                        {{ status.innodb_data_fsyncs }}
+                    </td>
+                    <td {% if(status.innodb_data_pending_fsyncs > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_data_pending_fsyncs }}
+                    </td>
+                    <td {% if(status.innodb_data_pending_reads > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_data_pending_reads }}
+                    </td>
+                    <td {% if(status.innodb_data_pending_writes > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_data_pending_writes }}
+                    </td>
+                    <td {% if(status.history_list_length > 5000) %} class="text-danger" {% endif %}>
+                        {{ status.history_list_length }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div class="row-fluid">
-        <div class="col-md-4">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
 
-                        </th>
-                        <th colspan="4" rowspan="1" class="text-center">
-                            Innodb Page
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            Size(K)
-                        </th>
-                        <th>
-                            Create
-                        </th>
-                        <th>
-                            Read
-                        </th>
-                        <th>
-                            Write
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_innodb %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td>
-                            {{ status.innodb_page_size }}
-                        </td>
-                        <td>
-                            {{ status.innodb_pages_created }}
-                        </td>
-                        <td>
-                            {{ status.innodb_pages_read }}
-                        </td>
-                        <td>
-                            {{ status.innodb_pages_written }}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </th>
+                    <th colspan="4" rowspan="1" class="text-center">
+                        Innodb Page
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        Size(K)
+                    </th>
+                    <th>
+                        Create
+                    </th>
+                    <th>
+                        Read
+                    </th>
+                    <th>
+                        Write
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_innodb %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td>
+                        {{ status.innodb_page_size }}
+                    </td>
+                    <td>
+                        {{ status.innodb_pages_created }}
+                    </td>
+                    <td>
+                        {{ status.innodb_pages_read }}
+                    </td>
+                    <td>
+                        {{ status.innodb_pages_written }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endif %}
 
 {% if(data_repl != None) %}
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>
 
-                        </th>
-                        <th colspan="2" rowspan="1" class="text-center">
-                            Slave Status
-                        </th>
-                        <th colspan="2" rowspan="1" class="text-center">
-                            Master Log
-                        </th>
-                        <th colspan="2" rowspan="1" class="text-center">
-                            Slave Log
-                        </th>
-                        <th colspan="2" rowspan="1" class="text-center">
-                            GTID
-                        </th>
-                        <th colspan="3" rowspan="1" class="text-center">
-                            Pos Delay
-                        </th>
-                        <th>
+            </th>
+            <th colspan="2" rowspan="1" class="text-center">
+                Slave Status
+            </th>
+            <th colspan="2" rowspan="1" class="text-center">
+                Master Log
+            </th>
+            <th colspan="2" rowspan="1" class="text-center">
+                Slave Log
+            </th>
+            <th colspan="2" rowspan="1" class="text-center">
+                GTID
+            </th>
+            <th colspan="3" rowspan="1" class="text-center">
+                Pos Delay
+            </th>
+            <th>
 
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            IO
-                        </th>
-                        <th>
-                            SQL
-                        </th>
-                        <th>
-                            M_Log
-                        </th>
-                        <th>
-                            M_Log_Pos
-                        </th>
-                        <th>
-                            S_Log
-                        </th>
-                        <th>
-                            S_Log_Pos
-                        </th>
-                        <th>
-                            Retrieved_GTID
-                        </th>
-                        <th>
-                            Executed_GTID
-                        </th>
-                        <th>
-                            Delay_Pos
-                        </th>
-                        <th>
-                            Seconds_Behind
-                        </th>
-                        <th>
-                            Error_Msg
-                        </th>
-                        <th>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_repl %}
-                        {% if(status.io_status and status.is_slave == 1) %}
-                            <tr>
-                                <td>
-                                    {{ status.host_info.remark }}
-                                </td>
-                                <td {% if(status.io_status != "Yes") %} class="text-danger" {% endif %}>
-                                    {{ status.io_status }}
-                                </td>
-                                <td {% if(status.sql_status != "Yes") %} class="text-danger" {% endif %}>
-                                    {{ status.sql_status }}
-                                </td>
-                                <td>
-                                    {{ status.master_log_file }}
-                                </td>
-                                <td>
-                                    {{ status.master_log_pos }}
-                                </td>
-                                <td>
-                                    {{ status.slave_log_file }}
-                                </td>
-                                <td>
-                                    {{ status.slave_log_pos }}
-                                </td>
-                                <td>
-                                    {{ status.slave_retrieved_gtid_set }}
-                                </td>
-                                <td>
-                                    {{ status.slave_execute_gtid_set }}
-                                </td>
-                                <td {% if(status.delay_pos_count > 10000) %} class="text-danger" {% endif %}>
-                                    {{ status.delay_pos_count }}
-                                </td>
-                                <td {% if(status.seconds_Behind_Master > 0) %} class="text-danger" {% endif %}>
-                                    {{ status.seconds_Behind_Master }}
-                                </td>
-                                <td>
-                                    {{ status.error_message }}
-                                </td>
-                                <td class="text-center">
-                                    <a href="javascript:void(0)" onclick=start("/replication/{{ status.host_info.key }}","repl")>Details</a>
-                                </td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                Host
+            </th>
+            <th>
+                IO
+            </th>
+            <th>
+                SQL
+            </th>
+            <th>
+                M_Log
+            </th>
+            <th>
+                M_Log_Pos
+            </th>
+            <th>
+                S_Log
+            </th>
+            <th>
+                S_Log_Pos
+            </th>
+            <th>
+                Retrieved_GTID
+            </th>
+            <th>
+                Executed_GTID
+            </th>
+            <th>
+                Delay_Pos
+            </th>
+            <th>
+                Seconds_Behind
+            </th>
+            <th>
+                Error_Msg
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for status in data_repl %}
+            {% if(status.io_status and status.is_slave == 1) %}
+                <tr>
+                    <td>
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td {% if(status.io_status != "Yes") %} class="text-danger" {% endif %}>
+                        {{ status.io_status }}
+                    </td>
+                    <td {% if(status.sql_status != "Yes") %} class="text-danger" {% endif %}>
+                        {{ status.sql_status }}
+                    </td>
+                    <td>
+                        {{ status.master_log_file }}
+                    </td>
+                    <td>
+                        {{ status.master_log_pos }}
+                    </td>
+                    <td>
+                        {{ status.slave_log_file }}
+                    </td>
+                    <td>
+                        {{ status.slave_log_pos }}
+                    </td>
+                    <td>
+                        {{ status.slave_retrieved_gtid_set }}
+                    </td>
+                    <td>
+                        {{ status.slave_execute_gtid_set }}
+                    </td>
+                    <td {% if(status.delay_pos_count > 10000) %} class="text-danger" {% endif %}>
+                        {{ status.delay_pos_count }}
+                    </td>
+                    <td {% if(status.seconds_Behind_Master > 0) %} class="text-danger" {% endif %}>
+                        {{ status.seconds_Behind_Master }}
+                    </td>
+                    <td>
+                        {{ status.error_message }}
+                    </td>
+                    <td class="text-center">
+                        <a href="javascript:void(0)" onclick=start("/replication/{{ status.host_info.key }}","repl")>Details</a>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
 {% endif %}
 
 {% if(data_host != None) %}
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
 
-                        </th>
-                        <th colspan="3" rowspan="1" class="text-center">
-                            CPU Load Avg
-                        </th>
-                         <th colspan="5" rowspan="1" class="text-center">
-                            CPU
-                        </th>
-                        <th colspan="2" rowspan="1" class="text-center">
-                            Disk
-                        </th>
-                        <th colspan="3" rowspan="1" class="text-center">
-                            IO
-                        </th>
-                        <th colspan="2" rowspan="1" class="text-center">
-                            Memory
-                        </th>
-                        <th colspan="2" rowspan="1" class="text-center">
-                            SWAP
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            1
-                        </th>
-                        <th>
-                            5
-                        </th>
-                        <th>
-                            15
-                        </th>
-                        <th>
-                            User
-                        </th>
-                        <th>
-                            Sys
-                        </th>
-                        <th>
-                            Nice
-                        </th>
-                        <th>
-                            Ldle
-                        </th>
-                        <th>
-                            Iowait
-                        </th>
-                        <th>
-                            Total
-                        </th>
-                        <th>
-                            Use
-                        </th>
-                        <th>
-                            QPS
-                        </th>
-                        <th>
-                            Read
-                        </th>
-                        <th>
-                            Write
-                        </th>
-                        <th title="memory total">
-                            T
-                        </th>
-                        <th title="memory free">
-                            F
-                        </th>
-                        <th title="swap total">
-                            T
-                        </th>
-                        <th title="swap free">
-                            F
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_host %}
-                        <tr>
-                            <td>
-                                {{ status.host_info.remark }}
-                            </td>
-                            <td>
-                                {{ status.cpu_1 }}
-                            </td>
-                            <td>
-                                {{ status.cpu_5 }}
-                            </td>
-                            <td>
-                                {{ status.cpu_15 }}
-                            </td>
-                            <td {% if(status.cpu_user > 80) %} class="text-danger" {% endif %}>
-                                {{ status.cpu_user }}
-                            </td>
-                            <td {% if(status.cpu_system > 20) %} class="text-danger" {% endif %}>
-                                {{ status.cpu_system }}
-                            </td>
-                            <td>
-                                {{ status.cpu_nice }}
-                            </td>
-                            <td {% if(status.cpu_idle < 70) %} class="text-danger" {% endif %}>
-                                {{ status.cpu_idle }}
-                            </td>
-                            <td>
-                                {{ status.cpu_iowait }}
-                            </td>
-                            <td>
-                                {{ status.total_disk_value }}
-                            </td>
-                            <td>
-                                {{ status.disk_value }}
-                            </td>
-                            <td>
-                                {{ status.io_tps }}
-                            </td>
-                            <td>
-                                {{ status.io_read }}
-                            </td>
-                            <td>
-                                {{ status.io_write }}
-                            </td>
-                            <td>
-                                {{ status.memory_total }}
-                            </td>
-                            <td>
-                                {{ status.memory_free }}
-                            </td>
-                            <td {% if(status.swap_total > 0) %} class="text-danger" {% endif %}>
-                                {{ status.swap_total }}
-                            </td>
-                            <td {% if(status.swap_free > 0) %} class="text-danger" {% endif %}>
-                                {{ status.swap_free }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-md-6">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>
-
-                        </th>
-                        <th colspan="3" rowspan="1" class="text-center">
-                            MySQL
-                        </th>
-                        <th colspan="2" rowspan="1" class="text-center">
-                            Net
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            CPU%
-                        </th>
-                        <th>
-                            Mem%
-                        </th>
-                        <th>
-                            Size
-                        </th>
-                        <th>
-                            Rec
-                        </th>
-                        <th>
-                            Send
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in data_host %}
-                        <tr>
-                            <td>
-                                {{ status.host_info.remark }}
-                            </td>
-                            <td {% if(status.mysql_cpu > 500) %} class="text-danger" {% endif %}>
-                                {{ status.mysql_cpu }}
-                            </td>
-                            <td {% if(status.mysql_memory > 80) %} class="text-danger" {% endif %}>
-                                {{ status.mysql_memory }}
-                            </td>
-                            <td>
-                                {{ status.mysql_data_size }}
-                            </td>
-                            <td>
-                                {{ status.net_receive_byte }}
-                            </td>
-                            <td>
-                                {{ status.net_send_byte }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if(data_engine_innodb != None) %}
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <table class="table table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th>
-                            Buffer_Name
-                        </th>
-                        <th>
-                            Total_P
-                        </th>
-                        <th>
-                            Free_P
-                        </th>
-                        <th>
-                            LRU_P
-                        </th>
-                        <th>
-                            Old_P
-                        </th>
-                        <th>
-                            Dirty_P
-                        </th>
-                        <th>
-                            Pending_R
-                        </th>
-                        <th>
-                            Read_Per
-                        </th>
-                        <th>
-                            Create_Per
-                        </th>
-                        <th>
-                            Write_Per
-                        </th>
-                        <th>
-                            Hit
-                        </th>
-                        <th>
-                            Unzip_LRU
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for info in data_engine_innodb.buffer_pool_infos.values() %}
-                    <tr>
-                        <td>
-                            {{ info.name }}
-                        </td>
-                        <td>
-                            {{ info.total_pages }}
-                        </td>
-                        <td >
-                            {{ info.free_pages }}
-                        </td>
-                        <td >
-                            {{ info.lru_pages }}
-                        </td>
-                        <td>
-                            {{ info.old_pages }}
-                        </td>
-                        <td>
-                            {{ info.dirty_pages }}
-                        </td>
-                        <td>
-                            {{ info.pending_reads }}
-                        </td>
-                        <td>
-                            {{ info.reads_per }}
-                        </td>
-                        <td>
-                            {{ info.creates_per }}
-                        </td>
-                        <td>
-                            {{ info.writes_per }}
-                        </td>
-                        <td>
-                            {{ info.buffer_pool_hit }}
-                        </td>
-                        <td>
-                            {{ info.unzip_lur }}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="col-md-12">
-            <table class="table table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th>
-                            Log_LSN
-                        </th>
-                        <th>
-                            Log_Flush_LSN
-                        </th>
-                        <th>
-                            Log_Flush_Diff
-                        </th>
-                        <th>
-                            Page_Flush_LSN
-                        </th>
-                        <th>
-                            Page_Flush_Diff
-                        </th>
-                        <th>
-                            Checkpoint_LSN
-                        </th>
-                        <th>
-                            Checkpoint_Diff
-                        </th>
-                        <th>
-                            Undo_History_List_Len
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            {{ data_engine_innodb.log_lsn }}
-                        </td>
-                        <td>
-                            {{ data_engine_innodb.log_flush_lsn }}
-                        </td>
-                        <td>
-                            {{ data_engine_innodb.log_flush_diff }}
-                        </td>
-                        <td >
-                            {{ data_engine_innodb.page_flush_lsn }}
-                        </td>
-                        <td>
-                            {{ data_engine_innodb.page_flush_diff }}
-                        </td>
-                        <td >
-                            {{ data_engine_innodb.checkpoint_lsn }}
-                        </td>
-                        <td>
-                            {{ data_engine_innodb.checkpoint_diff }}
-                        </td>
-                        <td>
-                            {{ data_engine_innodb.undo_history_list_len }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        {% if(data_engine_innodb.latest_deadlock != None) %}
-        <div class="col-md-12">
-            <table class="table table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th class="text-center">
-                            Latest Deadlock
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            {% for line in data_engine_innodb.latest_deadlock %}
-                                {{ line }} </br>
-                            {% endfor %}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        {% endif %}
-    </div>
-</div>
-{% endif %}
-
-{% if(slave_status != None) %}
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <table class="table table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th colspan="3" rowspan="1" class="text-center">
-                            Show Slave Status
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            {% for key, value in slave_status.items() %}
-                                {{ key }} : {{ value }} </br>
-                            {% endfor %}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if(tablespace_status != None) %}
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <table class="table table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th>
-                            Host
-                        </th>
-                        <th>
-                            Rows_T
-                        </th>
-                        <th>
-                            Data_T
-                        </th>
-                        <th>
-                            Index_T
-                        </th>
-                        <th>
-                            File_T
-                        </th>
-                        <th>
-                            Free_T
-                        </th>
-                        <th>
-                            Last Update Time
-                        </th>
-                        <th>
-
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in tablespace_status %}
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        CPU Load Avg
+                    </th>
+                     <th colspan="5" rowspan="1" class="text-center">
+                        CPU
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Disk
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        IO
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Memory
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        SWAP
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        1
+                    </th>
+                    <th>
+                        5
+                    </th>
+                    <th>
+                        15
+                    </th>
+                    <th>
+                        User
+                    </th>
+                    <th>
+                        Sys
+                    </th>
+                    <th>
+                        Nice
+                    </th>
+                    <th>
+                        Ldle
+                    </th>
+                    <th>
+                        Iowait
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                    <th>
+                        Use
+                    </th>
+                    <th>
+                        QPS
+                    </th>
+                    <th>
+                        Read
+                    </th>
+                    <th>
+                        Write
+                    </th>
+                    <th title="memory total">
+                        T
+                    </th>
+                    <th title="memory free">
+                        F
+                    </th>
+                    <th title="swap total">
+                        T
+                    </th>
+                    <th title="swap free">
+                        F
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_host %}
                     <tr>
                         <td>
                             {{ status.host_info.remark }}
                         </td>
                         <td>
-                            {{ status.rows_total }}
+                            {{ status.cpu_1 }}
                         </td>
                         <td>
-                            {{ status.data_total }}
-                        </td>
-                        <td >
-                            {{ status.index_total }}
+                            {{ status.cpu_5 }}
                         </td>
                         <td>
-                            {{ status.file_total }}
+                            {{ status.cpu_15 }}
                         </td>
-                        <td >
-                            {{ status.free_total }}
+                        <td {% if(status.cpu_user > 80) %} class="text-danger" {% endif %}>
+                            {{ status.cpu_user }}
+                        </td>
+                        <td {% if(status.cpu_system > 20) %} class="text-danger" {% endif %}>
+                            {{ status.cpu_system }}
                         </td>
                         <td>
-                            {{ status.last_update_time }}
+                            {{ status.cpu_nice }}
                         </td>
-                        <td class="text-center">
-                            <a href="javascript:void(0)" onclick=stop("/tablespace/{{ status.host_info.key }}","tablespace")>Details</a>
+                        <td {% if(status.cpu_idle < 70) %} class="text-danger" {% endif %}>
+                            {{ status.cpu_idle }}
+                        </td>
+                        <td>
+                            {{ status.cpu_iowait }}
+                        </td>
+                        <td>
+                            {{ status.total_disk_value }}
+                        </td>
+                        <td>
+                            {{ status.disk_value }}
+                        </td>
+                        <td>
+                            {{ status.io_tps }}
+                        </td>
+                        <td>
+                            {{ status.io_read }}
+                        </td>
+                        <td>
+                            {{ status.io_write }}
+                        </td>
+                        <td>
+                            {{ status.memory_total }}
+                        </td>
+                        <td>
+                            {{ status.memory_free }}
+                        </td>
+                        <td {% if(status.swap_total > 0) %} class="text-danger" {% endif %}>
+                            {{ status.swap_total }}
+                        </td>
+                        <td {% if(status.swap_free > 0) %} class="text-danger" {% endif %}>
+                            {{ status.swap_free }}
                         </td>
                     </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        MySQL
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Net
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        CPU%
+                    </th>
+                    <th>
+                        Mem%
+                    </th>
+                    <th>
+                        Size
+                    </th>
+                    <th>
+                        Rec
+                    </th>
+                    <th>
+                        Send
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_host %}
+                    <tr>
+                        <td>
+                            {{ status.host_info.remark }}
+                        </td>
+                        <td {% if(status.mysql_cpu > 500) %} class="text-danger" {% endif %}>
+                            {{ status.mysql_cpu }}
+                        </td>
+                        <td {% if(status.mysql_memory > 80) %} class="text-danger" {% endif %}>
+                            {{ status.mysql_memory }}
+                        </td>
+                        <td>
+                            {{ status.mysql_data_size }}
+                        </td>
+                        <td>
+                            {{ status.net_receive_byte }}
+                        </td>
+                        <td>
+                            {{ status.net_send_byte }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
+{% endif %}
+
+{% if(data_engine_innodb != None) %}
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        Buffer_Name
+                    </th>
+                    <th>
+                        Total_P
+                    </th>
+                    <th>
+                        Free_P
+                    </th>
+                    <th>
+                        LRU_P
+                    </th>
+                    <th>
+                        Old_P
+                    </th>
+                    <th>
+                        Dirty_P
+                    </th>
+                    <th>
+                        Pending_R
+                    </th>
+                    <th>
+                        Read_Per
+                    </th>
+                    <th>
+                        Create_Per
+                    </th>
+                    <th>
+                        Write_Per
+                    </th>
+                    <th>
+                        Hit
+                    </th>
+                    <th>
+                        Unzip_LRU
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for info in data_engine_innodb.buffer_pool_infos.values() %}
+                <tr>
+                    <td>
+                        {{ info.name }}
+                    </td>
+                    <td>
+                        {{ info.total_pages }}
+                    </td>
+                    <td >
+                        {{ info.free_pages }}
+                    </td>
+                    <td >
+                        {{ info.lru_pages }}
+                    </td>
+                    <td>
+                        {{ info.old_pages }}
+                    </td>
+                    <td>
+                        {{ info.dirty_pages }}
+                    </td>
+                    <td>
+                        {{ info.pending_reads }}
+                    </td>
+                    <td>
+                        {{ info.reads_per }}
+                    </td>
+                    <td>
+                        {{ info.creates_per }}
+                    </td>
+                    <td>
+                        {{ info.writes_per }}
+                    </td>
+                    <td>
+                        {{ info.buffer_pool_hit }}
+                    </td>
+                    <td>
+                        {{ info.unzip_lur }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-12">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        Log_LSN
+                    </th>
+                    <th>
+                        Log_Flush_LSN
+                    </th>
+                    <th>
+                        Log_Flush_Diff
+                    </th>
+                    <th>
+                        Page_Flush_LSN
+                    </th>
+                    <th>
+                        Page_Flush_Diff
+                    </th>
+                    <th>
+                        Checkpoint_LSN
+                    </th>
+                    <th>
+                        Checkpoint_Diff
+                    </th>
+                    <th>
+                        Undo_History_List_Len
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        {{ data_engine_innodb.log_lsn }}
+                    </td>
+                    <td>
+                        {{ data_engine_innodb.log_flush_lsn }}
+                    </td>
+                    <td>
+                        {{ data_engine_innodb.log_flush_diff }}
+                    </td>
+                    <td >
+                        {{ data_engine_innodb.page_flush_lsn }}
+                    </td>
+                    <td>
+                        {{ data_engine_innodb.page_flush_diff }}
+                    </td>
+                    <td >
+                        {{ data_engine_innodb.checkpoint_lsn }}
+                    </td>
+                    <td>
+                        {{ data_engine_innodb.checkpoint_diff }}
+                    </td>
+                    <td>
+                        {{ data_engine_innodb.undo_history_list_len }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {% if(data_engine_innodb.latest_deadlock != None) %}
+    <div class="col-md-12">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center">
+                        Latest Deadlock
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        {% for line in data_engine_innodb.latest_deadlock %}
+                            {{ line }} </br>
+                        {% endfor %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if(slave_status != None) %}
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th colspan="3" rowspan="1" class="text-center">
+                Show Slave Status
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                {% for key, value in slave_status.items() %}
+                    {{ key }} : {{ value }} </br>
+                {% endfor %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+
+{% if(tablespace_status != None) %}
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Host
+            </th>
+            <th>
+                Rows_T
+            </th>
+            <th>
+                Data_T
+            </th>
+            <th>
+                Index_T
+            </th>
+            <th>
+                File_T
+            </th>
+            <th>
+                Free_T
+            </th>
+            <th>
+                Last Update Time
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for status in tablespace_status %}
+        <tr>
+            <td>
+                {{ status.host_info.remark }}
+            </td>
+            <td>
+                {{ status.rows_total }}
+            </td>
+            <td>
+                {{ status.data_total }}
+            </td>
+            <td >
+                {{ status.index_total }}
+            </td>
+            <td>
+                {{ status.file_total }}
+            </td>
+            <td >
+                {{ status.free_total }}
+            </td>
+            <td>
+                {{ status.last_update_time }}
+            </td>
+            <td class="text-center">
+                <a href="javascript:void(0)" onclick=stop("/tablespace/{{ status.host_info.key }}","tablespace")>Details</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endif %}

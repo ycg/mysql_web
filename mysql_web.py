@@ -15,6 +15,7 @@ monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
 alarm_thread.AlarmLog().start()
+slow_log.load_slow_log_table_config()
 
 #region mysql api
 
@@ -135,6 +136,14 @@ def get_slow_logs(query_type_id):
 def get_slow_log_detail(checksum):
     return render_template("slow_log.html", slow_list = None, slow_low_info=slow_log.get_slow_log_detail(checksum))
 
+@app.route("/slowlog/config/load/")
+def load_log_table_config():
+    slow_log.load_slow_log_table_config()
+
+@app.route("/slowlog/detail/<int:host_id>/<int:checksum>")
+def get_detail(host_id, checksum):
+    return slow_log.get_slow_log_detail_by_host_id(host_id, checksum)
+
 #endregion
 
 #region execute sql api
@@ -219,4 +228,4 @@ def get_thread_infos(host_id, query_type):
 #endregion
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=int("5000"))
+    app.run(debug=True, host="0.0.0.0", port=int("5000"), use_reloader=False)

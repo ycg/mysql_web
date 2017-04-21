@@ -1,85 +1,83 @@
 {% if(general_logs != None) %}
-    <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="col-md-12">
-                <div class="text-center">
-                    <ul class="pagination pagination-centered">
-                        <li><a href="javascript:void(0)" onclick=stop("/general/1","general")>&laquo;</a></li>
-                        {% for number in page_list %}
-                            <li {% if(number == page_number) %} class="active" {% endif %}>
-                                <a href="javascript:void(0)" onclick=stop("/general/{{ number }}","general")>{{ number }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="text-center">
+            <ul class="pagination pagination-centered">
+                <li><a href="javascript:void(0)" onclick=stop("/general/1","general")>&laquo;</a></li>
+                {% for number in page_list %}
+                    <li {% if(number == page_number) %} class="active" {% endif %}>
+                        <a href="javascript:void(0)" onclick=stop("/general/{{ number }}","general")>{{ number }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
 
-                <table class="table table-hover table-bordered">
-                    <thead>
-                    <tr>
-                        <!--<th>
-                            Checksum
-                        </th>-->
-                        <th>
-                            Fingerprint
-                        </th>
-                        <th>
-                            First_Seen
-                        </th>
-                        <th>
-                            Last_Seen
-                        </th>
-                        <th>
-                            Count
-                        </th>
-                        <th>
-                            State
-                        </th>
-                        <th>
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th>
+                    Checksum
+                </th>
+                <th>
+                    Fingerprint
+                </th>
+                <th class="text-center">
+                    First_Seen
+                </th>
+                <th class="text-center">
+                    Last_Seen
+                </th>
+                <th class="text-center">
+                    Count
+                </th>
+                <th class="text-center">
+                    State
+                </th>
+                <th class="text-center">
+                    Detail
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for status in general_logs %}
+                <tr {% if(status.ts_cnt > 100) %} class="text-danger" {% endif %}>
+                    <td>
+                        {{ status.checksum }}
+                    </td>
+                    <td>
+                        {{ status.fingerprint }}
+                    </td>
+                    <td class="text-center">
+                        {{ status.first_seen }}
+                    </td>
+                    <td class="text-center">
+                        {{ status.last_seen }}
+                    </td>
+                    <td class="text-center">
+                        {{ status.ts_cnt }}
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-xs btn-primary disabled">Review</button>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-xs btn-default" name="{{ status.checksum }}" onclick=stop("/general/{{ page_number }}/detail/{{ status.checksum }}","general")>Detail</button>
+                        <!--<a href="javascript:void(0)" name="{{ status.checksum }}" onclick=stop("/general/{{ page_number }}/detail/{{ status.checksum }}","general")>Details</a>-->
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for status in general_logs %}
-                        <tr {% if(status.ts_cnt > 100) %} class="text-danger" {% endif %}>
-                            <!--<td>
-                                {{ status.checksum }}
-                            </td>-->
-                            <td>
-                                {{ status.fingerprint }}
-                            </td>
-                            <td>
-                                {{ status.first_seen }}
-                            </td>
-                            <td>
-                                {{ status.last_seen }}
-                            </td>
-                            <td>
-                                {{ status.ts_cnt }}
-                            </td>
-                            <td>
-                                <button class="btn btn-xs btn-primary disabled">Review</button>
-                            </td>
-                            <td>
-                                <button class="btn btn-xs btn-default" name="{{ status.checksum }}" onclick=stop("/general/{{ page_number }}/detail/{{ status.checksum }}","general")>Detail</button>
-                                <!--<a href="javascript:void(0)" name="{{ status.checksum }}" onclick=stop("/general/{{ page_number }}/detail/{{ status.checksum }}","general")>Details</a>-->
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-
-                <div class="text-center">
-                    <ul class="pagination pagination-centered">
-                        <li><a href="javascript:void(0)" onclick=stop("/general/1","general")>&laquo;</a></li>
-                        {% for number in page_list %}
-                            <li {% if(number == page_number) %} class="active" {% endif %}>
-                                <a href="javascript:void(0)" onclick=stop("/general/{{ number }}","general")>{{ number }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
+        <div class="text-center">
+            <ul class="pagination pagination-centered">
+                <li><a href="javascript:void(0)" onclick=stop("/general/1","general")>&laquo;</a></li>
+                {% for number in page_list %}
+                    <li {% if(number == page_number) %} class="active" {% endif %}>
+                        <a href="javascript:void(0)" onclick=stop("/general/{{ number }}","general")>{{ number }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
+</div>
 {% endif %}
