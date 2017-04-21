@@ -1,22 +1,22 @@
-mysql monitor web
+mysql monitor web</br>
 
-Ö§³ÖµÄ¹¦ÄÜ£º
-1.mysql tps qps table_cache handler¼à¿Ø
-2.Ö§³Ö¶Ôinnodb¸÷ÖÖstatus½øĞĞ¼à¿Ø
-3.Ö§³Ö¶Ôshow engine innodb status·ÖÎö
-4.Ö§³Ö¶Ô¸´ÖÆ½øĞĞ¼à¿Ø
-5.Ö§³Ö¶Ô±í¿Õ¼ä½øĞĞ·ÖÎö
-7.Ö§³Ö¶Ôos»ù±¾¼à¿Ø
-8.Ö§³ÖÊÕ¼¯Âı²éÑ¯¼à¿Ø
-9.Ö§³Ö¶Ôthread½øĞĞÍêÕû·ÖÎö
+æ”¯æŒçš„åŠŸèƒ½ï¼š</br>
+1.mysql tps qps table_cache handlerç›‘æ§</br>
+2.æ”¯æŒå¯¹innodbå„ç§statusè¿›è¡Œç›‘æ§</br>
+3.æ”¯æŒå¯¹show engine innodb statusåˆ†æ</br>
+4.æ”¯æŒå¯¹å¤åˆ¶è¿›è¡Œç›‘æ§</br>
+5.æ”¯æŒå¯¹è¡¨ç©ºé—´è¿›è¡Œåˆ†æ</br>
+7.æ”¯æŒå¯¹osåŸºæœ¬ç›‘æ§</br>
+8.æ”¯æŒæ”¶é›†æ…¢æŸ¥è¯¢ç›‘æ§</br>
+9.æ”¯æŒå¯¹threadè¿›è¡Œå®Œæ•´åˆ†æ</br>
 
-Íê³ÉµÄ½Å±¾£º
-1.Ò»¼ü°²×°Êı¾İ¿â½Å±¾
-2.Ê¹ÓÃmysqlbinlog½øĞĞbinlogµÄ±¸·İ½Å±¾
-3.Ö§³Ö»ùÓÚpymysqlreplicationµÄ¶ş½øÖÆ½âÎö½Å±¾
-4.Ö§³ÖÂı²éÑ¯ÊÕ¼¯½Å±¾
-5.Ö§³Ö¼ì²é±í¿Õ¼ä½Å±¾
-6.»ùÓÚmysqldumpµÄ´´½¨´Ó¿â½Å±¾
+å®Œæˆçš„è„šæœ¬ï¼š</br>
+1.ä¸€é”®å®‰è£…æ•°æ®åº“è„šæœ¬</br>
+2.ä½¿ç”¨mysqlbinlogè¿›è¡Œbinlogçš„å¤‡ä»½è„šæœ¬</br>
+3.æ”¯æŒåŸºäºpymysqlreplicationçš„äºŒè¿›åˆ¶è§£æè„šæœ¬</br>
+4.æ”¯æŒæ…¢æŸ¥è¯¢æ”¶é›†è„šæœ¬</br>
+5.æ”¯æŒæ£€æŸ¥è¡¨ç©ºé—´è„šæœ¬</br>
+6.åŸºäºmysqldumpçš„åˆ›å»ºä»åº“è„šæœ¬</br>
 
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/111.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/112.png)
