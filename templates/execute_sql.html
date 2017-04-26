@@ -1,45 +1,43 @@
-<div class="container-fluid">
-    <div class="row clearfix">
-        <form id="sql_form" action="/autoreview" method="post" target="nm_iframe" class="form-horizontal" role="form">
-            <div class="col-md-8 column">
-                <textarea id="sql_content" name="sql_content" class="form-control"
-                          placeholder="请在此提交SQL，请以分号结尾。例如：use test; create table t1(id int)engine=innodb;"
-                          rows=35 required></textarea>
-            </div>
+<div class="row">
+    <form id="sql_form" action="/autoreview" method="post" target="nm_iframe" class="form-horizontal" role="form">
+        <div class="col-md-8 column">
+            <textarea id="sql_content" name="sql_content" class="form-control"
+                      placeholder="请在此提交SQL，请以分号结尾。例如：use test; create table t1(id int)engine=innodb;"
+                      rows=35 required></textarea>
+        </div>
 
-            <div class="col-md-4 column">
-                <div class="form-group">
-                    <input id="workflow_name" type="text" name="workflow_name"
-                           class="form-control" data-name="上线单名称" placeholder="请输入上线单名称，如:XX项目会员功能建表" required>
-                </div>
-                <div class="form-group">
-                    <select id="cluster_name" name="cluster_name"
-                            class="selectpicker show-tick form-control bs-select-hidden"
-                            data-name="要上线的集群" data-placeholder="请选择要上线的集群:" required>
-                        <option value="0" disabled="" selected="selected">请选择要上线的集群:</option>
-                        {% for info in host_infos %}
-                            {% if(info.is_master == 1) %}
-                                <option value="{{ info.key }}">{{ info.remark }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select id="basic" name="is_backup"
-                            class="selectpicker show-tick form-control bs-select-hidden"
-                            data-name="是否选择备份" data-placeholder="请选择是否要备份:" required>
-                        <option value="0" disabled="" selected="selected">请选择是否要备份:</option>
-                        <option value="1">是</option>
-                        <option value="0">否</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">提交SQL</button>
-                    <button type="reset" class="btn btn-default">清空重填</button>
-                </div>
+        <div class="col-md-4 column">
+            <div class="form-group">
+                <input id="workflow_name" type="text" name="workflow_name"
+                       class="form-control" data-name="上线单名称" placeholder="请输入上线单名称，如:XX项目会员功能建表" required>
             </div>
-        </form>
-    </div>
+            <div class="form-group">
+                <select id="cluster_name" name="cluster_name"
+                        class="selectpicker show-tick form-control bs-select-hidden"
+                        data-name="要上线的集群" data-placeholder="请选择要上线的集群:" required>
+                    <option value="0" disabled="" selected="selected">请选择要上线的集群:</option>
+                    {% for info in host_infos %}
+                        {% if(info.is_master == 1) %}
+                            <option value="{{ info.key }}">{{ info.remark }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <select id="basic" name="is_backup"
+                        class="selectpicker show-tick form-control bs-select-hidden"
+                        data-name="是否选择备份" data-placeholder="请选择是否要备份:" required>
+                    <option value="0" disabled="" selected="selected">请选择是否要备份:</option>
+                    <option value="1">是</option>
+                    <option value="0">否</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">提交SQL</button>
+                <button type="reset" class="btn btn-default">清空重填</button>
+            </div>
+        </div>
+    </form>
 </div>
 
 <iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>

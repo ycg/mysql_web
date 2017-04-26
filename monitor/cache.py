@@ -30,8 +30,8 @@ class Cache(object):
                 host_info_temp = self.__host_infos[host_id]
             else:
                 host_info_temp = host_info.HoseInfo()
-                host_info_temp.id = host_id
-                self.__host_infos[host_info_temp.id] = host_info_temp
+                host_info_temp.host_id = host_id
+                self.__host_infos[host_info_temp.host_id] = host_info_temp
             host_info_temp.host = row["host"]
             host_info_temp.port = row["port"]
             host_info_temp.user = row["user"]
@@ -40,7 +40,7 @@ class Cache(object):
             host_info_temp.is_master = row["is_master"]
             host_info_temp.is_slave = row["is_slave"]
             host_info_temp.master_id = row["master_id"]
-            host_info_temp.key = host_info_temp.id
+            host_info_temp.key = host_info_temp.host_id
             if(row["is_deleted"] == 1):
                 self.remove_key(self.__tablespace, host_id)
                 self.remove_key(self.__host_infos, host_id)
@@ -80,20 +80,26 @@ class Cache(object):
         if(dic.has_key(key) == True):
             dic.pop(key)
 
-    def get_all_host_infos(self):
-        return self.__host_infos.values()
+    def get_all_host_infos(self, keys=[]):
+        #return self.__host_infos.values()
+        return self.get_values_by_keys(self.__host_infos, keys)
 
-    def get_all_repl_infos(self):
-        return self.__repl_infos.values()
+    def get_all_repl_infos(self, keys=[]):
+        #return self.__repl_infos.values()
+        #keys = list(keys)
+        return self.get_values_by_keys(self.__repl_infos, keys)
 
-    def get_all_status_infos(self):
-        return self.__status_infos.values()
+    def get_all_status_infos(self, keys=[]):
+        #return self.__status_infos.values()
+        return self.get_values_by_keys(self.__status_infos, keys)
 
-    def get_all_innodb_infos(self):
-        return self.__innodb_infos.values()
+    def get_all_innodb_infos(self, keys=[]):
+        #return self.__innodb_infos.values()
+        return self.get_values_by_keys(self.__innodb_infos, keys)
 
-    def get_all_linux_infos(self):
-        return self.__linux_infos.values()
+    def get_all_linux_infos(self, keys=[]):
+        #return self.__linux_infos.values()
+        return self.get_values_by_keys(self.__linux_infos, keys)
 
     def get_all_tablespace_infos(self):
         return self.__tablespace.values()
@@ -126,6 +132,16 @@ class Cache(object):
         if(dir.has_key(key)):
             return dir[key]
         return None
+
+    def get_values_by_keys(self, dir, keys):
+        if(len(keys) <= 0):
+            return dir.values()
+        result = []
+        for id in keys:
+            info = self.get_value_for_key(dir, int(id))
+            if(info != None):
+                result.append(info)
+        return result
 
     def check_mysql_server_version_and_branch(self):
         for host_info in self.__host_infos.values():

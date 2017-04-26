@@ -54,7 +54,7 @@ class MonitorServer(threading.Thread):
         time.sleep(1)
         mysql_status_new = self.get_dic_data(cursor, "show global status;")
         mysql_variables = self.get_dic_data(cursor, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
-                                                    "'max_connections', 'table_open_cache', 'table_open_cache_instances');")
+                                                    "'max_connections', 'table_open_cache', 'table_open_cache_instances', 'innodb_buffer_pool_size');")
         host_info.mysql_data_dir = mysql_variables["datadir"]
         host_info.mysql_pid_file = mysql_variables["pid_file"]
         host_info.uptime = int(mysql_status_new["Uptime"]) / 60 / 60 / 24
@@ -189,6 +189,8 @@ class MonitorServer(threading.Thread):
         innodb_info.page_dirty_pct = round(float(innodb_info.page_dirty_count) / float(innodb_info.page_total_count) * 100, 2)
         innodb_info.page_flush_persecond = int(mysql_status_new["Innodb_buffer_pool_pages_flushed"]) - int(mysql_status_old["Innodb_buffer_pool_pages_flushed"])
         innodb_info.page_usage = round((1 - float(innodb_info.page_free_count) / float(innodb_info.page_total_count)) * 100, 2)
+        innodb_info.data_page_usage = round(float(innodb_info.page_data_count) / float(innodb_info.page_total_count) * 100, 2)
+        innodb_info.dirty_page_usage = round(float(innodb_info.page_dirty_count) / float(innodb_info.page_total_count) * 100, 2)
 
         #buffer pool rows
         innodb_info.rows_read = int(mysql_status_new["Innodb_rows_read"]) - int(mysql_status_old["Innodb_rows_read"])
@@ -201,6 +203,8 @@ class MonitorServer(threading.Thread):
         innodb_info.buffer_pool_write_requests = int(mysql_status_new["Innodb_buffer_pool_write_requests"]) - int(mysql_status_old["Innodb_buffer_pool_write_requests"])
         innodb_info.buffer_pool_reads = int(mysql_status_new["Innodb_buffer_pool_reads"]) - int(mysql_status_old["Innodb_buffer_pool_reads"])
         innodb_info.buffer_pool_read_requests = int(mysql_status_new["Innodb_buffer_pool_read_requests"]) - int(mysql_status_old["Innodb_buffer_pool_read_requests"])
+        #innodb_info.data_usage = round(float(mysql_status_new["Innodb_buffer_pool_bytes_data"]) / float(mysql_variables["innodb_buffer_pool_size"]) * 100, 2)
+        #innodb_info.dirty_usage = round(float(mysql_status_new["Innodb_buffer_pool_bytes_dirty"]) / float(mysql_variables["innodb_buffer_pool_size"]) * 100, 2)
 
         #innodb data
         innodb_info.innodb_data_read = int(mysql_status_new["Innodb_data_read"]) - int(mysql_status_old["Innodb_data_read"])
@@ -278,7 +282,7 @@ class MonitorServer(threading.Thread):
         sql = "insert into mysql_web.mysql_status_log(host_id, qps, tps, commit, rollback, connections, " \
               "thread_count, thread_running_count, tmp_tables, tmp_disk_tables, send_bytes, receive_bytes) VALUES " \
               "({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, \'{10}\', \'{11}\')"\
-              .format(status_info.host_info.id, status_info.qps, status_info.tps, status_info.commit, status_info.rollback, status_info.connections_per,
+              .format(status_info.host_info.host_id, status_info.qps, status_info.tps, status_info.commit, status_info.rollback, status_info.connections_per,
                       status_info.threads_count, status_info.threads_run_count, status_info.create_tmp_table_count, status_info.create_tmp_disk_table_count,
                       status_info.send_bytes, status_info.receive_bytes)
         self.__db_util.execute(settings.MySQL_Host, sql)

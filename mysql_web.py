@@ -3,12 +3,13 @@
 #yum install openssl-devel python-devel libffi-devel -y
 #pip install flask threadpool pymysql DBUtils paramiko
 
-import enum, settings, sys
-from flask import Flask, render_template, request, app, redirect
+import datetime, json
+from flask import Flask, render_template, request, app, redirect, make_response
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread
 
-app = Flask(__name__)
+#region load data on run
 
+app = Flask(__name__)
 mysql_cache = cache.Cache()
 mysql_cache.load_all_host_infos()
 monitor_server = server.MonitorServer()
@@ -17,11 +18,13 @@ monitor_server.start()
 alarm_thread.AlarmLog().start()
 slow_log.load_slow_log_table_config()
 
+#endregion
+
 #region mysql api
 
-@app.route("/mysql")
+@app.route("/mysql", methods=['GET', 'POST'])
 def get_mysql_data():
-    return render_template("mysqls.html", mysql_infos=mysql_cache.get_all_host_infos())
+    return render_template("mysqls.html", mysql_infos=mysql_cache.get_all_host_infos(keys= json.loads(request.values["keys"])))
 
 @app.route("/mysql/<int:id>")
 def get_mysql_data_by_id(id):
@@ -35,9 +38,9 @@ def get_mysql_data_by_id(id):
 
 #region mysql status api
 
-@app.route("/status")
+@app.route("/status", methods=['GET', 'POST'])
 def get_status_data():
-    return get_monitor_data(data_status=mysql_cache.get_all_status_infos())
+    return get_monitor_data(data_status=mysql_cache.get_all_status_infos(keys= json.loads(request.values["keys"])))
 
 @app.route("/status/<int:id>")
 def get_status_data_by_id(id):
@@ -47,9 +50,9 @@ def get_status_data_by_id(id):
 
 #region innodb api
 
-@app.route("/innodb")
+@app.route("/innodb", methods=['GET', 'POST'])
 def get_innodb_data():
-    return get_monitor_data(data_innodb=mysql_cache.get_all_innodb_infos())
+    return get_monitor_data(data_innodb=mysql_cache.get_all_innodb_infos(keys= json.loads(request.values["keys"])))
 
 @app.route("/innodb/<int:id>")
 def get_innodb_data_by_id(id):
@@ -59,9 +62,9 @@ def get_innodb_data_by_id(id):
 
 #region replication api
 
-@app.route("/replication")
+@app.route("/replication", methods=['GET', 'POST'])
 def get_replication_data():
-    return get_monitor_data(data_repl=mysql_cache.get_all_repl_infos())
+    return get_monitor_data(data_repl=mysql_cache.get_all_repl_infos(keys= json.loads(request.values["keys"])))
 
 @app.route("/replication/<int:id>")
 def get_replication_data_by_id(id):
@@ -160,20 +163,21 @@ def execute_sql_for_commit():
 
 #region other api
 
-@app.route("/os")
+@app.route("/os", methods=['GET', 'POST'])
 def get_os_infos():
-    return get_monitor_data(data_host=mysql_cache.get_all_linux_infos())
+    return get_monitor_data(data_host=mysql_cache.get_all_linux_infos(keys= json.loads(request.values["keys"])))
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    return render_template("home.html", interval=settings.UPDATE_INTERVAL * 1000)
+    return render_template("home.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/home/chart")
 def chart():
-    data="[1996-01-02, 22], [1997-02-08, 36], [1996-01-02, 37], [1996-01-02, 45], [1996-01-02, 50], [1996-01-02, 30], [1996-01-02, 61], [1996-01-02, 61], [1996-01-02, 62], [1996-01-02, 66], [1996-01-02, 73]"
-    data="[aaa, 22], [bbb, 36], [1996-01-02, 37], [1996-01-02, 45], [1996-01-02, 50], [1996-01-02, 30], [1996-01-02, 61], [1996-01-02, 61], [1996-01-02, 62], [1996-01-02, 66], [1996-01-02, 73]"
+    #data="[1996-01-02, 22], [1997-02-08, 36], [1996-01-02, 37], [1996-01-02, 45], [1996-01-02, 50], [1996-01-02, 30], [1996-01-02, 61], [1996-01-02, 61], [1996-01-02, 62], [1996-01-02, 66], [1996-01-02, 73]"
+    #data="[aaa, 22], [bbb, 36], [1996-01-02, 37], [1996-01-02, 45], [1996-01-02, 50], [1996-01-02, 30], [1996-01-02, 61], [1996-01-02, 61], [1996-01-02, 62], [1996-01-02, 66], [1996-01-02, 73]"
     #return render_template("chart.html", p_data=data)
-    return render_template("test.html")
+    #return render_template("test.html")
+    return render_template("host_search.html")
 
 @app.route("/home/binlog")
 def get_test():
@@ -224,6 +228,32 @@ def thread_home():
 @app.route("/thread/<int:host_id>/<int:query_type>")
 def get_thread_infos(host_id, query_type):
     return render_template("thread_display.html", thread_infos=thread.get_all_thread(host_id, query_type))
+
+#endregion
+
+#region login api
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/login/verfiy", methods=['GET', 'POST'])
+def login_verfiy():
+    user_name = request.form["userName"]
+    password = request.form["passWord"]
+    print(user_name, password)
+    print(request.cookies)
+
+    outdate=datetime.datetime.today() + datetime.timedelta(days=1)
+    reponse = make_response("test")
+    reponse.set_cookie("Name", "Yang", expires=outdate)
+
+    if(user_name == "dba" and password == "123456"):
+        return redirect("home")
+    return reponse
+
+def check_user_is_login():
+    return "you not login"
 
 #endregion
 

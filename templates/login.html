@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link href={{ url_for('static', filename='css/bootstrap.min.css') }} rel="stylesheet" type="text/css">
+
+    <style>
+        body {
+            margin-left: auto;
+            margin-right: auto;
+            margin-TOP: 150PX;
+            width: 20em;
+        }
+    </style>
+</head>
+<body>
+<form id="login" action="/login/verfiy" method="post" target="nm_iframe" class="form-horizontal" role="form">
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon1">@</span>
+        <input id="userName" name="userName" type="text" class="form-control" placeholder="用户名" aria-describedby="basic-addon1">
+    </div>
+    <br>
+    <!--下面是密码输入框-->
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon1">@</span>
+        <input id="passWord" name="passWord" type="password" class="form-control" placeholder="密码" aria-describedby="basic-addon1">
+    </div>
+    <br>
+    <!--下面是登陆按钮,包括颜色控制-->
+    <button type="submit" style="width:280px;" class="btn btn-default">登 录</button>
+</form>
+</body>
+</html>

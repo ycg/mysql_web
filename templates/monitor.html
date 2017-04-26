@@ -1,3 +1,214 @@
+{% if(data_host != None) %}
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        CPU Load Avg
+                    </th>
+                     <th colspan="5" rowspan="1" class="text-center">
+                        CPU
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Disk
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        IO
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Memory
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        SWAP
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        1
+                    </th>
+                    <th>
+                        5
+                    </th>
+                    <th>
+                        15
+                    </th>
+                    <th>
+                        User
+                    </th>
+                    <th>
+                        Sys
+                    </th>
+                    <th>
+                        Nice
+                    </th>
+                    <th>
+                        Ldle
+                    </th>
+                    <th>
+                        Iowait
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                    <th>
+                        Use
+                    </th>
+                    <th>
+                        QPS
+                    </th>
+                    <th>
+                        Read
+                    </th>
+                    <th>
+                        Write
+                    </th>
+                    <th title="memory total">
+                        T
+                    </th>
+                    <th title="memory free">
+                        F
+                    </th>
+                    <th title="swap total">
+                        T
+                    </th>
+                    <th title="swap free">
+                        F
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_host %}
+                    <tr>
+                        <td>
+                            {{ status.host_info.remark }}
+                        </td>
+                        <td>
+                            {{ status.cpu_1 }}
+                        </td>
+                        <td>
+                            {{ status.cpu_5 }}
+                        </td>
+                        <td>
+                            {{ status.cpu_15 }}
+                        </td>
+                        <td {% if(status.cpu_user > 80) %} class="text-danger" {% endif %}>
+                            {{ status.cpu_user }}
+                        </td>
+                        <td {% if(status.cpu_system > 20) %} class="text-danger" {% endif %}>
+                            {{ status.cpu_system }}
+                        </td>
+                        <td>
+                            {{ status.cpu_nice }}
+                        </td>
+                        <td {% if(status.cpu_idle < 70) %} class="text-danger" {% endif %}>
+                            {{ status.cpu_idle }}
+                        </td>
+                        <td>
+                            {{ status.cpu_iowait }}
+                        </td>
+                        <td>
+                            {{ status.total_disk_value }}
+                        </td>
+                        <td>
+                            {{ status.disk_value }}
+                        </td>
+                        <td>
+                            {{ status.io_tps }}
+                        </td>
+                        <td>
+                            {{ status.io_read }}
+                        </td>
+                        <td>
+                            {{ status.io_write }}
+                        </td>
+                        <td>
+                            {{ status.memory_total }}
+                        </td>
+                        <td>
+                            {{ status.memory_free }}
+                        </td>
+                        <td {% if(status.swap_total > 0) %} class="text-danger" {% endif %}>
+                            {{ status.swap_total }}
+                        </td>
+                        <td {% if(status.swap_free > 0) %} class="text-danger" {% endif %}>
+                            {{ status.swap_free }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        MySQL
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Net
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        CPU%
+                    </th>
+                    <th>
+                        Mem%
+                    </th>
+                    <th>
+                        Size
+                    </th>
+                    <th>
+                        Rec
+                    </th>
+                    <th>
+                        Send
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_host %}
+                    <tr>
+                        <td>
+                            {{ status.host_info.remark }}
+                        </td>
+                        <td {% if(status.mysql_cpu > 500) %} class="text-danger" {% endif %}>
+                            {{ status.mysql_cpu }}
+                        </td>
+                        <td {% if(status.mysql_memory > 80) %} class="text-danger" {% endif %}>
+                            {{ status.mysql_memory }}
+                        </td>
+                        <td>
+                            {{ status.mysql_data_size }}
+                        </td>
+                        <td>
+                            {{ status.net_receive_byte }}
+                        </td>
+                        <td>
+                            {{ status.net_send_byte }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
 {% if(data_status != None) %}
 <div class="row">
     <!--QPS TPS-->
@@ -445,7 +656,7 @@
                     <th colspan="4" rowspan="1" class="text-center">
                         Innodb_Rows
                     </th>
-                    <th colspan="7" rowspan="1" class="text-center">
+                    <th colspan="9" rowspan="1" class="text-center">
                         Buffer Pool Pages
                     </th>
                     <th colspan="5" rowspan="1" class="text-center">
@@ -481,8 +692,14 @@
                     <th>
                         Free
                     </th>
+                    <th title="dirty page usage">
+                        Dirty_U
+                    </th>
+                    <th title="data page usage">
+                        Data_U
+                    </th>
                     <th>
-                        Usage
+                        Page_U
                     </th>
                     <th title="buffer pool page wait free">
                         Waits
@@ -539,6 +756,12 @@
                     </td>
                     <td>
                         {{ status.page_free_count }}
+                    </td>
+                    <td {% if(status.dirty_page_usage > 10) %} class="text-danger" {% endif %}>
+                        {{ status.dirty_page_usage }}
+                    </td>
+                    <td>
+                        {{ status.data_page_usage }}
                     </td>
                     <td>
                         {{ status.page_usage }}
@@ -899,217 +1122,6 @@
         {% endfor %}
     </tbody>
 </table>
-{% endif %}
-
-{% if(data_host != None) %}
-<div class="row">
-    <div class="col-md-12">
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>
-
-                    </th>
-                    <th colspan="3" rowspan="1" class="text-center">
-                        CPU Load Avg
-                    </th>
-                     <th colspan="5" rowspan="1" class="text-center">
-                        CPU
-                    </th>
-                    <th colspan="2" rowspan="1" class="text-center">
-                        Disk
-                    </th>
-                    <th colspan="3" rowspan="1" class="text-center">
-                        IO
-                    </th>
-                    <th colspan="2" rowspan="1" class="text-center">
-                        Memory
-                    </th>
-                    <th colspan="2" rowspan="1" class="text-center">
-                        SWAP
-                    </th>
-                </tr>
-                <tr>
-                    <th>
-                        Host
-                    </th>
-                    <th>
-                        1
-                    </th>
-                    <th>
-                        5
-                    </th>
-                    <th>
-                        15
-                    </th>
-                    <th>
-                        User
-                    </th>
-                    <th>
-                        Sys
-                    </th>
-                    <th>
-                        Nice
-                    </th>
-                    <th>
-                        Ldle
-                    </th>
-                    <th>
-                        Iowait
-                    </th>
-                    <th>
-                        Total
-                    </th>
-                    <th>
-                        Use
-                    </th>
-                    <th>
-                        QPS
-                    </th>
-                    <th>
-                        Read
-                    </th>
-                    <th>
-                        Write
-                    </th>
-                    <th title="memory total">
-                        T
-                    </th>
-                    <th title="memory free">
-                        F
-                    </th>
-                    <th title="swap total">
-                        T
-                    </th>
-                    <th title="swap free">
-                        F
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for status in data_host %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td>
-                            {{ status.cpu_1 }}
-                        </td>
-                        <td>
-                            {{ status.cpu_5 }}
-                        </td>
-                        <td>
-                            {{ status.cpu_15 }}
-                        </td>
-                        <td {% if(status.cpu_user > 80) %} class="text-danger" {% endif %}>
-                            {{ status.cpu_user }}
-                        </td>
-                        <td {% if(status.cpu_system > 20) %} class="text-danger" {% endif %}>
-                            {{ status.cpu_system }}
-                        </td>
-                        <td>
-                            {{ status.cpu_nice }}
-                        </td>
-                        <td {% if(status.cpu_idle < 70) %} class="text-danger" {% endif %}>
-                            {{ status.cpu_idle }}
-                        </td>
-                        <td>
-                            {{ status.cpu_iowait }}
-                        </td>
-                        <td>
-                            {{ status.total_disk_value }}
-                        </td>
-                        <td>
-                            {{ status.disk_value }}
-                        </td>
-                        <td>
-                            {{ status.io_tps }}
-                        </td>
-                        <td>
-                            {{ status.io_read }}
-                        </td>
-                        <td>
-                            {{ status.io_write }}
-                        </td>
-                        <td>
-                            {{ status.memory_total }}
-                        </td>
-                        <td>
-                            {{ status.memory_free }}
-                        </td>
-                        <td {% if(status.swap_total > 0) %} class="text-danger" {% endif %}>
-                            {{ status.swap_total }}
-                        </td>
-                        <td {% if(status.swap_free > 0) %} class="text-danger" {% endif %}>
-                            {{ status.swap_free }}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="col-md-6">
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>
-
-                    </th>
-                    <th colspan="3" rowspan="1" class="text-center">
-                        MySQL
-                    </th>
-                    <th colspan="2" rowspan="1" class="text-center">
-                        Net
-                    </th>
-                </tr>
-                <tr>
-                    <th>
-                        Host
-                    </th>
-                    <th>
-                        CPU%
-                    </th>
-                    <th>
-                        Mem%
-                    </th>
-                    <th>
-                        Size
-                    </th>
-                    <th>
-                        Rec
-                    </th>
-                    <th>
-                        Send
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for status in data_host %}
-                    <tr>
-                        <td>
-                            {{ status.host_info.remark }}
-                        </td>
-                        <td {% if(status.mysql_cpu > 500) %} class="text-danger" {% endif %}>
-                            {{ status.mysql_cpu }}
-                        </td>
-                        <td {% if(status.mysql_memory > 80) %} class="text-danger" {% endif %}>
-                            {{ status.mysql_memory }}
-                        </td>
-                        <td>
-                            {{ status.mysql_data_size }}
-                        </td>
-                        <td>
-                            {{ status.net_receive_byte }}
-                        </td>
-                        <td>
-                            {{ status.net_send_byte }}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
 {% endif %}
 
 {% if(data_engine_innodb != None) %}
