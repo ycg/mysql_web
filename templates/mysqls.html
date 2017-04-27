@@ -18,6 +18,18 @@
                 Trxs
             </th>
             <th>
+                Threads
+            </th>
+            <th>
+                Threads_R
+            </th>
+            <th>
+                Send_B
+            </th>
+            <th>
+                Rece_B
+            </th>
+            <th>
                 Uptime(Day)
             </th>
             <th>
@@ -54,6 +66,18 @@
             </td>
             <td>
                 {{ data.trxs }}
+            </td>
+            <td {% if(data.threads > 1000) %} class="text-danger" {% endif %}>
+                {{ data.threads }}
+            </td>
+            <td {% if(data.threads_running > 10) %} class="text-danger" {% endif %}>
+                {{ data.threads_running }}
+            </td>
+            <td>
+                {{ data.send_bytes }}
+            </td>
+            <td>
+                {{ data.receive_bytes }}
             </td>
             <td>
                 {{ data.uptime }}

@@ -17,9 +17,10 @@
             <option value="6">QPS</option>
         </select>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         <button class="btn btn-default" onclick="set_host_id()">Query</button>
         &nbsp;&nbsp;<button class="btn btn-default">Reset</button>
+        &nbsp;&nbsp;<button class="btn btn-default">Stop</button>
         </br></br>
     </div>
 </div>
@@ -35,6 +36,10 @@
     <div id="thread_chart" class="col-md-12" style="height:300px;">
     </div>
 </div>
+<div class="row">
+    <div id="dml" class="col-md-12" style="height:400px;">
+    </div>
+</div>
 
 <script type="text/javascript">
     $('.selectpicker').selectpicker({
@@ -47,11 +52,16 @@
     var select_host_id = $("#host_ids").val();
     var qps_chart = echarts.init(document.getElementById('qps'));
     var tps_chart = echarts.init(document.getElementById('tps'));
+    var dml_chart = echarts.init(document.getElementById('dml'));
     var thread_chart = echarts.init(document.getElementById('thread_chart'));
 
     var qps_data_y = [];
     var tps_data_y = [];
     var date_time_x = [];
+    var select_date_y = [];
+    var insert_date_y = [];
+    var update_date_y = [];
+    var delete_date_y = [];
     var thread_data_y = [];
 
     function init_chart_data() {
@@ -65,12 +75,20 @@
         tps_data_y = [];
         date_time_x = [];
         thread_data_y = [];
+        select_date_y = [];
+        insert_date_y = [];
+        update_date_y = [];
+        delete_date_y = [];
     }
 
     function set_chart_data(obj_data) {
         qps_data_y.push(obj_data.qps)
         tps_data_y.push(obj_data.tps)
         date_time_x.push(obj_data.time)
+        select_date_y.push(obj_data.select)
+        insert_date_y.push(obj_data.insert);
+        update_date_y.push(obj_data.update);
+        delete_date_y.push(obj_data.delete);
         thread_data_y.push(obj_data.threads)
     }
 
@@ -82,6 +100,7 @@
         refresh_chart(qps_chart, date_time_x, qps_data_y);
         refresh_chart(tps_chart, date_time_x, tps_data_y);
         refresh_chart(thread_chart, date_time_x, thread_data_y)
+        refresh_dml_chart(dml_chart, select_date_y, insert_date_y, update_date_y, delete_date_y)
     }
 
     function set_chart_options(chart_dom, name, data_x, data_y) {
@@ -116,6 +135,82 @@
         });
     }
 
+    function refresh_dml_chart(chart_dom, select_y, insert_y, update_y, delete_y) {
+        chart_dom.setOption({
+            xAxis: {
+                data: date_time_x
+            },
+            series: [
+                {
+                    data: select_y
+                },
+                {
+                    data: insert_y
+                },
+                {
+                    data: update_y
+                },
+                {
+                    data: delete_y
+                }]
+        });
+    }
+
+    function set_dml_chart_options() {
+        var chart_option = {
+            title: {
+                text: "DML"
+            },
+            tooltip : {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            legend: {
+                data:['select','insert','update','delete']
+            },
+            xAxis: {
+                data: date_time_x
+            },
+            yAxis: {},
+            series: [
+                {
+                    name: "select",
+                    type: 'line',
+                    data: select_date_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "insert",
+                    type: 'line',
+                    data: insert_date_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "update",
+                    type: 'line',
+                    data: update_date_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "delete",
+                    type: 'line',
+                    data: delete_date_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                }]
+        };
+        dml_chart.setOption(chart_option)
+    }
+
+    set_dml_chart_options()
     set_chart_options(qps_chart, "QPS", date_time_x, qps_data_y);
     set_chart_options(tps_chart, "TPS", date_time_x, tps_data_y);
     set_chart_options(thread_chart, "Threads", date_time_x, thread_data_y);

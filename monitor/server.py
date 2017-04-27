@@ -54,7 +54,8 @@ class MonitorServer(threading.Thread):
         time.sleep(1)
         mysql_status_new = self.get_dic_data(cursor, "show global status;")
         mysql_variables = self.get_dic_data(cursor, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
-                                                    "'max_connections', 'table_open_cache', 'table_open_cache_instances', 'innodb_buffer_pool_size');")
+                                                    "'max_connections', 'table_open_cache', 'table_open_cache_instances', 'innodb_buffer_pool_size', "
+                                                    "'read_only');")
         host_info.mysql_data_dir = mysql_variables["datadir"]
         host_info.mysql_pid_file = mysql_variables["pid_file"]
         host_info.uptime = int(mysql_status_new["Uptime"]) / 60 / 60 / 24
@@ -227,6 +228,7 @@ class MonitorServer(threading.Thread):
         if(result != None):
             repl_info = self.__cache.get_repl_info(host_info.key)
             repl_info.is_slave = 1
+            repl_info.read_only = mysql_variables["read_only"]
             repl_info.error_message = result["Last_Error"]
             repl_info.io_status = result["Slave_IO_Running"]
             repl_info.sql_status = result["Slave_SQL_Running"]
@@ -243,13 +245,17 @@ class MonitorServer(threading.Thread):
             if(mysql_status_new["Slave_running"] == "OFF"):
                 repl_info.is_slave = 0
 
-        #self.insert_status_log(status_info)
+        self.insert_status_log(status_info)
         self.__db_util.close(connection, cursor)
         self.read_innodb_status(host_info)
 
         host_info.tps = status_info.tps
         host_info.qps = status_info.qps
         host_info.trxs = innodb_info.trx_count
+        host_info.threads = status_info.threads_count
+        host_info.threads_running = status_info.threads_run_count
+        host_info.send_bytes = status_info.send_bytes
+        host_info.receive_bytes = status_info.receive_bytes
 
     def get_data_length(self, data_length):
         value = float(1024)
