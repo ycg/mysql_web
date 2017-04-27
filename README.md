@@ -1,5 +1,27 @@
 mysql monitor web</br>
 
+安装环境：</br>
+1.基于python2.7.11开发的</br>
+2.安装MySQL5.6数据库</br>
+3.如果要监控OS，需要设置ssh免密码登录</br>
+    监控OS需要取消monitor/server.py的两行注释</br>
+    去掉pass代码，并取消pass后两行的注释</br>
+    pass</br>
+    #self.__cache.join_thread_pool(self.monitor_host_status)</br>
+    #self.__cache.join_thread_pool(self.monitor_host_for_cpu_and_io)</br>
+4.安装如下依赖包</br>
+    yum install openssl-devel python-devel libffi-devel -y</br>
+    pip install flask threadpool pymysql DBUtils paramiko</br>
+5.在setting.py设置MySQL_Host相关账户信息</br>
+    MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")</br>
+6.导入sql/table.sql的SQL脚本</br>
+7.在mysql_web.host_infos添加MySQL数据库用户</br>
+    insert into host_infos (host, port, user, password, remark) values</br>
+    ("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"),</br>
+    ("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");</br>
+8.启动 python mysql_web.py runserver</br>
+9.如果要监控慢查询还要进行几步配置</br>
+
 支持的功能：</br>
 1.mysql tps qps table_cache handler监控</br>
 2.支持对innodb各种status进行监控</br>
@@ -19,6 +41,12 @@ mysql monitor web</br>
 4.支持慢查询收集脚本</br>
 5.支持检查表空间脚本</br>
 6.基于mysqldump的创建从库脚本</br>
+
+待开发的功能：</br>
+1.邮件报警功能</br>
+2.监控数据入库形成历史数据</br>
+3.登录界面，权限验证</br>
+4.图标界面支持查看历史数据</br>
 
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/111.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/112.png)
