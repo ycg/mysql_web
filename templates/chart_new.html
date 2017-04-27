@@ -1,0 +1,108 @@
+<div class="row">
+    <div class="col-md-2">
+        <select id="host_ids" name="host_ids" class="selectpicker show-tick form-control bs-select-hidden">
+            {% for info in host_infos %}
+                <option value="{{ info.host_id }}">{{ info.remark }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="chart_type" name="chart_type" class="selectpicker show-tick form-control bs-select-hidden">
+            <option value="0">QPS</option>
+            <option value="1">TPS</option>
+            <option value="2">QPS</option>
+            <option value="3">QPS</option>
+            <option value="4">QPS</option>
+            <option value="5">QPS</option>
+            <option value="6">QPS</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-default" onclick="set_host_id()">Query</button>
+        &nbsp;&nbsp;<button class="btn btn-default">Reset</button>
+        </br></br>
+    </div>
+</div>
+
+<div class="row">
+    <div id="qps" class="col-md-12" style="height:300px;">
+
+    </div>
+    <div id="tps" class="col-md-12" style="height:300px;">
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $("#host_ids").find("option:first").attr("selected", true);
+
+    var timer = 0
+    var select_host_id = $("#host_ids").val();
+    var qps_chart = echarts.init(document.getElementById('qps'));
+    var tps_chart = echarts.init(document.getElementById('tps'));
+
+    var qps_data_x = [5, 20, 36, 10, 10, 20];
+    var qps_data_y = [5, 20, 36, 10, 10, 20];
+    var tps_data_x = [5, 20, 36, 10, 10, 20];
+    var tps_data_y = [5, 20, 36, 10, 10, 20];
+
+    clearInterval(timer)
+    timer = setInterval(function () {
+        $.get("/chart/" + select_host_id, "", function (data) {
+            var obj = jQuery.parseJSON(data)
+            qps_data_x.push(obj.time)
+            qps_data_y.push(obj.qps)
+
+            tps_data_x.push(obj.time)
+            tps_data_y.push(obj.tps)
+        });
+
+        refresh_chart(qps_chart, qps_data_x, qps_data_y);
+        refresh_chart(tps_chart, tps_data_x, tps_data_y);
+    }, 2000);
+
+    function set_host_id() {
+        select_host_id = $("#host_ids").val();
+        qps_data_x = [];
+        qps_data_y = [];
+
+        tps_data_x = [];
+        tps_data_y = [];
+    }
+
+    function set_chart_options(chart_dom, name, data_x, data_y) {
+        var chart_option = {
+            title: {
+                text: name
+            },
+            tooltip: {},
+            xAxis: {
+                data: data_x
+            },
+            yAxis: {},
+            series: [{
+                name: name,
+                type: 'line',
+                data: data_y,
+                showSymbol: false,
+                hoverAnimation: false,
+            }]
+        };
+        chart_dom.setOption(chart_option)
+    }
+
+    function refresh_chart(chart_dom, data_x, data_y) {
+        chart_dom.setOption({
+            xAxis: {
+                data: data_x
+            },
+            series: [{
+                data: data_y
+            }]
+        });
+    }
+
+    set_chart_options(qps_chart, "QPS", qps_data_x, qps_data_y);
+    set_chart_options(tps_chart, "TPS", tps_data_x, tps_data_y);
+</script>

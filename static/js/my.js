@@ -58,7 +58,7 @@ function myActive(id_name) {
     });
 }
 
-var id_names = ["sql", "slowlog", "tablespace", "general", "user", "thread"]
+var id_names = ["sql", "slowlog", "tablespace", "general", "user", "thread", "chart"]
 
 function search_div(id_name) {
     if ($.inArray(id_name, id_names) >= 0) {
