@@ -1,84 +1,119 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <script type="text/javascript" src="http://www.daimajiayuan.com/download/jquery/jquery-1.10.2.min.js"></script>
+
+    <script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>
+
+    <script type="text/javascript" src="http://cdn.bootcss.com/bootstrap-select/2.0.0-beta1/js/bootstrap-select.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://cdn.bootcss.com/bootstrap-select/2.0.0-beta1/css/bootstrap-select.css">
+
+    <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
+    <script src={{ url_for("static", filename="js/bootstrap.min.js") }} type="text/javascript"></script>
+
     <script type="text/javascript" src={{ url_for("static", filename="js/echarts.min.js") }}></script>
 </head>
 <body>
-
-<div id="main" style="width: 800px;height:400px;">
-    AAAAAAAAAAAAAA
+<div class="row">
+    <div id="search_tmp" class="col-md-2">
+        <select id="host_ids" name="host_ids" class="selectpicker form-control" data-live-search="true">
+            {% for info in host_infos %}
+                <option value="{{ info.host_id }}">{{ info.remark }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="chart_type" name="chart_type" class="selectpicker show-tick form-control bs-select-hidden">
+            <option value="0">QPS</option>
+            <option value="1">TPS</option>
+            <option value="2">QPS</option>
+            <option value="3">QPS</option>
+            <option value="4">QPS</option>
+            <option value="5">QPS</option>
+            <option value="6">QPS</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-default" onclick="set_host_id()">Query</button>
+        &nbsp;&nbsp;<button class="btn btn-default">Reset</button>
+        </br></br>
+    </div>
 </div>
+<div class="row">
+    <div id="qps" class="col-md-12" style="height:300px;">
+
+    </div>
+    <div id="tps" class="col-md-12" style="height:300px;">
+
+    </div>
+</div>
+</body>
+</html>
 
 <script type="text/javascript">
 
-    /*    var myData = new Array(["1996-06-10 21:10:00", 22], ["1997-01-02 21:10:00", 36], ["1997-01-02 21:10:00", 37], ["1997-01-02 21:10:00", 45], ["1997-01-02 21:10:00", 50], ["1997-01-02 21:10:00", 30], ["1997-01-02 21:10:00", 61], ["1997-01-02 21:10:00", 61], ["1997-01-02 21:10:00", 62], ["1997-01-02 21:10:00", 66], ["1997-01-02 21:10:00", 73]);
-     //var myData = new Array(["21:10:00", 22], ["21:10:00", 36], ["21:10:00", 37], ["21:10:00", 45], ["21:10:00", 50], ["21:10:00", 30], ["21:10:00", 61], ["21:10:00", 61], ["21:10:00", 62], ["21:10:00", 66], ["21:10:00", 73]);
-     var myChart = new JSChart('tps', 'line');
-     //alert({{ p_data }})
-     //var myData = new Array({{ p_data }})
 
-     //var josn = {"JSChart" : {  "datasets" : [  {  "type" : "line", "data" : [  {  "unit" : "Unit_1",  "value" : "20"  },  {  "unit" : "Unit_2",  "value" : "10"  },  {  "unit" : "Unit_3", "value" : "30" },  {  "unit" : "Unit_4", "value" : "10"},  {  "unit" : "Unit_5",  "value" : "5"  }  ]  }  ]  }  }
-     function setAttribute(obj_chart, data_json, title) {
-     obj_chart.setTitle(title)
-     obj_chart.setAxisNameX('');
-     obj_chart.setAxisNameY('');
-     obj_chart.setDataJSON(data_json)
-     obj_chart.draw()
-     }
+    $("#host_ids").find("option:first").attr("selected", true);
 
-     myChart.setDataArray(myData);
-     myChart.setAxisNameX('');
-     myChart.setAxisNameY('');
-     myChart.setTitle("TPS")
-     myChart.setSize(1000, 400)
-     myChart.draw()*/
+    var timer = 0
+    var select_host_id = $("#host_ids").val();
+    var qps_chart = echarts.init(document.getElementById('qps'));
+    var tps_chart = echarts.init(document.getElementById('tps'));
 
+    var qps_data_y = [];
+    var tps_data_y = [];
+    var date_time_x = [];
 
-    // 基于准备好的dom，初始化echarts实例
-    var myChart123 = echarts.init(document.getElementById('main'));
+    function init_chart_data() {
+        $("#host_ids option").each(function () {
+        })
+    }
 
-    var data_x = [5, 20, 36, 10, 10, 20];
-    var data_y = [5, 20, 36, 10, 10, 20];
-    // 指定图表的配置项和数据
-    var option = {
-        title: {
-            text: 'QPS'
-        },
-        tooltip: {},
-        //legend: {
-        //    data: ['销量']
-        //},
-        xAxis: {
-            data: [5, 20, 36, 10, 10, 20],
-            splitLine: {
-                show: false
-            }
-        },
-        yAxis: {
-            splitLine: {
-                show: true
-            }
-        },
-        series: [{
-            name: 'QPS',
-            type: 'line',
-            data: [5, 20, 36, 10, 10, 20]
-        }]
-    };
+    function set_host_id() {
+        select_host_id = $("#host_ids").val();
+        qps_data_y = [];
+        tps_data_y = [];
+        date_time_x = [];
+    }
 
-    // 使用刚指定的配置项和数据显示图表。
-    myChart123.setOption(option);
+    function set_chart_data(obj_data) {
+        qps_data_y.push(obj_data.qps)
+        tps_data_y.push(obj_data.tps)
+        date_time_x.push(obj_data.time)
+    }
 
+    function get_chart_data() {
+        $.get("/chart/" + select_host_id, "", function (data) {
+            set_chart_data(jQuery.parseJSON(data))
+        });
 
-    setInterval(function () {
-        if(data_x.length > 50) {
-            data_x.shift();
-            data_y.shift();
-        }
-        data_x.push(Math.ceil(Math.random()*100))
-        data_y.push(Math.ceil(Math.random()*100))
+        refresh_chart(qps_chart, date_time_x, qps_data_y);
+        refresh_chart(tps_chart, date_time_x, tps_data_y);
+    }
 
-        myChart123.setOption({
+    function set_chart_options(chart_dom, name, data_x, data_y) {
+        var chart_option = {
+            title: {
+                text: name
+            },
+            tooltip: {},
+            xAxis: {
+                data: data_x
+            },
+            yAxis: {},
+            series: [{
+                name: name,
+                type: 'line',
+                data: data_y,
+                showSymbol: false,
+                hoverAnimation: false,
+            }]
+        };
+        chart_dom.setOption(chart_option)
+    }
+
+    function refresh_chart(chart_dom, data_x, data_y) {
+        chart_dom.setOption({
             xAxis: {
                 data: data_x
             },
@@ -86,80 +121,15 @@
                 data: data_y
             }]
         });
-    }, 1000);
-
-    /*var myChart = echarts.init(document.getElementById('main'));
-
-    function randomData() {
-        now = new Date(+now + oneDay);
-        value = value + Math.random() * 21 - 10;
-        return {
-            name: now.toString(),
-            value: [
-                [now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'),
-                Math.round(value)
-            ]
-        }
     }
 
-    var data = [];
-    var now = +new Date(1997, 9, 3);
-    var oneDay = 24 * 3600 * 1000;
-    var value = Math.random() * 1000;
-    for (var i = 0; i < 1000; i++) {
-        data.push(randomData());
-    }
+    set_chart_options(qps_chart, "QPS", date_time_x, qps_data_y);
+    set_chart_options(tps_chart, "TPS", date_time_x, tps_data_y);
 
-    option = {
-        title: {
-            text: '动态数据 + 时间坐标轴'
-        },
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (params) {
-                params = params[0];
-                var date = new Date(params.name);
-                return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
-            },
-            axisPointer: {
-                animation: false
-            }
-        },
-        xAxis: {
-            type: 'time',
-            splitLine: {
-                show: false
-            }
-        },
-        yAxis: {
-            type: 'value',
-            boundaryGap: [0, '100%'],
-            splitLine: {
-                show: false
-            }
-        },
-        series: [{
-            name: '模拟数据',
-            type: 'line',
-            showSymbol: false,
-            hoverAnimation: false,
-            data: [5, 20, 36, 10, 10, 20]
-        }]
-    };
-
-    setInterval(function () {
-
-        for (var i = 0; i < 5; i++) {
-            data.shift();
-            data.push(randomData());
-        }
-
-        myChart.setOption({
-            series: [{
-                data: data
-            }]
-        });
-    }, 1000);*/
+    get_chart_data();
+    clearInterval(timer);
+    timer = setInterval(get_chart_data, 2000);
 </script>
-</body>
-</html>
+
+
+<script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>

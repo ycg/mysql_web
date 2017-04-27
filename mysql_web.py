@@ -3,7 +3,7 @@
 #yum install openssl-devel python-devel libffi-devel -y
 #pip install flask threadpool pymysql DBUtils paramiko
 
-import datetime, json, time
+import datetime, json
 from flask import Flask, render_template, request, app, redirect, make_response
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
 
@@ -257,7 +257,7 @@ def chart_home():
 
 @app.route("/chart_new")
 def chart_home_old():
-    return render_template("chart.html")
+    return render_template("chart.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/chart/<int:host_id>")
 def get_chart_data_by_host_id(host_id):
