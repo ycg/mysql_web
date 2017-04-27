@@ -15,6 +15,9 @@
 #ADD PRIMARY KEY (`id`),
 #ADD UNIQUE INDEX `checksum_UNIQUE` (`checksum` ASC);
 
+#目前只之前percona分支版本
+#set global log_slow_verbosity = 'query_plan,innodb,microtime';
+
 #1.slow log存放的地址
 db_host=""
 db_port=3306
