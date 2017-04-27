@@ -9,6 +9,8 @@ mysql monitor web</br>
 7.支持对os基本监控</br>
 8.支持收集慢查询监控</br>
 9.支持对thread进行完整分析</br>
+10.支持实时的图标显示
+11.支持对数据库用户账号的查询
 
 完成的脚本：</br>
 1.一键安装数据库脚本</br>
@@ -26,3 +28,4 @@ mysql monitor web</br>
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/116.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/117.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/118.png)
+![image](https://github.com/ycg/mysql_web/blob/master/static/img/119.png)

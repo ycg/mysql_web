@@ -42,33 +42,41 @@
     var qps_chart = echarts.init(document.getElementById('qps'));
     var tps_chart = echarts.init(document.getElementById('tps'));
 
-    var qps_data_x = [5, 20, 36, 10, 10, 20];
-    var qps_data_y = [5, 20, 36, 10, 10, 20];
-    var tps_data_x = [5, 20, 36, 10, 10, 20];
-    var tps_data_y = [5, 20, 36, 10, 10, 20];
+    var qps_data_y = [];
+    var tps_data_y = [];
+    var date_time_x = [];
 
     clearInterval(timer)
-    timer = setInterval(function () {
-        $.get("/chart/" + select_host_id, "", function (data) {
-            var obj = jQuery.parseJSON(data)
-            qps_data_x.push(obj.time)
-            qps_data_y.push(obj.qps)
+    console.log(timer)
+    timer = setInterval(get_chart_data, 2000);
 
-            tps_data_x.push(obj.time)
-            tps_data_y.push(obj.tps)
-        });
-
-        refresh_chart(qps_chart, qps_data_x, qps_data_y);
-        refresh_chart(tps_chart, tps_data_x, tps_data_y);
-    }, 2000);
+    function init_chart_data() {
+        $("#host_ids option").each(function () {
+            //qps_data_y[$(this).val()] = [];
+            //tps_data_y[$(this).val()] = [];
+        })
+    }
 
     function set_host_id() {
         select_host_id = $("#host_ids").val();
-        qps_data_x = [];
         qps_data_y = [];
-
-        tps_data_x = [];
         tps_data_y = [];
+        date_time_x = [];
+    }
+
+    function set_chart_data(obj_data) {
+        qps_data_y.push(obj_data.qps)
+        tps_data_y.push(obj_data.tps)
+        date_time_x.push(obj_data.time)
+    }
+
+    function get_chart_data() {
+        $.get("/chart/" + select_host_id, "", function (data) {
+            set_chart_data(jQuery.parseJSON(data))
+        });
+
+        refresh_chart(qps_chart, date_time_x, qps_data_y);
+        refresh_chart(tps_chart, date_time_x, tps_data_y);
     }
 
     function set_chart_options(chart_dom, name, data_x, data_y) {
@@ -103,6 +111,6 @@
         });
     }
 
-    set_chart_options(qps_chart, "QPS", qps_data_x, qps_data_y);
-    set_chart_options(tps_chart, "TPS", tps_data_x, tps_data_y);
+    set_chart_options(qps_chart, "QPS", date_time_x, qps_data_y);
+    set_chart_options(tps_chart, "TPS", date_time_x, tps_data_y);
 </script>
