@@ -3,7 +3,7 @@
 #yum install openssl-devel python-devel libffi-devel -y
 #pip install flask flask-login threadpool pymysql DBUtils paramiko
 
-import json, os
+import json, os, gzip, StringIO, base64
 from flask import Flask, render_template, request, app, redirect, make_response, helpers
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
 from monitor import login_new, base_class
@@ -36,7 +36,7 @@ slow_log.load_slow_log_table_config()
 @app.route("/mysql", methods=['GET', 'POST'])
 @login_required
 def get_mysql_data():
-    return render_template("mysqls.html", mysql_infos=mysql_cache.get_all_host_infos(keys=json.loads(request.values["keys"])))
+    return gzip_compress(render_template("mysqls.html", mysql_infos=mysql_cache.get_all_host_infos(keys=json.loads(request.values["keys"]))))
 
 @app.route("/mysql/<int:id>")
 @login_required
@@ -54,7 +54,7 @@ def get_mysql_data_by_id(id):
 @app.route("/status", methods=['GET', 'POST'])
 @login_required
 def get_status_data():
-    return get_monitor_data(data_status=mysql_cache.get_all_status_infos(keys=json.loads(request.values["keys"])))
+    return gzip_compress(get_monitor_data(data_status=mysql_cache.get_all_status_infos(keys=json.loads(request.values["keys"]))))
 
 @app.route("/status/<int:id>")
 @login_required
@@ -68,7 +68,7 @@ def get_status_data_by_id(id):
 @app.route("/innodb", methods=['GET', 'POST'])
 @login_required
 def get_innodb_data():
-    return get_monitor_data(data_innodb=mysql_cache.get_all_innodb_infos(keys=json.loads(request.values["keys"])))
+    return gzip_compress(get_monitor_data(data_innodb=mysql_cache.get_all_innodb_infos(keys=json.loads(request.values["keys"]))))
 
 @app.route("/innodb/<int:id>")
 @login_required
@@ -82,7 +82,7 @@ def get_innodb_data_by_id(id):
 @app.route("/replication", methods=['GET', 'POST'])
 @login_required
 def get_replication_data():
-    return get_monitor_data(data_repl=mysql_cache.get_all_repl_infos(keys=json.loads(request.values["keys"])))
+    return gzip_compress(get_monitor_data(data_repl=mysql_cache.get_all_repl_infos(keys=json.loads(request.values["keys"]))))
 
 @app.route("/replication/<int:id>")
 @login_required
@@ -135,6 +135,20 @@ def get_general_log_detail(page_number, checksum):
 #endregion
 
 #region common methon
+
+def gzip_compress(content):
+    zbuf = StringIO.StringIO()
+    zfile = gzip.GzipFile(mode='wb', compresslevel=9, fileobj=zbuf)
+    zfile.write(content)
+    zfile.close()
+    return base64.b64encode(zbuf.getvalue())
+
+def gzip_decompress(content):
+    compresseddata = base64.b64decode(content)
+    compressedstream = StringIO.StringIO(compresseddata)
+    gzipper = gzip.GzipFile(fileobj=compressedstream)
+    data = gzipper.read()
+    return data
 
 def convert_object_to_list(obj):
     list_tmp = None
@@ -196,7 +210,7 @@ def execute_sql_for_commit():
 @app.route("/os", methods=['GET', 'POST'])
 @login_required
 def get_os_infos():
-    return get_monitor_data(data_host=mysql_cache.get_all_linux_infos(keys=json.loads(request.values["keys"])))
+    return gzip_compress(get_monitor_data(data_host=mysql_cache.get_all_linux_infos(keys=json.loads(request.values["keys"]))))
 
 @app.route("/home", methods=['GET', 'POST'])
 @login_required

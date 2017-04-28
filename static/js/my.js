@@ -7,7 +7,7 @@ var post_url = ["/mysql", "/status", "/innodb", "/replication", "/os"]
 function myrefresh() {
     if ($.inArray(my_url, post_url) >= 0) {
         $.post(my_url, {"keys":JSON.stringify(host_ids)}, function (data){
-            $("#data").html(data);
+            $("#data").html(ungzip_new(data));
         });
     }
     else {
@@ -86,21 +86,23 @@ function reset_select_ids() {
     host_ids = new Array()
 }
 
+function gzip_new(string) {
+    var charData = string.split('').map(function (x) {
+        return x.charCodeAt(0);
+    });
+    var binData = new Uint8Array(charData);
+    var data = pako.gzip(binData);
+    var strData = String.fromCharCode.apply(null, new Uint16Array(data));
+    return btoa(strData);
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function ungzip_new(string) {
+    var strData = atob(string);
+    var charData = strData.split('').map(function (x) {
+        return x.charCodeAt(0);
+    });
+    var binData = new Uint8Array(charData);
+    var data = pako.ungzip(binData);
+    var strData = String.fromCharCode.apply(null, new Uint16Array(data));
+    return strData;
+}
