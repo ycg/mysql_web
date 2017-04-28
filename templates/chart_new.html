@@ -82,6 +82,16 @@
     }
 
     function set_chart_data(obj_data) {
+        if(qps_data_y.length >= 300) {
+            qps_data_y.shift();
+            tps_data_y.shift();
+            date_time_x.shift();
+            select_date_y.shift();
+            insert_date_y.shift();
+            update_date_y.shift();
+            delete_date_y.shift();
+            thread_data_y.shift();
+        }
         qps_data_y.push(obj_data.qps)
         tps_data_y.push(obj_data.tps)
         date_time_x.push(obj_data.time)

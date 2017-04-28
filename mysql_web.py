@@ -1,15 +1,26 @@
 # -*- coding: utf-8 -*-
 
 #yum install openssl-devel python-devel libffi-devel -y
-#pip install flask threadpool pymysql DBUtils paramiko
+#pip install flask flask-login threadpool pymysql DBUtils paramiko
 
-import datetime, json
-from flask import Flask, render_template, request, app, redirect, make_response
+import json, os
+from flask import Flask, render_template, request, app, redirect, make_response, helpers
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
+from monitor import login_new, base_class
+from flask_login import login_user, login_required
+from flask_login import LoginManager, current_user
 
 #region load data on run
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
+login_manager = LoginManager()
+login_manager.session_protection = "strong"
+login_manager.login_view = "login_home"
+login_manager.init_app(app=app)
+init_user = login_new.User("admin")
+init_user.password = "ycg123!.+"
+
 mysql_cache = cache.Cache()
 mysql_cache.load_all_host_infos()
 monitor_server = server.MonitorServer()
@@ -23,10 +34,12 @@ slow_log.load_slow_log_table_config()
 #region mysql api
 
 @app.route("/mysql", methods=['GET', 'POST'])
+@login_required
 def get_mysql_data():
     return render_template("mysqls.html", mysql_infos=mysql_cache.get_all_host_infos(keys=json.loads(request.values["keys"])))
 
 @app.route("/mysql/<int:id>")
+@login_required
 def get_mysql_data_by_id(id):
     return get_monitor_data(data_host=convert_object_to_list(mysql_cache.get_linux_info(id)),
                             data_status=convert_object_to_list(mysql_cache.get_status_infos(id)),
@@ -39,10 +52,12 @@ def get_mysql_data_by_id(id):
 #region mysql status api
 
 @app.route("/status", methods=['GET', 'POST'])
+@login_required
 def get_status_data():
     return get_monitor_data(data_status=mysql_cache.get_all_status_infos(keys=json.loads(request.values["keys"])))
 
 @app.route("/status/<int:id>")
+@login_required
 def get_status_data_by_id(id):
     return get_monitor_data(data_status=convert_object_to_list(mysql_cache.get_status_infos(id)))
 
@@ -51,10 +66,12 @@ def get_status_data_by_id(id):
 #region innodb api
 
 @app.route("/innodb", methods=['GET', 'POST'])
+@login_required
 def get_innodb_data():
     return get_monitor_data(data_innodb=mysql_cache.get_all_innodb_infos(keys=json.loads(request.values["keys"])))
 
 @app.route("/innodb/<int:id>")
+@login_required
 def get_innodb_data_by_id(id):
     return get_monitor_data(data_innodb=convert_object_to_list(mysql_cache.get_innodb_infos(id)), data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(id))
 
@@ -63,10 +80,12 @@ def get_innodb_data_by_id(id):
 #region replication api
 
 @app.route("/replication", methods=['GET', 'POST'])
+@login_required
 def get_replication_data():
     return get_monitor_data(data_repl=mysql_cache.get_all_repl_infos(keys=json.loads(request.values["keys"])))
 
 @app.route("/replication/<int:id>")
+@login_required
 def get_replication_data_by_id(id):
     return get_monitor_data(slave_status=mysql_status.get_show_slave_status(id))
 
@@ -75,6 +94,7 @@ def get_replication_data_by_id(id):
 #region tablespace api
 
 @app.route("/tablespace")
+@login_required
 def get_tablespace():
     return render_template("tablespace.html", host_infos=mysql_cache.get_all_host_infos())
 
@@ -84,6 +104,7 @@ def execute_check_tablespace():
     return "invoke ok, please wait."
 
 @app.route("/tablespace/sort/<int:host_id>/<int:sort_type>")
+@login_required
 def sort_tablespace(host_id, sort_type):
     if(host_id <= 0):
         return render_template("tablespace_dispaly.html", host_tablespace_infos=tablespace.sort_tablespace(sort_type), tablespace_status=None)
@@ -98,6 +119,7 @@ def sort_tablespace(host_id, sort_type):
 #region general log api
 
 @app.route("/general/<int:page_number>")
+@login_required
 def get_general_log_by_page_number(page_number):
     if(page_number <= 5):
         page_list = range(1, 10)
@@ -106,6 +128,7 @@ def get_general_log_by_page_number(page_number):
     return render_template("general_log.html", general_logs=general_log.get_general_logs_by_page_index(page_number), page_number=page_number, page_list=page_list)
 
 @app.route("/general/<int:page_number>/detail/<checksum>")
+@login_required
 def get_general_log_detail(page_number, checksum):
     return render_template("general_log_detail.html", page_number=page_number, general_log_detail=general_log.get_general_log_detail(checksum))
 
@@ -128,22 +151,27 @@ def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_en
 #region slow log api
 
 @app.route("/slowlog")
+@login_required
 def slow_log_home():
     return render_template("slow_log_new.html")
 
 @app.route("/slowlog/<int:query_type_id>")
+@login_required
 def get_slow_logs(query_type_id):
     return render_template("slow_log_display.html", slow_log_infos=slow_log.get_all_slow_infos(0, query_type_id))
 
 @app.route("/slowlog/<checksum>")
+@login_required
 def get_slow_log_detail(checksum):
     return render_template("slow_log.html", slow_list = None, slow_low_info=slow_log.get_slow_log_detail(checksum))
 
 @app.route("/slowlog/config/load/")
+@login_required
 def load_log_table_config():
     slow_log.load_slow_log_table_config()
 
 @app.route("/slowlog/detail/<int:host_id>/<int:checksum>")
+@login_required
 def get_detail(host_id, checksum):
     return slow_log.get_slow_log_detail_by_host_id(host_id, checksum)
 
@@ -152,10 +180,12 @@ def get_detail(host_id, checksum):
 #region execute sql api
 
 @app.route("/sql")
+@login_required
 def execute_sql_home():
     return render_template("execute_sql.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/autoreview", methods=['GET', 'POST'])
+@login_required
 def execute_sql_for_commit():
     return execute_sql.execute_sql_test(request.form["cluster_name"], request.form["sql_content"], request.form["workflow_name"], request.form["is_backup"])
 
@@ -164,14 +194,17 @@ def execute_sql_for_commit():
 #region other api
 
 @app.route("/os", methods=['GET', 'POST'])
+@login_required
 def get_os_infos():
     return get_monitor_data(data_host=mysql_cache.get_all_linux_infos(keys=json.loads(request.values["keys"])))
 
 @app.route("/home", methods=['GET', 'POST'])
+@login_required
 def home():
-    return render_template("home.html", host_infos=mysql_cache.get_all_host_infos())
+    return render_template("home.html", host_infos=mysql_cache.get_all_host_infos(), username=current_user.username)
 
 @app.route("/home/binlog")
+@login_required
 def get_test():
     return render_template("binlog.html")
 
@@ -180,24 +213,29 @@ def get_test():
 #region user web api
 
 @app.route("/user")
+@login_required
 def user_home():
     return render_template("user.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/user/query", methods=['GET', 'POST'])
+@login_required
 def select_user():
     print(request.form)
     host_id = int(request.form["server_id"])
     return render_template("user_display.html", host_id=host_id, user_infos=user.MySQLUser(host_id).query_user(request.form["user_name"], request.form["ip"]))
 
 @app.route("/user/db")
+@login_required
 def get_all_database_name():
     return user.MySQLUser(1).get_all_database_name()
 
 @app.route("/user/<name>/<ip>")
+@login_required
 def get_detail_priv_by_user(name, ip):
     return user.MySQLUser(1).get_privs_by_user(name, ip)
 
 @app.route("/user/detail/<int:host_id>/<name>/<ip>")
+@login_required
 def get_user_detail(host_id, name, ip):
     return user.MySQLUser(host_id).get_privs_by_user(name, ip)
 
@@ -206,6 +244,7 @@ def add_user():
     pass
 
 @app.route("/user/drop/<int:host_id>/<name>/<ip>")
+@login_required
 def drop_user(host_id, name, ip):
     return user.MySQLUser(host_id).drop_user(name, ip)
 
@@ -214,10 +253,12 @@ def drop_user(host_id, name, ip):
 #region thread api
 
 @app.route("/thread")
+@login_required
 def thread_home():
     return render_template("thread.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/thread/<int:host_id>/<int:query_type>")
+@login_required
 def get_thread_infos(host_id, query_type):
     return render_template("thread_display.html", thread_infos=thread.get_all_thread(host_id, query_type))
 
@@ -225,41 +266,43 @@ def get_thread_infos(host_id, query_type):
 
 #region login api
 
-@app.route("/login")
-def login():
-    return render_template("login.html")
-
 @app.route("/login/verfiy", methods=['GET', 'POST'])
 def login_verfiy():
-    user_name = request.form["userName"]
-    password = request.form["passWord"]
-    print(user_name, password)
-    print(request.cookies)
+    result = base_class.BaseClass(None)
+    result.error = ""
+    result.success = ""
+    user_tmp = login_new.User(request.form["userName"])
+    if(user_tmp.verify_password(request.form["passWord"])):
+        login_user(user_tmp)
+        result.success = "ok"
+    else:
+        result.error = "password incorrect"
+    return json.dumps(result, default=lambda o: o.__dict__)
 
-    outdate=datetime.datetime.today() + datetime.timedelta(days=1)
-    reponse = make_response("test")
-    reponse.set_cookie("Name", "Yang", expires=outdate)
+@login_manager.user_loader
+def load_user(user_id):
+    return login_new.User(None).get(user_id)
 
-    if(user_name == "dba" and password == "123456"):
-        return redirect("home")
-    return reponse
-
-def check_user_is_login():
-    return "you not login"
+@app.route('/login')
+def login_home():
+    return render_template("login.html")
 
 #endregion
 
 #region chart api
 
 @app.route("/chart")
+@login_required
 def chart_home():
     return render_template("chart_new.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/chart_new")
+@login_required
 def chart_home_old():
     return render_template("chart.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/chart/<int:host_id>")
+@login_required
 def get_chart_data_by_host_id(host_id):
     return chart.get_chart_data_by_host_id(host_id)
 

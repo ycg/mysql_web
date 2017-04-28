@@ -55,7 +55,7 @@ class MonitorServer(threading.Thread):
         mysql_status_new = self.get_dic_data(cursor, "show global status;")
         mysql_variables = self.get_dic_data(cursor, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
                                                     "'max_connections', 'table_open_cache', 'table_open_cache_instances', 'innodb_buffer_pool_size', "
-                                                    "'read_only');")
+                                                    "'read_only', 'log_bin');")
         host_info.mysql_data_dir = mysql_variables["datadir"]
         host_info.mysql_pid_file = mysql_variables["pid_file"]
         host_info.uptime = int(mysql_status_new["Uptime"]) / 60 / 60 / 24
@@ -224,6 +224,7 @@ class MonitorServer(threading.Thread):
         innodb_info.innodb_pages_written = int(mysql_status_new["Innodb_pages_written"]) - int(mysql_status_old["Innodb_pages_written"])
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
+        self.get_binlog_size_total(mysql_variables["log_bin"], status_info, cursor)
         result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
         if(result != None):
             repl_info = self.__cache.get_repl_info(host_info.key)
@@ -245,7 +246,7 @@ class MonitorServer(threading.Thread):
             if(mysql_status_new["Slave_running"] == "OFF"):
                 repl_info.is_slave = 0
 
-        self.insert_status_log(status_info)
+        #self.insert_status_log(status_info)
         self.__db_util.close(connection, cursor)
         self.read_innodb_status(host_info)
 
@@ -267,6 +268,15 @@ class MonitorServer(threading.Thread):
                 return str(int(result)) + "K"
         else:
             return str(data_length) + "KB"
+
+    def get_binlog_size_total(self, log_bin, status_info, cursor):
+        if(log_bin == "ON"):
+            total_size = 0
+            for row in self.__db_util.fetchall_for_cursor("show master logs;", cursor=cursor):
+                total_size += int(row["File_size"])
+            status_info.binlog_size_total = tablespace.get_data_length(total_size)
+        else:
+            status_info.binlog_size_total = 0
 
     def get_dic_data(self, cursor, sql):
         data = {}

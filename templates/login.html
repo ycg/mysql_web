@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <link href={{ url_for('static', filename='css/bootstrap.min.css') }} rel="stylesheet" type="text/css">
+    <script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>
+    <script src={{ url_for("static", filename="js/bootstrap.min.js") }} type="text/javascript"></script>
+    <script src={{ url_for("static", filename="jquery/jquery-form.js") }} type="text/javascript"></script>
 
     <style>
         body {
@@ -15,7 +18,7 @@
     </style>
 </head>
 <body>
-<form id="login" action="/login/verfiy" method="post" target="nm_iframe" class="form-horizontal" role="form">
+<form id="login_form" action="/login/verfiy" method="post" target="nm_iframe" class="form-horizontal" role="form">
     <div class="input-group">
         <span class="input-group-addon" id="basic-addon1">@</span>
         <input id="userName" name="userName" type="text" class="form-control" placeholder="用户名" aria-describedby="basic-addon1">
@@ -30,5 +33,43 @@
     <!--下面是登陆按钮,包括颜色控制-->
     <button type="submit" style="width:280px;" class="btn btn-default">登 录</button>
 </form>
+
+<iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Result</h4>
+            </div>
+            <div class="modal-body">
+                <p id="msg">One fine body…</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
+
+<script language="JavaScript">
+    $(document).ready(function () {
+        $("#login_form").ajaxForm(function (data) {
+            obj = jQuery.parseJSON(data);
+            if (obj.error.length > 0) {
+                showModal(obj.error)
+            }
+            else {
+                window.location.href = 'home';
+            }
+        });
+    });
+
+    function showModal(msg) {
+        $("#msg").html(msg);
+        $("#myModal").modal("show");
+    }
+</script>

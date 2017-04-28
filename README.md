@@ -11,7 +11,7 @@ mysql monitor web</br>
     &nbsp;&nbsp;#self.__cache.join_thread_pool(self.monitor_host_for_cpu_and_io)</br>
 4.安装如下依赖包</br>
     &nbsp;&nbsp;yum install openssl-devel python-devel libffi-devel -y</br>
-    &nbsp;&nbsp;pip install flask threadpool pymysql DBUtils paramiko</br>
+    &nbsp;&nbsp;pip install flask flask-login threadpool pymysql DBUtils paramiko</br>
 5.在setting.py设置MySQL_Host相关账户信息</br>
     &nbsp;&nbsp;MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")</br>
 6.导入sql/table.sql的SQL脚本</br>
@@ -33,6 +33,7 @@ mysql monitor web</br>
 9.支持对thread进行完整分析</br>
 10.支持实时的图标显示</br>
 11.支持对数据库用户账号的查询</br>
+12.支持登录验证，未登录不允许查看其它任何界面</br>
 
 完成的脚本：</br>
 1.一键安装数据库脚本</br>
@@ -44,8 +45,11 @@ mysql monitor web</br>
 
 待开发的功能：</br>
 1.邮件报警功能</br>
+&nbsp;&nbsp;&nbsp;&nbsp;接下来进行告警界面的开发，可以自定义告警参数</br>
 2.监控数据入库形成历史数据</br>
 3.登录界面，权限验证</br>
+&nbsp;&nbsp;&nbsp;&nbsp;2017-4-28完成基本的登录验证，不过用户名和密码写死的</br>
+&nbsp;&nbsp;&nbsp;&nbsp;接下来考虑用户验证从数据库里读取，不过这个不急</br>
 4.图标界面支持查看历史数据</br>
 
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/111.png)

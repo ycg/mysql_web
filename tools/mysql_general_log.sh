@@ -25,7 +25,7 @@ function start_general_log()
 {
     general_log_file_old=`$mysql_client -h$mysql_host -P$mysql_port -u$mysql_user -p$mysql_password -e "show global variables like 'general_log_file';" | grep log | awk '{print $2}'`
     echo "---------------------------------start general log-------------------------------------------------"
-	general_log_file_new=$general_log_dir`date "+%Y-%m-%d_%H-%M-%S.slow"`
+	general_log_file_new=$general_log_dir`date "+%Y-%m-%d_%H-%M-%S.general"`
 	`$mysql_client -h$mysql_host -P$mysql_port -u$mysql_user -p$mysql_password \
 	-e "set global general_log = 1;set global log_output = 'FILE';set global general_log_file = '$general_log_file_new';"`
 

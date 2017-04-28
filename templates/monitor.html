@@ -510,7 +510,7 @@
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th colspan="7" class="text-center">
+                    <th colspan="8" class="text-center">
                         Tmp Table Binlog Table Lock
                     </th>
                 </tr>
@@ -529,6 +529,9 @@
                     </th>
                     <th title="binlog cache hit">
                         B_C_H
+                    </th>
+                    <th title="binlog size total">
+                        B_S_T
                     </th>
                     <th title="table locks immediate">
                         T_L_I
@@ -555,6 +558,9 @@
                     </td>
                     <td {% if(status.binlog_cache_hit > 0 and status.binlog_cache_hit < 100) %} class="text-danger" {% endif %}>
                         {{ status.binlog_cache_hit }}
+                    </td>
+                    <td>
+                        {{ status.binlog_size_total }}
                     </td>
                     <td>
                         {{ status.table_locks_immediate }}
