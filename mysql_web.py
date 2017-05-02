@@ -220,6 +220,11 @@ def home():
 def get_test():
     return render_template("binlog.html")
 
+@app.route("/home/load")
+def load_all_host_infos():
+    mysql_cache.load_all_host_infos()
+    return "load ok"
+
 #endregion
 
 #region user web api

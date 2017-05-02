@@ -26,7 +26,7 @@ def get_slow_log_top_20():
                 from db1.mysql_slow_query_review t1
              ) t2 order by Query_time_sum desc limit 20;"""
     slow_list = []
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         slow_info = base_class.BaseClass(None)
         slow_info.checksum = row["checksum"]
         slow_info.count = int(row["ts_cnt"])
@@ -47,7 +47,7 @@ def get_slow_log_detail(checksum):
              left join db1.mysql_slow_query_review_history t2 on t1.checksum = t2.checksum
              where t1.checksum='{0}' limit 1;""".format(checksum)
     slow_log_detail = None
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         slow_log_detail = base_class.BaseClass(None)
         slow_log_detail.checksum = row["checksum"]
         slow_log_detail.count = int(row["ts_cnt"])
@@ -88,7 +88,7 @@ def get_all_slow_infos(host_id, query_type_id):
     else:
         sql = sql.format(query_type[query_type_id])
     slow_list = []
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         slow_info = base_class.BaseClass(None)
         slow_info.id = row["id"]
         slow_info.checksum = row["checksum"]
@@ -146,7 +146,7 @@ def get_slow_log_detail_by_host_id(host_id, checksum):
                                                         table_config[host_id].slow_log_table,
                                                         table_config[host_id].slow_log_table_history, checksum)
     slow_log_detail = None
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         slow_log_detail = base_class.BaseClass(None)
         for key, value in row.items():
             setattr(slow_log_detail, key, value)
@@ -182,7 +182,7 @@ def load_slow_log_table_config():
     sql = """select host_id, slow_log_db, slow_log_table, slow_log_table_history,
              general_log_db, general_log_table, general_log_table_history
              from mysql_web.slow_general_log_table_config where is_deleted = 0;"""
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         info = base_class.BaseClass(None)
         info.host_id = int(row["host_id"])
         info.slow_log_db = row["slow_log_db"]

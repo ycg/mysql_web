@@ -19,8 +19,9 @@ mysql monitor web</br>
     &nbsp;&nbsp;insert into host_infos (host, port, user, password, remark) values</br>
     &nbsp;&nbsp;("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"),</br>
     &nbsp;&nbsp;("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");</br>
-8.启动 python mysql_web.py runserver</br>
-9.如果要监控慢查询还要进行几步配置</br>
+8.添加账号insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yangcaogui", md5("123456"));</br>
+9.启动 python mysql_web.py runserver</br>
+10.如果要监控慢查询还要进行几步配置</br>
 
 支持的功能：</br>
 1.mysql tps qps table_cache handler监控</br>
@@ -50,6 +51,7 @@ mysql monitor web</br>
 3.登录界面，权限验证</br>
 &nbsp;&nbsp;&nbsp;&nbsp;2017-4-28完成基本的登录验证，不过用户名和密码写死的</br>
 &nbsp;&nbsp;&nbsp;&nbsp;接下来考虑用户验证从数据库里读取，不过这个不急</br>
+&nbsp;&nbsp;&nbsp;&nbsp;2017-05-02完成从数据库进行登录验证，可以在数据库添加多个账户</br>
 4.图标界面支持查看历史数据</br>
 
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/111.png)

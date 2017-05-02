@@ -18,7 +18,7 @@ def get_general_logs_by_page_index(page_number):
              from db1.general_log_review t1 order by t1.first_seen desc limit {0}, 50""".format(page_number * 50)
 
     general_logs = []
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         info = base_class.BaseClass(None)
         info.checksum = row["checksum"]
         info.fingerprint = row["fingerprint"].decode("utf-8")
@@ -35,7 +35,7 @@ def get_general_log_detail(checksum):
              left join db1.general_log_review_history t2 on t1.checksum = t2.checksum
              where t1.checksum = '{0}' limit 1""".format(checksum)
     info = base_class.BaseClass(None)
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         info.checksum = row["checksum"]
         info.fingerprint = row["fingerprint"].decode("utf-8")
         info.first_seen = row["first_seen"]
