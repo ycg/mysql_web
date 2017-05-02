@@ -4,6 +4,7 @@ class Cache(object):
     __number = False
     __instance = None
     __thread_pool = None
+    __user_infos = collections.OrderedDict()
     __tablespace = collections.OrderedDict()
     __host_infos = collections.OrderedDict()
     __repl_infos = collections.OrderedDict()
@@ -65,10 +66,28 @@ class Cache(object):
                     self.__innodb_status_infos[host_id] = base_class.BaseClass(host_info_temp)
                     self.__innodb_status_infos[host_id].buffer_pool_infos = collections.OrderedDict()
 
+        self.load_mysql_web_user_infos()
         self.check_mysql_server_version_and_branch()
         result = "load all host infos ok."
         print(result)
         return result
+
+    def add_user_info(self, info):
+        if(info.is_deleted == 1):
+            if(self.__user_infos.has_key(info.user_id) == True):
+                self.__user_infos.pop(info.user_id)
+        else:
+            self.__user_infos[info.user_id] = info
+
+    def load_mysql_web_user_infos(self):
+        sql = "select id, user_name, user_password, is_deleted from mysql_web.mysql_web_user_info;"
+        for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
+            user_info = base_class.BaseClass(None)
+            user_info.user_id = row["id"]
+            user_info.user_name = row["user_name"]
+            user_info.user_password = row["user_password"]
+            user_info.is_deleted = row["is_deleted"]
+            self.add_user_info(user_info)
 
     def join_thread_pool(self, method_name):
         requests = threadpool.makeRequests(method_name, list(self.get_all_host_infos()), None)
@@ -100,6 +119,11 @@ class Cache(object):
     def get_all_linux_infos(self, keys=[]):
         #return self.__linux_infos.values()
         return self.get_values_by_keys(self.__linux_infos, keys)
+
+    def get_mysql_web_user_infos(self, key=None):
+        if(key == None):
+            return self.__user_infos.values()
+        return self.get_value_for_key(self.__user_infos, key)
 
     def get_all_tablespace_infos(self):
         return self.__tablespace.values()

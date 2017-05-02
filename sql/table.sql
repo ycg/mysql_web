@@ -162,3 +162,13 @@ CREATE TABLE execute_sql_log
     created_time TIMESTAMP NOT NULL DEFAULT now()
 );
 
+CREATE TABLE mysql_web_user_info
+(
+    id MEDIUMINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    user_name VARCHAR(20) NOT NULL,
+    user_password VARCHAR(100) NOT NULL,
+    is_deleted TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    created_time TIMESTAMP NOT NULL DEFAULT now(),
+    updated_time TIMESTAMP NOT NULL DEFAULT current_timestamp on UPDATE CURRENT_TIMESTAMP
+);
+

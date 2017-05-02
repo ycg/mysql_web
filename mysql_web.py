@@ -6,7 +6,7 @@
 import json, os, gzip, StringIO, base64
 from flask import Flask, render_template, request, app, redirect, make_response, helpers
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
-from monitor import login_new, base_class
+from monitor import user_login, base_class
 from flask_login import login_user, login_required
 from flask_login import LoginManager, current_user
 
@@ -18,8 +18,6 @@ login_manager = LoginManager()
 login_manager.session_protection = "strong"
 login_manager.login_view = "login_home"
 login_manager.init_app(app=app)
-init_user = login_new.User("admin")
-init_user.password = "ycg123!.+"
 
 mysql_cache = cache.Cache()
 mysql_cache.load_all_host_infos()
@@ -285,19 +283,16 @@ def login_verfiy():
     result = base_class.BaseClass(None)
     result.error = ""
     result.success = ""
-    user_tmp = login_new.User(request.form["userName"])
-    if(user_tmp.verify_password(request.form["passWord"])):
+    user_tmp = user_login.User(request.form["userName"])
+    if(user_tmp.verify_password(request.form["passWord"], result) == True):
         login_user(user_tmp)
-        result.success = "ok"
-    else:
-        result.error = "password incorrect"
     return json.dumps(result, default=lambda o: o.__dict__)
 
 @login_manager.user_loader
 def load_user(user_id):
-    return login_new.User(None).get(user_id)
+    return user_login.User(None).get(user_id)
 
-@app.route('/login')
+@app.route("/login")
 def login_home():
     return render_template("login.html")
 
