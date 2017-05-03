@@ -57,11 +57,14 @@
                         {{ status.ts_cnt }}
                     </td>
                     <td class="text-center">
-                        <button class="btn btn-xs btn-primary disabled">Review</button>
+                        {% if(status.is_reviewed == 0) %}
+                            <button id="{{ status.checksum }}" class="btn btn-xs btn-primary" onclick=set_general_log_is_review("{{ status.checksum }}")>Not Review</button>
+                        {% else %}
+                            <button id="{{ status.checksum }}" class="btn btn-xs btn-primary disabled">Reviewed</button>
+                        {% endif %}
                     </td>
                     <td class="text-center">
-                        <button class="btn btn-xs btn-default" name="{{ status.checksum }}" onclick=stop("/general/{{ page_number }}/detail/{{ status.checksum }}","general")>Detail</button>
-                        <!--<a href="javascript:void(0)" name="{{ status.checksum }}" onclick=stop("/general/{{ page_number }}/detail/{{ status.checksum }}","general")>Details</a>-->
+                        <button class="btn btn-xs btn-default"  onclick=show_general_log_detail("{{ status.checksum }}")>Detail</button>
                     </td>
                 </tr>
             {% endfor %}
@@ -81,3 +84,44 @@
     </div>
 </div>
 {% endif %}
+
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog row" style="width:1100px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Result</h4>
+            </div>
+            <div class="modal-body">
+                <p id="msg">One fine body…</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script language="JavaScript">
+    function set_general_log_is_review(checksum) {
+        $.get("/general/review/" + checksum, "", function (data) {
+            alert("success");
+            var name_tmp = "#" + checksum;
+            $(name_tmp).text("Reviewed");
+            $(name_tmp).attr("disabled", "true");
+        });
+    }
+
+    function show_general_log_detail(checksum) {
+        $.get("/general/1/detail/" + checksum, "", function (data) {
+            showModal(data);
+        });
+    }
+
+    function showModal(msg){
+        $("#msg").html(msg);
+        $("#myModal").modal("show");
+    }
+</script>

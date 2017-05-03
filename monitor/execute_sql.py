@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import db_util, cache, settings, base_class, json, traceback, pymysql
 
 def execute_sql_test(host_id, sql, comment, is_backup):
@@ -9,20 +7,26 @@ def execute_sql_test(host_id, sql, comment, is_backup):
     conn, cur = None, None
     try:
         host_info = cache.Cache().get_host_info(int(host_id))
-        conn = pymysql.connect(host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password, db="mysql", charset="utf8")
+        conn = pymysql.connect(host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password, db="mysql", charset="utf8", autocommit=True)
         cur = conn.cursor()
         cur.execute(sql)
         result.success = "execute sql ok."
-        db_util.DBUtil().close(conn, cur)
+        close(conn, cur)
         insert_execute_sql_log(host_id, sql, comment, is_backup=is_backup)
     except Exception, e:
         traceback.print_exc()
         result.error = str(e)
         try:
-            db_util.DBUtil().close(conn, cur)
+            close(conn, cur)
         except Exception:
             pass
     return json.dumps(result, default=lambda o: o.__dict__)
+
+def close(connection, cursor):
+    if(cursor != None):
+        cursor.close()
+    if(connection != None):
+        connection.close()
 
 def insert_execute_sql_log(host_id, sql, comment, is_backup=0, backup_name=""):
     sql = "insert into mysql_web.execute_sql_log " \

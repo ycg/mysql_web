@@ -193,7 +193,7 @@
                             {{ status.mysql_memory }}
                         </td>
                         <td>
-                            {{ status.mysql_data_size }}
+                            {{ status.mysql_data_size }}G
                         </td>
                         <td>
                             {{ status.net_receive_byte }}
@@ -374,7 +374,7 @@
 </div>
 <div class="row">
     <!--Handler-->
-    <div class="col-md-7">
+    <div class="col-md-6">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
@@ -448,12 +448,18 @@
         </table>
     </div>
     <!--Table Open Cache-->
-    <div class="col-md-5">
+    <div class="col-md-6">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th colspan="6" class="text-center">
+                    <th>
+
+                    </th>
+                    <th colspan="5" class="text-center">
                         Table Open Cache
+                    </th>
+                    <th colspan="2" class="text-center">
+                        File Open
                     </th>
                 </tr>
                 <tr>
@@ -474,6 +480,12 @@
                     </th>
                     <th>
                         Overflows
+                    </th>
+                    <th>
+                        Open_F
+                    </th>
+                    <th>
+                        Opened_F
                     </th>
                 </tr>
             </thead>
@@ -497,6 +509,12 @@
                     </td>
                     <td {% if(status.table_open_cache_overflows > 0) %} class="text-danger" {% endif %}>
                         {{ status.table_open_cache_overflows }}
+                    </td>
+                    <td>
+                        {{ status.open_files }}
+                    </td>
+                    <td>
+                        {{ status.opened_files }}
                     </td>
                 </tr>
                 {% endfor %}

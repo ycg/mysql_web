@@ -16,12 +16,12 @@ def send_mail(subject, to_list, content, mail_type):
         message = MIMEText(content, _subtype=mail_type, _charset="utf8")
         message['Subject'] = subject
         message['To'] = ";".join(list_t)
-        message['From'] = settings.EMAIL_HOST_USER
+        message['From'] = settings.EMAIL_USER
 
         server = smtplib.SMTP()
         server.connect(settings.EMAIL_HOST)
-        server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-        server.sendmail(settings.EMAIL_HOST_USER, list_t, message.as_string())
+        server.login(settings.EMAIL_USER, settings.EMAIL_PASSWORD)
+        server.sendmail(settings.EMAIL_USER, list_t, message.as_string())
     finally:
         if(server != None):
             server.close()

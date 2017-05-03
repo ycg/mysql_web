@@ -45,7 +45,7 @@ def get_slow_log_detail(checksum):
              Rows_examined_sum,Rows_examined_min,Rows_examined_max,Rows_examined_pct_95
              from db1.mysql_slow_query_review t1
              left join db1.mysql_slow_query_review_history t2 on t1.checksum = t2.checksum
-             where t1.checksum='{0}' limit 1;""".format(checksum)
+             where t1.checksum={0} limit 1;""".format(checksum)
     slow_log_detail = None
     for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         slow_log_detail = base_class.BaseClass(None)
@@ -142,7 +142,7 @@ def get_slow_log_by_host_id(host_id, query_type_id):
 def get_slow_log_detail_by_host_id(host_id, checksum):
     sql = """select * from {0}.{1} t1
              left join {0}.{2} t2 on t1.checksum = t2.checksum
-             where t1.checksum='{3}' limit 1;""".format(table_config[host_id].slow_log_db,
+             where t1.checksum={3} limit 1;""".format(table_config[host_id].slow_log_db,
                                                         table_config[host_id].slow_log_table,
                                                         table_config[host_id].slow_log_table_history, checksum)
     slow_log_detail = None

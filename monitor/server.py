@@ -42,7 +42,7 @@ class MonitorServer(threading.Thread):
             if(self.__times % settings.TABLE_CHECK_INTERVAL == 0):
                self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
             time.sleep(1)
-            self.__times = self.__times + 1
+            self.__times += 1
 
     def invoke_check_tablespace_method(self):
         self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
@@ -126,6 +126,8 @@ class MonitorServer(threading.Thread):
         status_info.table_open_cache_hits = int(mysql_status_new["Table_open_cache_hits"]) - int(mysql_status_old["Table_open_cache_hits"])
         status_info.table_open_cache_misses = int(mysql_status_new["Table_open_cache_misses"]) - int(mysql_status_old["Table_open_cache_misses"])
         status_info.table_open_cache_overflows = int(mysql_status_new["Table_open_cache_overflows"]) - int(mysql_status_old["Table_open_cache_overflows"])
+        status_info.open_files = int(mysql_status_new["Open_files"])
+        status_info.opened_files = int(mysql_status_new["Opened_files"]) - int(mysql_status_old["Opened_files"])
 
         #tmp table create
         status_info.create_tmp_files = int(mysql_status_new["Created_tmp_files"]) - int(mysql_status_old["Created_tmp_files"])
@@ -204,8 +206,6 @@ class MonitorServer(threading.Thread):
         innodb_info.buffer_pool_write_requests = int(mysql_status_new["Innodb_buffer_pool_write_requests"]) - int(mysql_status_old["Innodb_buffer_pool_write_requests"])
         innodb_info.buffer_pool_reads = int(mysql_status_new["Innodb_buffer_pool_reads"]) - int(mysql_status_old["Innodb_buffer_pool_reads"])
         innodb_info.buffer_pool_read_requests = int(mysql_status_new["Innodb_buffer_pool_read_requests"]) - int(mysql_status_old["Innodb_buffer_pool_read_requests"])
-        #innodb_info.data_usage = round(float(mysql_status_new["Innodb_buffer_pool_bytes_data"]) / float(mysql_variables["innodb_buffer_pool_size"]) * 100, 2)
-        #innodb_info.dirty_usage = round(float(mysql_status_new["Innodb_buffer_pool_bytes_dirty"]) / float(mysql_variables["innodb_buffer_pool_size"]) * 100, 2)
 
         #innodb data
         innodb_info.innodb_data_read = int(mysql_status_new["Innodb_data_read"]) - int(mysql_status_old["Innodb_data_read"])
@@ -227,6 +227,7 @@ class MonitorServer(threading.Thread):
         self.get_binlog_size_total(mysql_variables["log_bin"], status_info, cursor)
         result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
         if(result != None):
+            host_info.role = "S"
             repl_info = self.__cache.get_repl_info(host_info.key)
             repl_info.is_slave = 1
             repl_info.read_only = mysql_variables["read_only"]
@@ -245,6 +246,8 @@ class MonitorServer(threading.Thread):
                 repl_info.seconds_Behind_Master = 0
             if(mysql_status_new["Slave_running"] == "OFF"):
                 repl_info.is_slave = 0
+        else:
+            host_info.role = "M"
 
         #self.insert_status_log(status_info)
         self.__db_util.close(connection, cursor)

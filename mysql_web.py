@@ -6,7 +6,7 @@
 import json, os, gzip, StringIO, base64
 from flask import Flask, render_template, request, app, redirect, make_response, helpers
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
-from monitor import user_login, base_class
+from monitor import user_login, base_class, alarm
 from flask_login import login_user, login_required
 from flask_login import LoginManager, current_user
 
@@ -24,7 +24,7 @@ mysql_cache.load_all_host_infos()
 monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
-alarm_thread.AlarmLog().start()
+#alarm.AlarmServer().start()
 slow_log.load_slow_log_table_config()
 
 #endregion
@@ -129,6 +129,16 @@ def get_general_log_by_page_number(page_number):
 @login_required
 def get_general_log_detail(page_number, checksum):
     return render_template("general_log_detail.html", page_number=page_number, general_log_detail=general_log.get_general_log_detail(checksum))
+
+@app.route("/general/review/<int:checksum>")
+@login_required
+def set_general_log_is_review(checksum):
+    return general_log.set_general_log_is_review(checksum)
+
+@app.route("/general/review/<int:host_id>/<int:checksum>")
+@login_required
+def set_general_log_is_review_by_host_id(host_id, checksum):
+    return general_log.set_general_log_is_review_by_host_id(host_id, checksum)
 
 #endregion
 
