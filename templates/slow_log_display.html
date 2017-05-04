@@ -65,7 +65,7 @@
                     {{ status.last_seen }}
                 </td>
                 <td class="text-center">
-                    <button class="btn btn-default btn-xs">Detail</button>
+                    <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>Detail</button>
                 </td>
             </tr>
         {% endfor %}

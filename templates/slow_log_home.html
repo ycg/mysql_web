@@ -36,6 +36,21 @@
     </div>
 </div>
 
+<div class="modal fade" id="detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+    <div class="modal-dialog" role="document" style="width: 1000px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Slow Log Detail</h4>
+            </div>
+            <div class="modal-body" id="slow_log_detail">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script language="JavaScript">
     query_type_id = 1;
 
@@ -49,6 +64,13 @@
         $.get("/slowlog/" + query_type_id, "", function (data) {
             $("#slow_log").html(data);
             $("#loading").modal("hide")
+        })
+    }
+
+    function get_slow_log_detail(checksum) {
+        $.get("/slowlog/detail/new/" + checksum, "", function (data) {
+            $("#slow_log_detail").html(data);
+            $("#detail").modal("show")
         })
     }
 

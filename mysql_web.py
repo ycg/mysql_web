@@ -175,17 +175,12 @@ def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_en
 @app.route("/slowlog")
 @login_required
 def slow_log_home():
-    return render_template("slow_log_new.html")
+    return render_template("slow_log_home.html")
 
 @app.route("/slowlog/<int:query_type_id>")
 @login_required
 def get_slow_logs(query_type_id):
     return render_template("slow_log_display.html", slow_log_infos=slow_log.get_all_slow_infos(0, query_type_id))
-
-@app.route("/slowlog/<checksum>")
-@login_required
-def get_slow_log_detail(checksum):
-    return render_template("slow_log.html", slow_list = None, slow_low_info=slow_log.get_slow_log_detail(checksum))
 
 @app.route("/slowlog/config/load/")
 @login_required
@@ -196,6 +191,11 @@ def load_log_table_config():
 @login_required
 def get_detail(host_id, checksum):
     return slow_log.get_slow_log_detail_by_host_id(host_id, checksum)
+
+@app.route("/slowlog/detail/new/<int:checksum>")
+@login_required
+def get_slow_log_detail(checksum):
+    return render_template("slow_log_detail.html", slow_low_info=slow_log.get_slow_log_detail(checksum))
 
 #endregion
 
