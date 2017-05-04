@@ -1,5 +1,5 @@
 mysql monitor web</br>
-</hr>
+<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
 安装环境：</br>
 1.基于python2.7.11开发的</br>
 2.安装MySQL5.6数据库</br>
