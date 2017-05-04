@@ -22,7 +22,8 @@ mysql monitor web</br>
 8.添加系统登录账号insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yangcaogui", md5("123456"));</br>
 9.启动python mysql_web.py runserver</br>
 10.如果要监控慢查询还要进行几步配置</br>
-</hr>
+
+<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
 支持的功能：</br>
 1.mysql tps qps table_cache handler监控</br>
 2.支持对innodb各种status进行监控</br>
@@ -35,7 +36,8 @@ mysql monitor web</br>
 10.支持实时的图标显示</br>
 11.支持对数据库用户账号的查询</br>
 12.支持登录验证，未登录不允许查看其它任何界面</br>
-</hr>
+
+<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
 完成的脚本：</br>
 1.一键安装数据库脚本</br>
 2.使用mysqlbinlog进行binlog的备份脚本</br>
@@ -43,7 +45,8 @@ mysql monitor web</br>
 4.支持慢查询收集脚本</br>
 5.支持检查表空间脚本</br>
 6.基于mysqldump的创建从库脚本</br>
-</hr>
+
+<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
 待开发的功能：</br>
 1.邮件报警功能</br>
 &nbsp;&nbsp;&nbsp;&nbsp;接下来进行告警界面的开发，可以自定义告警参数</br>
@@ -53,8 +56,8 @@ mysql monitor web</br>
 &nbsp;&nbsp;&nbsp;&nbsp;接下来考虑用户验证从数据库里读取，不过这个不急</br>
 &nbsp;&nbsp;&nbsp;&nbsp;2017-05-02完成从数据库进行登录验证，可以在数据库添加多个账户</br>
 4.图标界面支持查看历史数据</br>
-<hr/>
 
+<hr style=" height:2px;border:none;border-top:2px dotted #185598;" />
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/111.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/112.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/113.png)
