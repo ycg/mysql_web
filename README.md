@@ -53,8 +53,8 @@ mysql monitor web</br>
 &nbsp;&nbsp;&nbsp;&nbsp;接下来考虑用户验证从数据库里读取，不过这个不急</br>
 &nbsp;&nbsp;&nbsp;&nbsp;2017-05-02完成从数据库进行登录验证，可以在数据库添加多个账户</br>
 4.图标界面支持查看历史数据</br>
-</hr>
-界面显示
+<hr/>
+
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/111.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/112.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/113.png)
