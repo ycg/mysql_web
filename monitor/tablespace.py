@@ -98,10 +98,12 @@ def sum_tablespace_info(host_info, table_infos):
     tablespace_info.index_total = get_data_length(index_total)
     tablespace_info.file_total = get_data_length(file_total)
     tablespace_info.free_total = get_data_length(free_total)
+    tablespace_info.total = get_data_length(data_total + index_total)
     tablespace_info.data_total_o = data_total
     tablespace_info.index_total_o = index_total
     tablespace_info.file_total_o = file_total
     tablespace_info.free_total_o = free_total
+    tablespace_info.total_o = data_total + index_total
     tablespace_info.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
 
 def get_table_name_and_file_size(value):
@@ -135,6 +137,8 @@ def sort_tablespace(sort_type):
         return sorted(infos, cmp=lambda x,y:cmp(x.data_total_o, y.data_total_o), reverse=True)
     elif(sort_type == 3):
         return sorted(infos, cmp=lambda x,y:cmp(x.index_total_o, y.index_total_o), reverse=True)
+    elif(sort_type == 4):
+        return sorted(infos, cmp=lambda x,y:cmp(x.total_o, y.total_o), reverse=True)
     elif(sort_type == 5):
         return sorted(infos, cmp=lambda x,y:cmp(x.file_total_o, y.file_total_o), reverse=True)
     else:

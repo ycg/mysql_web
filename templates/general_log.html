@@ -58,7 +58,7 @@
                     </td>
                     <td class="text-center">
                         {% if(status.is_reviewed == 0) %}
-                            <button id="{{ status.checksum }}" class="btn btn-xs btn-primary" onclick=set_general_log_is_review("{{ status.checksum }}")>Not Review</button>
+                            <button id="{{ status.checksum }}" class="btn btn-xs btn-primary" onclick=show_confirm_modal("{{ status.checksum }}")>Not Review</button>
                         {% else %}
                             <button id="{{ status.checksum }}" class="btn btn-xs btn-primary disabled">Reviewed</button>
                         {% endif %}
@@ -104,11 +104,30 @@
     </div>
 </div>
 
+<div class="modal fade" id="confirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">操作提示</h4>
+            </div>
+            <div class="modal-body">
+                <p id="msg">是否确认审核?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default cancel" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary ok" data-dismiss="modal" onclick="set_general_log_is_review()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script language="JavaScript">
-    function set_general_log_is_review(checksum) {
-        $.get("/general/review/" + checksum, "", function (data) {
-            alert("success");
-            var name_tmp = "#" + checksum;
+    var checksum_value = ""
+
+    function set_general_log_is_review() {
+        $.get("/general/review/" + checksum_value, "", function (data) {
+            var name_tmp = "#" + checksum_value;
             $(name_tmp).text("Reviewed");
             $(name_tmp).attr("disabled", "true");
         });
@@ -116,12 +135,17 @@
 
     function show_general_log_detail(checksum) {
         $.get("/general/1/detail/" + checksum, "", function (data) {
-            showModal(data);
+            show_detail_modal(data);
         });
     }
 
-    function showModal(msg){
+    function show_detail_modal(msg){
         $("#msg").html(msg);
         $("#myModal").modal("show");
+    }
+
+    function show_confirm_modal(checksum) {
+        checksum_value = checksum
+        $("#confirm").modal("show");
     }
 </script>
