@@ -33,6 +33,14 @@ function post_data(url, input_data) {
     return result_data
 }
 
+function show_modal_dialog(id_name) {
+    $(id_name).modal("show")
+}
+
+function hide_modal_dialog(id_name) {
+    $(id_name).modal("hide")
+}
+
 function stop(parameter, id_name) {
     search_div(id_name)
     myActive(id_name)

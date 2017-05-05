@@ -80,6 +80,7 @@ def get_tablespace_infos(host_info):
     print(host_info.remark, "ok")
 
 def sum_tablespace_info(host_info, table_infos):
+    table_count = 0
     rows_total = 0
     data_total = 0
     index_total = 0
@@ -88,12 +89,14 @@ def sum_tablespace_info(host_info, table_infos):
     tablespace_info = cache.Cache().get_tablespace_info(host_info.key)
     tablespace_info.detail = sorted(table_infos, cmp=lambda x,y:cmp(x.free_size, y.free_size), reverse=True)
     for info in table_infos:
+        table_count += 1
         rows_total = info.rows_o + rows_total
         data_total = info.data_size_o + data_total
         index_total = info.index_size_o + index_total
         file_total = info.file_size_o + file_total
         free_total = info.free_size + free_total
     tablespace_info.rows_total = rows_total
+    tablespace_info.table_count = table_count
     tablespace_info.data_total = get_data_length(data_total)
     tablespace_info.index_total = get_data_length(index_total)
     tablespace_info.file_total = get_data_length(file_total)

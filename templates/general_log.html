@@ -135,7 +135,7 @@
 
     function show_general_log_detail(checksum) {
         $.get("/general/1/detail/" + checksum, "", function (data) {
-            show_detail_modal(data);
+            show_detail_modal(data)
         });
     }
 

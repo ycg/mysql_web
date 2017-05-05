@@ -64,3 +64,4 @@ mysql monitor web</br>
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/117.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/118.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/119.png)
+![image](https://github.com/ycg/mysql_web/blob/master/static/img/120.png)

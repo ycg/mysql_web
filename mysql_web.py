@@ -318,11 +318,6 @@ def login_home():
 @app.route("/chart")
 @login_required
 def chart_home():
-    return render_template("chart_new.html", host_infos=mysql_cache.get_all_host_infos())
-
-@app.route("/chart_new")
-@login_required
-def chart_home_old():
     return render_template("chart.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/chart/<int:host_id>")

@@ -9,6 +9,7 @@ def execute_sql_test(host_id, sql, comment, is_backup):
         host_info = cache.Cache().get_host_info(int(host_id))
         conn = pymysql.connect(host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password, db="mysql", charset="utf8", autocommit=True)
         cur = conn.cursor()
+        sql = "start transaction;" + sql + "commit;"
         cur.execute(sql)
         result.success = "execute sql ok."
         close(conn, cur)

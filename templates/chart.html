@@ -1,29 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <script type="text/javascript" src="http://www.daimajiayuan.com/download/jquery/jquery-1.10.2.min.js"></script>
-
-    <script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>
-
-    <script type="text/javascript" src="http://cdn.bootcss.com/bootstrap-select/2.0.0-beta1/js/bootstrap-select.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://cdn.bootcss.com/bootstrap-select/2.0.0-beta1/css/bootstrap-select.css">
-
-    <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
-    <script src={{ url_for("static", filename="js/bootstrap.min.js") }} type="text/javascript"></script>
-
-    <script type="text/javascript" src={{ url_for("static", filename="js/echarts.min.js") }}></script>
-</head>
-<body>
 <div class="row">
     <div id="search_tmp" class="col-md-2">
-        <select id="host_ids" name="host_ids" class="selectpicker form-control" data-live-search="true">
+        <select id="host_ids" name="host_ids" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
             {% for info in host_infos %}
                 <option value="{{ info.host_id }}">{{ info.remark }}</option>
             {% endfor %}
         </select>
     </div>
-    <div class="col-md-2">
-        <select id="chart_type" name="chart_type" class="selectpicker show-tick form-control bs-select-hidden">
+    <div class="col-md-2" hidden>
+        <select id="chart_type" name="chart_type" hidden class="selectpicker show-tick form-control bs-select-hidden">
             <option value="0">QPS</option>
             <option value="1">TPS</option>
             <option value="2">QPS</option>
@@ -33,36 +17,68 @@
             <option value="6">QPS</option>
         </select>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         <button class="btn btn-default" onclick="set_host_id()">Query</button>
         &nbsp;&nbsp;<button class="btn btn-default">Reset</button>
         </br></br>
     </div>
 </div>
 <div class="row">
-    <div id="qps" class="col-md-12" style="height:300px;">
-
+    <div class="col-md-6">
+        <div id="qps" style="height:300px;"></div>
     </div>
-    <div id="tps" class="col-md-12" style="height:300px;">
-
+    <div class="col-md-6">
+        <div id="tps" style="height:300px;"></div>
     </div>
 </div>
-</body>
-</html>
+<div class="row">
+    <div class="col-md-6">
+        <div id="thread_chart" style="height:300px;"></div>
+    </div>
+    <div class="col-md-6">
+        <div id="dml" style="height:300px;"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div id="cpu_load" style="height:300px;"></div>
+    </div>
+    <div class="col-md-6">
+        <div id="cpu" style="height:300px;"></div>
+    </div>
+</div>
+
 
 <script type="text/javascript">
-
+    $('.selectpicker').selectpicker({
+        liveSearch: true
+    });
 
     $("#host_ids").find("option:first").attr("selected", true);
 
     var timer = 0
     var select_host_id = $("#host_ids").val();
+    var cpu_chart = echarts.init(document.getElementById('cpu'));
     var qps_chart = echarts.init(document.getElementById('qps'));
     var tps_chart = echarts.init(document.getElementById('tps'));
+    var dml_chart = echarts.init(document.getElementById('dml'));
+    var cpu_load_chart = echarts.init(document.getElementById('cpu_load'));
+    var thread_chart = echarts.init(document.getElementById('thread_chart'));
 
     var qps_data_y = [];
     var tps_data_y = [];
     var date_time_x = [];
+    var cpu1_data_y = [];
+    var cpu5_data_y = [];
+    var cpu15_data_y = [];
+    var select_date_y = [];
+    var insert_date_y = [];
+    var update_date_y = [];
+    var delete_date_y = [];
+    var thread_data_y = [];
+    var cpu_user_data_y = [];
+    var cpu_sys_data_y = [];
+    var cpu_idle_data_y = [];
 
     function init_chart_data() {
         $("#host_ids option").each(function () {
@@ -74,12 +90,50 @@
         qps_data_y = [];
         tps_data_y = [];
         date_time_x = [];
+        cpu1_data_y = [];
+        cpu5_data_y = [];
+        cpu15_data_y = [];
+        thread_data_y = [];
+        select_date_y = [];
+        insert_date_y = [];
+        update_date_y = [];
+        delete_date_y = [];
+        cpu_user_data_y = [];
+        cpu_sys_data_y = [];
+        cpu_idle_data_y = [];
     }
 
     function set_chart_data(obj_data) {
-        qps_data_y.push(obj_data.qps)
-        tps_data_y.push(obj_data.tps)
-        date_time_x.push(obj_data.time)
+        if(qps_data_y.length >= 150) {
+            qps_data_y.shift();
+            tps_data_y.shift();
+            date_time_x.shift();
+            cpu1_data_y.shift();
+            cpu5_data_y.shift();
+            cpu15_data_y.shift();
+            select_date_y.shift();
+            insert_date_y.shift();
+            update_date_y.shift();
+            delete_date_y.shift();
+            thread_data_y.shift();
+            cpu_user_data_y.shift();
+            cpu_idle_data_y.shift();
+            cpu_sys_data_y.shift();
+        }
+        qps_data_y.push(obj_data.qps);
+        tps_data_y.push(obj_data.tps);
+        date_time_x.push(obj_data.time);
+        cpu1_data_y.push(obj_data.cpu_1);
+        cpu5_data_y.push(obj_data.cpu_5);
+        cpu15_data_y.push(obj_data.cpu_15);
+        select_date_y.push(obj_data.select)
+        insert_date_y.push(obj_data.insert);
+        update_date_y.push(obj_data.update);
+        delete_date_y.push(obj_data.delete);
+        thread_data_y.push(obj_data.threads)
+        cpu_user_data_y.push(obj_data.cpu_user);
+        cpu_idle_data_y.push(obj_data.cpu_idle);
+        cpu_sys_data_y.push(obj_data.cpu_system);
     }
 
     function get_chart_data() {
@@ -87,14 +141,18 @@
             set_chart_data(jQuery.parseJSON(data))
         });
 
+        refresh_dml_chart();
+        refresh_cpu_chart();
+        refresh_cpu_load_chart();
         refresh_chart(qps_chart, date_time_x, qps_data_y);
         refresh_chart(tps_chart, date_time_x, tps_data_y);
+        refresh_chart(thread_chart, date_time_x, thread_data_y)
     }
 
     function set_chart_options(chart_dom, name, data_x, data_y) {
         var chart_option = {
             title: {
-                text: name
+                text: name,
             },
             tooltip: {},
             xAxis: {
@@ -123,13 +181,219 @@
         });
     }
 
+    function refresh_cpu_chart() {
+        cpu_chart.setOption({
+            xAxis: {
+                data: date_time_x
+            },
+            series: [
+                {
+                    data: cpu_user_data_y
+                },
+                {
+                    data: cpu_sys_data_y
+                },
+                {
+                    data: cpu_idle_data_y
+                }]
+        });
+    }
+
+    function refresh_cpu_load_chart() {
+        cpu_load_chart.setOption({
+            xAxis: {
+                data: date_time_x
+            },
+            series: [
+                {
+                    data: cpu1_data_y
+                },
+                {
+                    data: cpu5_data_y
+                },
+                {
+                    data: cpu15_data_y
+                }]
+        });
+    }
+
+    function refresh_dml_chart() {
+        dml_chart.setOption({
+            xAxis: {
+                data: date_time_x
+            },
+            series: [
+                {
+                    data: select_date_y
+                },
+                {
+                    data: insert_date_y
+                },
+                {
+                    data: update_date_y
+                },
+                {
+                    data: delete_date_y
+                }]
+        });
+    }
+
+    function set_dml_chart_options() {
+        var chart_option = {
+            title: {
+                text: "DML"
+            },
+            tooltip : {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            legend: {
+                data:['select','insert','update','delete']
+            },
+            xAxis: {
+                data: date_time_x
+            },
+            yAxis: {},
+            series: [
+                {
+                    name: "select",
+                    type: 'line',
+                    data: select_date_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "insert",
+                    type: 'line',
+                    data: insert_date_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "update",
+                    type: 'line',
+                    data: update_date_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "delete",
+                    type: 'line',
+                    data: delete_date_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                }]
+        };
+        dml_chart.setOption(chart_option)
+    }
+
+    function set_cpu_chart_options() {
+        var chart_option = {
+            title: {
+                text: "CPU"
+            },
+            tooltip : {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            legend: {
+                data:['user', 'sys', 'idle']
+            },
+            xAxis: {
+                data: date_time_x
+            },
+            yAxis: {},
+            series: [
+                {
+                    name: "user",
+                    type: 'line',
+                    data: cpu_user_data_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "sys",
+                    type: 'line',
+                    data: cpu_sys_data_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "idle",
+                    type: 'line',
+                    data: cpu_idle_data_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                }]
+        };
+        cpu_chart.setOption(chart_option)
+    }
+
+    function set_cpu_load_chart_options() {
+        var chart_option = {
+            title: {
+                text: "CPU Load"
+            },
+            tooltip : {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            legend: {
+                data:['CPU1', 'CPU5', 'CPU15']
+            },
+            xAxis: {
+                data: date_time_x
+            },
+            yAxis: {},
+            series: [
+                {
+                    name: "CPU1",
+                    type: 'line',
+                    data: cpu1_data_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "CPU5",
+                    type: 'line',
+                    data: cpu5_data_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                },
+                {
+                    name: "CPU15",
+                    type: 'line',
+                    data: cpu15_data_y,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                }]
+        };
+        cpu_load_chart.setOption(chart_option)
+    }
+
+    set_dml_chart_options();
+    set_cpu_chart_options();
+    set_cpu_load_chart_options();
     set_chart_options(qps_chart, "QPS", date_time_x, qps_data_y);
     set_chart_options(tps_chart, "TPS", date_time_x, tps_data_y);
+    set_chart_options(thread_chart, "Threads", date_time_x, thread_data_y);
 
     get_chart_data();
     clearInterval(timer);
     timer = setInterval(get_chart_data, 2000);
 </script>
-
-
-<script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>
