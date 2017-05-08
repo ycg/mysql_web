@@ -225,11 +225,9 @@ class MonitorServer(threading.Thread):
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         self.get_binlog_size_total(mysql_variables["log_bin"], status_info, cursor)
-        result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
-        if(result != None):
-            host_info.role = "S"
+        if(host_info.is_slave):
             repl_info = self.__cache.get_repl_info(host_info.key)
-            repl_info.is_slave = 1
+            result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
             repl_info.read_only = mysql_variables["read_only"]
             repl_info.error_message = result["Last_Error"]
             repl_info.io_status = result["Slave_IO_Running"]
@@ -240,14 +238,9 @@ class MonitorServer(threading.Thread):
             repl_info.slave_log_pos = int(result["Exec_Master_Log_Pos"])
             repl_info.slave_retrieved_gtid_set = result["Retrieved_Gtid_Set"]
             repl_info.slave_execute_gtid_set = result["Executed_Gtid_Set"]
-            repl_info.seconds_Behind_Master = result["Seconds_Behind_Master"]
+            repl_info.seconds_Behind_Master = result["Seconds_Behind_Master"] if result["Seconds_Behind_Master"] else 0
             repl_info.delay_pos_count = repl_info.master_log_pos - repl_info.slave_log_pos
-            if(repl_info.seconds_Behind_Master is None):
-                repl_info.seconds_Behind_Master = 0
-            if(mysql_status_new["Slave_running"] == "OFF"):
-                repl_info.is_slave = 0
-        else:
-            host_info.role = "M"
+            repl_info.slave_status = mysql_status_new["Slave_running"]
 
         #self.insert_status_log(status_info)
         self.__db_util.close(connection, cursor)

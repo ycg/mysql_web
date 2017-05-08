@@ -59,7 +59,7 @@ function start(parameter, id_name) {
 
 function start_timer() {
     stop_timer()
-    timer = setInterval(myrefresh, 2000)
+    timer = setInterval(myrefresh, interval_refresh)
 }
 
 function stop_timer() {

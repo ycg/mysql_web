@@ -4,6 +4,7 @@
 #pip install flask flask-login threadpool pymysql DBUtils paramiko
 
 import json, os, gzip, StringIO, base64
+import settings
 from flask import Flask, render_template, request, app, redirect, make_response, helpers
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
 from monitor import user_login, base_class, alarm
@@ -223,7 +224,7 @@ def get_os_infos():
 @app.route("/home", methods=['GET', 'POST'])
 @login_required
 def home():
-    return render_template("home.html", host_infos=mysql_cache.get_all_host_infos(), username=current_user.username)
+    return render_template("home.html", host_infos=mysql_cache.get_all_host_infos(), username=current_user.username, interval=settings.UPDATE_INTERVAL * 1000)
 
 @app.route("/home/binlog")
 @login_required
@@ -318,7 +319,7 @@ def login_home():
 @app.route("/chart")
 @login_required
 def chart_home():
-    return render_template("chart.html", host_infos=mysql_cache.get_all_host_infos())
+    return render_template("chart.html", host_infos=mysql_cache.get_all_host_infos(), interval=settings.UPDATE_INTERVAL * 1000)
 
 @app.route("/chart/<int:host_id>")
 @login_required

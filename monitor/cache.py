@@ -67,6 +67,7 @@ class Cache(object):
                     self.__innodb_status_infos[host_id].buffer_pool_infos = collections.OrderedDict()
 
         self.load_mysql_web_user_infos()
+        self.check_master_and_slave_relation()
         self.check_mysql_server_version_and_branch()
         result = "load all host infos ok."
         print(result)
@@ -166,6 +167,24 @@ class Cache(object):
             if(info != None):
                 result.append(info)
         return result
+
+    def check_master_and_slave_relation(self):
+        for key, value in self.__repl_infos.items():
+            result = db_util.DBUtil().fetchone(self.__host_infos[key], "show slave status;")
+            if(result != None):
+                value.is_slave = 1
+                value.master_host_id = 0
+                value.host_info.role = "S"
+                value.host_info.is_slave = True
+                master_ip = result["Master_Host"]
+                master_port = result["Master_Port"]
+                for host_info in self.__host_infos.values():
+                    if(host_info.host == master_ip and host_info.port == master_port):
+                        value.master_host_id = host_info.host_id
+                        break
+            else:
+                value.host_info.role = "M"
+                value.host_info.is_master = True
 
     def check_mysql_server_version_and_branch(self):
         for host_info in self.__host_infos.values():
