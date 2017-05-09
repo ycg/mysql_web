@@ -77,6 +77,7 @@ def get_tablespace_infos(host_info):
     host_client.close()
     insert_tablespace_data(host_info, result_lst)
     sum_tablespace_info(host_info, result_lst)
+    insert_host_tablespace_data(cache.Cache().get_tablespace_info(host_info.host_id))
     print(host_info.remark, "ok")
 
 def sum_tablespace_info(host_info, table_infos):
@@ -124,12 +125,21 @@ def convert_bytes(table_info):
 
 def insert_tablespace_data(host_info, table_infos):
     value_list = []
-    value_format = "({0},'{1}','{2}',{3},{4},{5},{6},{7},{8},date(now()))"
-    sql = "insert into mysql_web.mysql_data_size_log (host_id, `schema`, table_name, data_size, index_size, rows, auto_increment, file_size, free_size, `date`) values"
+    value_format = "({0},'{1}','{2}',{3},{4},{5},{6},{7},{8},{9},date(now()))"
+    sql = "insert into mysql_web.mysql_data_size_log (host_id, `schema`, table_name, data_size, total_size, index_size, rows, auto_increment, file_size, free_size, `date`) values"
     for table_info in table_infos:
-        value_list.append(value_format.format(host_info.key, table_info.schema, table_info.t_name, table_info.data_size_o, table_info.index_size_o,
+        value_list.append(value_format.format(host_info.key, table_info.schema, table_info.t_name, table_info.data_size_o, table_info.index_size_o, table_info.total_size_o,
                                               table_info.rows_o, table_info.auto_increment, table_info.file_size_o, table_info.free_size))
     sql = sql + ','.join(value_list) + ";"
+    db_util.DBUtil().execute(settings.MySQL_Host, sql)
+
+def insert_host_tablespace_data(info):
+    sql = "insert into mysql_web.mysql_data_total_size_log " \
+          "(host_id, rows_t, data_t, index_t, all_t, file_t, free_t, table_count, `date`) " \
+          "values " \
+          "({0},{1},{2},{3},{4},{5},{6},{7},date(now()));"
+    sql = sql.format(info.host_info.key, info.rows_total, info.data_total_o,
+                     info.index_total_o, info.total_o, info.file_total_o, info.free_total_o, info.table_count)
     db_util.DBUtil().execute(settings.MySQL_Host, sql)
 
 def sort_tablespace(sort_type):

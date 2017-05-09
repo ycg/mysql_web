@@ -96,6 +96,23 @@ CREATE TABLE mysql_data_size_for_day
     UNIQUE KEY idx_host_id_date(host_id, `date`)
 ) COMMENT = 'mysql data size log';
 
+DROP TABLE mysql_data_total_size_log;
+CREATE TABLE mysql_data_total_size_log
+(
+    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    host_id MEDIUMINT NOT NULL,
+    rows_t BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    data_t BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    index_t BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    all_t BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    file_t BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    free_t BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    table_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    `date` DATE NOT NULL,
+    created_time TIMESTAMP NOT NULL DEFAULT NOW(),
+    KEY idx_hostId_date(host_id, `date`)
+) COMMENT = '数据库大小汇总表';
+
 DROP TABLE mysql_data_size_log;
 CREATE TABLE mysql_data_size_log
 (
@@ -105,13 +122,15 @@ CREATE TABLE mysql_data_size_log
     table_name VARCHAR(80) NOT NULL DEFAULT '',
     data_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
     index_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    total_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
     rows INT UNSIGNED NOT NULL DEFAULT 0,
     auto_increment BIGINT UNSIGNED NOT NULL DEFAULT 0,
     file_size BIGINT UNSIGNED NOT NULL DEFAULT 0,
     free_size BIGINT NOT NULL DEFAULT 0,
     `date` DATE NOT NULL,
-    created_time TIMESTAMP NOT NULL DEFAULT NOW()
-) COMMENT = 'mysql data size log';
+    created_time TIMESTAMP NOT NULL DEFAULT NOW(),
+    KEY idx_hostId_date(host_id, `date`)
+) COMMENT = '数据库表信息汇总表';
 
 #异常记录表
 DROP TABLE mysql_exception;
@@ -172,3 +191,121 @@ CREATE TABLE mysql_web_user_info
     updated_time TIMESTAMP NOT NULL DEFAULT current_timestamp on UPDATE CURRENT_TIMESTAMP
 );
 
+-- -----------------------------------------------------------
+-- 慢查询配置表
+-- -----------------------------------------------------------
+DROP TABLE IF EXISTS `mysql_slow_query_review`;
+CREATE TABLE `mysql_slow_query_review` (
+  `checksum` bigint(20) unsigned NOT NULL,
+  `fingerprint` text NOT NULL,
+  `sample` mediumtext NOT NULL,
+  `first_seen` datetime DEFAULT NULL,
+  `last_seen` datetime DEFAULT NULL,
+  `reviewed_by` varchar(20) DEFAULT NULL,
+  `reviewed_on` datetime DEFAULT NULL,
+  `comments` text,
+  PRIMARY KEY (`checksum`),
+  KEY `idx_last_seen` (`last_seen`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `mysql_slow_query_review_history`;
+CREATE TABLE `mysql_slow_query_review_history` (
+  `serverid_max` smallint(4) NOT NULL DEFAULT '0',
+  `db_max` varchar(30) DEFAULT NULL,
+  `user_max` varchar(30) DEFAULT NULL,
+  `checksum` bigint(20) unsigned NOT NULL,
+  `sample` mediumtext NOT NULL,
+  `ts_min` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `ts_max` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `ts_cnt` float DEFAULT NULL,
+  `Query_time_sum` float DEFAULT NULL,
+  `Query_time_min` float DEFAULT NULL,
+  `Query_time_max` float DEFAULT NULL,
+  `Query_time_pct_95` float DEFAULT NULL,
+  `Query_time_stddev` float DEFAULT NULL,
+  `Query_time_median` float DEFAULT NULL,
+  `Lock_time_sum` float DEFAULT NULL,
+  `Lock_time_min` float DEFAULT NULL,
+  `Lock_time_max` float DEFAULT NULL,
+  `Lock_time_pct_95` float DEFAULT NULL,
+  `Lock_time_stddev` float DEFAULT NULL,
+  `Lock_time_median` float DEFAULT NULL,
+  `Rows_sent_sum` float DEFAULT NULL,
+  `Rows_sent_min` float DEFAULT NULL,
+  `Rows_sent_max` float DEFAULT NULL,
+  `Rows_sent_pct_95` float DEFAULT NULL,
+  `Rows_sent_stddev` float DEFAULT NULL,
+  `Rows_sent_median` float DEFAULT NULL,
+  `Rows_examined_sum` float DEFAULT NULL,
+  `Rows_examined_min` float DEFAULT NULL,
+  `Rows_examined_max` float DEFAULT NULL,
+  `Rows_examined_pct_95` float DEFAULT NULL,
+  `Rows_examined_stddev` float DEFAULT NULL,
+  `Rows_examined_median` float DEFAULT NULL,
+  `Rows_affected_sum` float DEFAULT NULL,
+  `Rows_affected_min` float DEFAULT NULL,
+  `Rows_affected_max` float DEFAULT NULL,
+  `Rows_affected_pct_95` float DEFAULT NULL,
+  `Rows_affected_stddev` float DEFAULT NULL,
+  `Rows_affected_median` float DEFAULT NULL,
+  `Rows_read_sum` float DEFAULT NULL,
+  `Rows_read_min` float DEFAULT NULL,
+  `Rows_read_max` float DEFAULT NULL,
+  `Rows_read_pct_95` float DEFAULT NULL,
+  `Rows_read_stddev` float DEFAULT NULL,
+  `Rows_read_median` float DEFAULT NULL,
+  `Merge_passes_sum` float DEFAULT NULL,
+  `Merge_passes_min` float DEFAULT NULL,
+  `Merge_passes_max` float DEFAULT NULL,
+  `Merge_passes_pct_95` float DEFAULT NULL,
+  `Merge_passes_stddev` float DEFAULT NULL,
+  `Merge_passes_median` float DEFAULT NULL,
+  `InnoDB_IO_r_ops_min` float DEFAULT NULL,
+  `InnoDB_IO_r_ops_max` float DEFAULT NULL,
+  `InnoDB_IO_r_ops_pct_95` float DEFAULT NULL,
+  `InnoDB_IO_r_ops_stddev` float DEFAULT NULL,
+  `InnoDB_IO_r_ops_median` float DEFAULT NULL,
+  `InnoDB_IO_r_bytes_min` float DEFAULT NULL,
+  `InnoDB_IO_r_bytes_max` float DEFAULT NULL,
+  `InnoDB_IO_r_bytes_pct_95` float DEFAULT NULL,
+  `InnoDB_IO_r_bytes_stddev` float DEFAULT NULL,
+  `InnoDB_IO_r_bytes_median` float DEFAULT NULL,
+  `InnoDB_IO_r_wait_min` float DEFAULT NULL,
+  `InnoDB_IO_r_wait_max` float DEFAULT NULL,
+  `InnoDB_IO_r_wait_pct_95` float DEFAULT NULL,
+  `InnoDB_IO_r_wait_stddev` float DEFAULT NULL,
+  `InnoDB_IO_r_wait_median` float DEFAULT NULL,
+  `InnoDB_rec_lock_wait_min` float DEFAULT NULL,
+  `InnoDB_rec_lock_wait_max` float DEFAULT NULL,
+  `InnoDB_rec_lock_wait_pct_95` float DEFAULT NULL,
+  `InnoDB_rec_lock_wait_stddev` float DEFAULT NULL,
+  `InnoDB_rec_lock_wait_median` float DEFAULT NULL,
+  `InnoDB_queue_wait_min` float DEFAULT NULL,
+  `InnoDB_queue_wait_max` float DEFAULT NULL,
+  `InnoDB_queue_wait_pct_95` float DEFAULT NULL,
+  `InnoDB_queue_wait_stddev` float DEFAULT NULL,
+  `InnoDB_queue_wait_median` float DEFAULT NULL,
+  `InnoDB_pages_distinct_min` float DEFAULT NULL,
+  `InnoDB_pages_distinct_max` float DEFAULT NULL,
+  `InnoDB_pages_distinct_pct_95` float DEFAULT NULL,
+  `InnoDB_pages_distinct_stddev` float DEFAULT NULL,
+  `InnoDB_pages_distinct_median` float DEFAULT NULL,
+  `QC_Hit_cnt` float DEFAULT NULL,
+  `QC_Hit_sum` float DEFAULT NULL,
+  `Full_scan_cnt` float DEFAULT NULL,
+  `Full_scan_sum` float DEFAULT NULL,
+  `Full_join_cnt` float DEFAULT NULL,
+  `Full_join_sum` float DEFAULT NULL,
+  `Tmp_table_cnt` float DEFAULT NULL,
+  `Tmp_table_sum` float DEFAULT NULL,
+  `Tmp_table_on_disk_cnt` float DEFAULT NULL,
+  `Tmp_table_on_disk_sum` float DEFAULT NULL,
+  `Filesort_cnt` float DEFAULT NULL,
+  `Filesort_sum` float DEFAULT NULL,
+  `Filesort_on_disk_cnt` float DEFAULT NULL,
+  `Filesort_on_disk_sum` float DEFAULT NULL,
+  PRIMARY KEY (`checksum`,`ts_min`,`ts_max`)
+  #KEY `idx_serverid_max` (`serverid_max`) USING BTREE,
+  #KEY `idx_query_time_max` (`Query_time_max`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- -------------------------------------------------------------------

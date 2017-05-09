@@ -106,3 +106,18 @@ class AlarmLog(threading.Thread):
         cur.execute("insert into mysql_web.mysql_exception(host_id, exception_type, level) VALUES ({0}, {1}, {2});".format(host_id, type, level))
         cur.execute("insert into mysql_web.mysql_exception_log(id, log_text) VALUES ({0}, '{1}');".format(cur.lastrowid, log_text))
         db_util.DBUtil().close(conn, cur)
+
+class AlarmParameter():
+    #status
+
+    #innodb
+
+    #replication
+    Delay_Time = 10
+
+    #os
+    MySQL_CPU = 500
+    CPU_SYS = 100
+    CPU_USER = 100
+
+    pass

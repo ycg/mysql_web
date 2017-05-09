@@ -1,0 +1,69 @@
+<script src={{ url_for("static", filename="js/bootstrap-datetimepicker.min.js") }} type="text/javascript"></script>
+<link href={{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }} rel="stylesheet" type="text/css">
+
+<form class="form-inline row" action="/newslowlog/" method="post" role="form" id="slow_log_form">
+    <div class="form-group col-md-2">
+        <select id="host_ids" name="host_ids" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
+            {% for info in host_infos %}
+                <option value="{{ info.host_id }}">{{ info.remark }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <input id="start_datetime" name="start_datetime" type="text" value="" class="form_datetime form-control" readonly>
+        -
+        <input id="stop_datetime" name="stop_datetime" type="text" value="" class="form_datetime form-control" readonly>
+    </div>
+    <div class="form-group">
+        &nbsp;&nbsp;
+        <button type="submit" class="btn btn-primary">Query</button>
+        &nbsp;&nbsp;
+        <button type="reset" class="btn btn-default">Reset</button>
+    </div>
+</form>
+</br>
+<div class="row">
+    <div id="display_slow_log" class="col-md-12"></div>
+</div>
+
+<iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>
+
+<div class="modal fade" id="detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+    <div class="modal-dialog" role="document" style="width: 1100px">
+        <div class="modal-content">
+            <!--<div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Slow Log Detail</h4>
+            </div>-->
+            <div class="modal-body" id="slow_log_detail">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(".selectpicker").selectpicker({liveSearch: true});
+    $(".form_datetime").datetimepicker({
+        format: "yyyy-mm-dd hh:ii",
+        autoclose: true,
+        todayBtn: true,
+        pickerPosition: "bottom-left"
+    });
+
+    $(document).ready(function() {
+        $("#slow_log_form").ajaxForm(function(data){
+            $("#display_slow_log").html(data);
+        });
+    });
+
+    function get_slow_log_detail(checksum) {
+        var host_id = $("#host_ids").val();
+        var url = "/newslowlog/detail/" + checksum + "/" + host_id
+        $.get(url, "", function (data) {
+            $("#slow_log_detail").html(data);
+            $("#detail").modal("show")
+        })
+    }
+</script>

@@ -1,6 +1,20 @@
 {% if(slow_low_info != None) %}
-<table class="table table-hover table-bordered">
-    <tbody>
+    <table class="table table-hover table-bordered">
+        <tbody>
+        <tr>
+            <td style="width: 100px">
+                <strong>DB</strong>
+            </td>
+            <td colspan="2" rowspan="1">
+                {{ slow_low_info.db_max }}
+            </td>
+            <td>
+                <strong>User</strong>
+            </td>
+            <td colspan="1" rowspan="1">
+                {{ slow_low_info.user_max }}
+            </td>
+        </tr>
         <tr>
             <td style="width: 100px">
                 <strong>Checksum</strong>
@@ -169,7 +183,74 @@
                 {{ slow_low_info.sample }}
             </td>
         </tr>
-    </tbody>
-</table>
+        </tbody>
+    </table>
+
+    <table class="table table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>
+                id
+            </th>
+            <th>
+                select_type
+            </th>
+            <th>
+                table
+            </th>
+            <th>
+                possible_keys
+            </th>
+            <th>
+                key
+            </th>
+            <th>
+                key_len
+            </th>
+            <th>
+                ref
+            </th>
+            <th>
+                rows
+            </th>
+            <th>
+                Extra
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for status in slow_low_info.explain_infos %}
+            <tr>
+                <td>
+                    {{ status.id }}
+                </td>
+                <td>
+                    {{ status.select_type }}
+                </td>
+                <td>
+                    {{ status.table }}
+                </td>
+                <td>
+                    {{ status.possible_keys }}
+                </td>
+                <td>
+                    {{ status.key }}
+                </td>
+                <td>
+                    {{ status.key_len }}
+                </td>
+                <td>
+                    {{ status.ref }}
+                </td>
+                <td>
+                    {{ status.rows }}
+                </td>
+                <td>
+                    {{ status.Extra }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endif %}
 

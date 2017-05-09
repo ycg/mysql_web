@@ -7,7 +7,7 @@ import json, os, gzip, StringIO, base64
 import settings
 from flask import Flask, render_template, request, app, redirect, make_response, helpers
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
-from monitor import user_login, base_class, alarm
+from monitor import user_login, base_class, alarm, new_slow_log
 from flask_login import login_user, login_required
 from flask_login import LoginManager, current_user
 
@@ -176,7 +176,7 @@ def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_en
 @app.route("/slowlog")
 @login_required
 def slow_log_home():
-    return render_template("slow_log_home.html")
+    return render_template("new_slow_log_home.html", host_infos=mysql_cache.get_all_host_infos())
 
 @app.route("/slowlog/<int:query_type_id>")
 @login_required
@@ -197,6 +197,21 @@ def get_detail(host_id, checksum):
 @login_required
 def get_slow_log_detail(checksum):
     return render_template("slow_log_detail.html", slow_low_info=slow_log.get_slow_log_detail(checksum))
+
+@app.route("/newslowlog/", methods=['POST'])
+@login_required
+def new_get_slow_logs():
+    print(request.form)
+    return render_template("slow_log_display.html", slow_logs=new_slow_log.get_slow_logs(2016), slow_log_infos=None)
+
+@app.route("/newslowlog/detail/<int:checksum>/<int:host_id>")
+@login_required
+def new_get_slow_log_detail(checksum, host_id):
+    return render_template("slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, 2016))
+
+@app.route("/newslowlog/explain/<int:checksum>/<int:host_id>")
+def get_explain_infos(server_id, checksum, ):
+    return render_template("slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, 2016))
 
 #endregion
 
