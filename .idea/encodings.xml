@@ -5,6 +5,7 @@
     <file url="file://$PROJECT_DIR$/monitor/new_slow_log.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/static/js/my.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/templates/general_log.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/templates/new_slow_log_home.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools/aaa.py" charset="UTF-8" />
   </component>
 </project>

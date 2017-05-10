@@ -203,6 +203,7 @@ CREATE TABLE `mysql_slow_query_review` (
   `last_seen` datetime DEFAULT NULL,
   `reviewed_by` varchar(20) DEFAULT NULL,
   `reviewed_on` datetime DEFAULT NULL,
+  `is_reviewed` TINYINT NOT NULL DEFAULT 0,
   `comments` text,
   PRIMARY KEY (`checksum`),
   KEY `idx_last_seen` (`last_seen`) USING BTREE

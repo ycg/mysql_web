@@ -9,6 +9,14 @@
             {% endfor %}
         </select>
     </div>
+    <div class="form-group col-md-2">
+        <select id="order_by_options" name="order_by_options" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
+            <option value="1">Last Seen</option>
+            <option value="2">Query Time</option>
+            <option value="3">Query Count</option>
+            <option value="4">Lock Time</option>
+        </select>
+    </div>
     <div class="form-group">
         <input id="start_datetime" name="start_datetime" type="text" value="" class="form_datetime form-control" readonly>
         -
@@ -31,9 +39,12 @@
 <div class="modal fade" id="detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
     <div class="modal-dialog" role="document" style="width: 1100px">
         <div class="modal-content">
-            <!--<div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Slow Log Detail</h4>
-            </div>-->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="exampleModalLabel">Detail</h4>
+            </div>
             <div class="modal-body" id="slow_log_detail">
             </div>
             <div class="modal-footer">
@@ -63,7 +74,30 @@
         var url = "/newslowlog/detail/" + checksum + "/" + host_id
         $.get(url, "", function (data) {
             $("#slow_log_detail").html(data);
-            $("#detail").modal("show")
+            show_modal_dialog()
         })
+    }
+
+    function get_explain_infos(checksum) {
+        var host_id = $("#host_ids").val();
+        var url = "/newslowlog/explain/" + checksum + "/" + host_id
+        $.get(url, "", function (data) {
+            $("#slow_log_detail").html(data);
+            show_modal_dialog()
+        })
+    }
+
+    function show_modal_dialog() {
+        $("#detail").modal({backdrop: "static", keyboard: false});
+        $("#detail").modal("show")
+    }
+
+    function visible_or_hidden(checksum) {
+        var id = "#" + checksum
+        if ($(id).is(":hidden")) {
+            $(id).show();
+        } else {
+            $(id).hide();
+        }
     }
 </script>

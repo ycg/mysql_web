@@ -136,7 +136,9 @@
         {% for status in slow_logs %}
             <tr>
                 <td>
-                    {{ status.fingerprint }}
+                    <a role="button" onclick=visible_or_hidden("{{ status.checksum }}") >
+                        {{ status.fingerprint_tmp }}
+                    </a>
                 </td>
                 <td>
                     {{ status.db_max }}
@@ -172,8 +174,13 @@
                     {{ status.Lock_time_max }}
                 </td>
                 <td class="text-center">
-                    <button class="btn btn-xs btn-default" onclick=get_slow_log_detail("{{ status.checksum }}")>Detail</button>
-                    <button class="btn btn-xs btn-default">Explain</button>
+                    <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>Detail</button>
+                    <button class="btn btn-xs btn-primary">Review</button>
+                </td>
+            </tr>
+            <tr style="display: none" id="{{ status.checksum }}">
+                <td colspan="13">
+                    {{ status.fingerprint }}
                 </td>
             </tr>
         {% endfor %}
