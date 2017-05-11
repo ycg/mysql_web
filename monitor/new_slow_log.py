@@ -2,7 +2,7 @@ import db_util, base_class, settings, traceback, cache
 
 order_by_options = {1: "last_seen", 2: "Query_time_sum", 3: "ts_cnt", 4: "Lock_time_sum"}
 
-def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=1):
+def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=1, page_number=1):
     where_sql = ""
     if(len(start_datetime) > 0):
         where_sql += " and a.last_seen >= '{0}'".format(start_datetime)
@@ -19,10 +19,11 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
              where 1 = 1 {1}
              group by a.checksum
              order by {2} desc
-             limit 15;"""
+             limit {3}, 15;"""
 
     result = []
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql.format(server_id, where_sql, order_by_options[order_by_type])):
+    sql = sql.format(server_id, where_sql, order_by_options[order_by_type], (page_number - 1) * 15)
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
         info = base_class.BaseClass(None)
         info.checksum = row["checksum"]
         info.fingerprint = row["fingerprint"]
@@ -69,10 +70,10 @@ def get_slow_log_detail(checksum, server_id):
         slow_log_detail.query_time_max = row["Query_time_max"]
         slow_log_detail.query_time_min = row["Query_time_min"]
         slow_log_detail.query_time_pct_95 = row["Query_time_pct_95"]
-        slow_log_detail.lock_time_sum = row["Lock_time_sum"]
-        slow_log_detail.lock_time_max = row["Lock_time_max"]
-        slow_log_detail.lock_time_min = row["Lock_time_min"]
-        slow_log_detail.lock_time_pct_95 = row["Lock_time_pct_95"]
+        slow_log_detail.lock_time_sum = get_float(row["Lock_time_sum"])
+        slow_log_detail.lock_time_max = get_float(row["Lock_time_max"])
+        slow_log_detail.lock_time_min = get_float(row["Lock_time_min"])
+        slow_log_detail.lock_time_pct_95 = get_float(row["Lock_time_pct_95"])
         slow_log_detail.rows_sent_sum = int(row["Rows_sent_sum"])
         slow_log_detail.rows_sent_max = int(row["Rows_sent_max"])
         slow_log_detail.rows_sent_min = int(row["Rows_sent_min"])

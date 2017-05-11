@@ -186,5 +186,16 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <div class="text-center">
+        <ul class="pagination pagination-centered">
+            <li><a href="javascript:void(0)" onclick="get_slow_logs_by_page_number(1)">&laquo;</a></li>
+            {% for number in page_list %}
+                <li {% if(number == page_number) %} class="active" {% endif %}>
+                    <a href="javascript:void(0)" onclick="get_slow_logs_by_page_number({{ number }})">{{ number }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endif %}
 

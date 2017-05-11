@@ -100,4 +100,23 @@
             $(id).hide();
         }
     }
+
+    function get_slow_logs_by_page_number(page_number) {
+        var obj = new Object();
+        obj.page_number = page_number;
+        obj.host_ids = $("#host_ids").val();
+        obj.start_datetime = $("#start_datetime").val();
+        obj.stop_datetime = $("#stop_datetime").val();
+        obj.order_by_options = $("#order_by_options").val();
+
+        host_ids = $("#host_ids").val();
+        start_datetime = $("#start_datetime").val();
+        stop_datetime = $("#stop_datetime").val();
+        order_by_options = $("#order_by_options").val();
+
+        var post_data = "page_number="+page_number+"&host_ids="+host_ids+"&start_datetime="+start_datetime+"&stop_datetime="+stop_datetime+"&order_by_options="+order_by_options
+        $.post("/newslowlog/", post_data, function (data) {
+            $("#display_slow_log").html(data);
+        })
+    }
 </script>
