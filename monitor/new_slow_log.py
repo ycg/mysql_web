@@ -1,4 +1,4 @@
-import db_util, base_class, settings, traceback, cache
+import db_util, base_class, settings, traceback, cache, time
 
 order_by_options = {1: "last_seen", 2: "Query_time_sum", 3: "ts_cnt", 4: "Lock_time_sum"}
 
@@ -23,6 +23,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
 
     result = []
     sql = sql.format(server_id, where_sql, order_by_options[order_by_type], (page_number - 1) * 15)
+
     for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
         info = base_class.BaseClass(None)
         info.checksum = row["checksum"]

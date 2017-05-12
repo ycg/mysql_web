@@ -54,6 +54,19 @@
     </div>
 </div>
 
+<div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+    <div class="modal-dialog" role="document" style="width: 600px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLabel">提示</h4>
+            </div>
+            <div class="modal-body">
+                请稍候。。。
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     $(".selectpicker").selectpicker({liveSearch: true});
     $(".form_datetime").datetimepicker({
@@ -78,15 +91,6 @@
         })
     }
 
-    function get_explain_infos(checksum) {
-        var host_id = $("#host_ids").val();
-        var url = "/newslowlog/explain/" + checksum + "/" + host_id
-        $.get(url, "", function (data) {
-            $("#slow_log_detail").html(data);
-            show_modal_dialog()
-        })
-    }
-
     function show_modal_dialog() {
         $("#detail").modal({backdrop: "static", keyboard: false});
         $("#detail").modal("show")
@@ -102,13 +106,7 @@
     }
 
     function get_slow_logs_by_page_number(page_number) {
-        var obj = new Object();
-        obj.page_number = page_number;
-        obj.host_ids = $("#host_ids").val();
-        obj.start_datetime = $("#start_datetime").val();
-        obj.stop_datetime = $("#stop_datetime").val();
-        obj.order_by_options = $("#order_by_options").val();
-
+        show_loading();
         host_ids = $("#host_ids").val();
         start_datetime = $("#start_datetime").val();
         stop_datetime = $("#stop_datetime").val();
@@ -117,6 +115,16 @@
         var post_data = "page_number="+page_number+"&host_ids="+host_ids+"&start_datetime="+start_datetime+"&stop_datetime="+stop_datetime+"&order_by_options="+order_by_options
         $.post("/newslowlog/", post_data, function (data) {
             $("#display_slow_log").html(data);
+            hide_loading();
         })
+    }
+
+    function show_loading() {
+        $("#loading").modal({backdrop: "static", keyboard: false});
+        $("#loading").modal("show")
+    }
+
+    function hide_loading() {
+        $("#loading").modal("hide")
     }
 </script>

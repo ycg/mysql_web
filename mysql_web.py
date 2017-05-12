@@ -205,7 +205,7 @@ def new_get_slow_logs():
     if(request.form.to_dict().has_key("page_number")):
         page_number = int(request.form["page_number"])
     return render_template("slow_log_display.html",
-                           slow_logs=new_slow_log.get_slow_logs(2016,
+                           slow_logs=new_slow_log.get_slow_logs(request.form["host_ids"],
                                                                 start_datetime=request.form["start_datetime"],
                                                                 stop_datetime=request.form["stop_datetime"],
                                                                 order_by_type=int(request.form["order_by_options"]),
@@ -217,11 +217,11 @@ def new_get_slow_logs():
 @app.route("/newslowlog/detail/<int:checksum>/<int:host_id>")
 @login_required
 def new_get_slow_log_detail(checksum, host_id):
-    return render_template("slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, 2016))
+    return render_template("slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, host_id))
 
 @app.route("/newslowlog/explain/<int:checksum>/<int:host_id>")
 def get_explain_infos(checksum, host_id):
-    return render_template("slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, 2016))
+    return render_template("slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, host_id))
 
 def get_page_number_list(page_number):
     if(page_number <= 5):
