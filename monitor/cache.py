@@ -188,12 +188,14 @@ class Cache(object):
 
     def check_mysql_server_version_and_branch(self):
         for host_info in self.__host_infos.values():
-            result = db_util.DBUtil().fetchall(host_info, "show global variables where variable_name in ('version', 'version_comment');")
-            host_info.version = result[0]["Value"]
-            str_branch = result[1]["Value"]
+            result = db_util.DBUtil().fetchall(host_info, "show global variables where variable_name in ('version', 'version_comment', 'datadir');")
+            str_branch = result[2]["Value"]
+            host_info.version = result[1]["Value"]
+            host_info.mysql_data_dir = result[0]["Value"]
             if(str_branch.find(mysql_branch.MySQLBranch.Percona.name) >= 0):
                 host_info.branch = mysql_branch.MySQLBranch.Percona
             elif(str_branch.find(mysql_branch.MySQLBranch.Mariadb.name) >= 0):
                 host_info.branch = mysql_branch.MySQLBranch.Mariadb
             else:
                 host_info.branch = mysql_branch.MySQLBranch.MySQL
+

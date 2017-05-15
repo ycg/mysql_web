@@ -1,6 +1,6 @@
 {% if(slow_low_info != None) %}
     <table class="table table-hover table-bordered">
-        <tbody>
+        <tbody style="word-break:break-all">
         <tr>
             <td style="width: 100px">
                 <strong>DB</strong>
@@ -199,6 +199,9 @@
                 table
             </th>
             <th>
+                type
+            </th>
+            <th>
                 possible_keys
             </th>
             <th>
@@ -229,6 +232,9 @@
                 </td>
                 <td>
                     {{ status.table }}
+                </td>
+                <td>
+                    {{ status.type }}
                 </td>
                 <td>
                     {{ status.possible_keys }}

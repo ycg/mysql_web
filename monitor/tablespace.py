@@ -1,4 +1,7 @@
-import paramiko, db_util, settings, cache, time
+# -*- coding: utf-8 -*-
+
+import paramiko, time
+import db_util, settings, cache
 
 KB = 1024
 K = KB * 1024
@@ -75,8 +78,8 @@ def get_tablespace_infos(host_info):
                 convert_bytes(table_info)
 
     host_client.close()
-    insert_tablespace_data(host_info, result_lst)
     sum_tablespace_info(host_info, result_lst)
+    insert_tablespace_data(host_info, result_lst)
     insert_host_tablespace_data(cache.Cache().get_tablespace_info(host_info.host_id))
     print(host_info.remark, "ok")
 

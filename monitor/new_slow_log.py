@@ -1,4 +1,4 @@
-import db_util, base_class, settings, traceback, cache, time
+import db_util, base_class, settings, traceback, cache
 
 order_by_options = {1: "last_seen", 2: "Query_time_sum", 3: "ts_cnt", 4: "Lock_time_sum"}
 
@@ -9,7 +9,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
     if(len(stop_datetime) > 0):
         where_sql += " and a.last_seen <= '{0}'".format(stop_datetime)
 
-    sql = """select a.checksum, a.fingerprint, a.first_seen, a.last_seen,
+    sql = """select a.checksum, a.fingerprint, a.first_seen, a.last_seen, a.is_reviewed,
                     b.serverid_max, b.db_max, b.user_max, b.ts_min, b.ts_max, sum(b.ts_cnt) ts_cnt,
                     sum(b.Query_time_sum)/sum(b.ts_cnt) Query_time_avg,
                     max(b.Query_time_max) Query_time_max, min(b.Query_time_min) Query_time_min, sum(b.Query_time_sum) Query_time_sum,
@@ -24,7 +24,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
     result = []
     sql = sql.format(server_id, where_sql, order_by_options[order_by_type], (page_number - 1) * 15)
 
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         info = base_class.BaseClass(None)
         info.checksum = row["checksum"]
         info.fingerprint = row["fingerprint"]
@@ -39,6 +39,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
         info.user_max = row["user_max"]
         info.ts_max = row["ts_max"]
         info.ts_cnt = int(row["ts_cnt"])
+        info.is_reviewed = row["is_reviewed"]
         info.Query_time_avg = get_float(row["Query_time_avg"])
         info.Query_time_max = get_float(row["Query_time_max"])
         info.Query_time_min = get_float(row["Query_time_min"])
@@ -60,7 +61,7 @@ def get_slow_log_detail(checksum, server_id):
              left join mysql_web.mysql_slow_query_review_history t2 on t1.checksum = t2.checksum and t2.serverid_max={0}
              where t1.checksum={1} limit 1;""".format(server_id, checksum)
     slow_log_detail = None
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host_Tmp, sql):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
         slow_log_detail = base_class.BaseClass(None)
         slow_log_detail.serverid_max = row["serverid_max"]
         slow_log_detail.db_max = row["db_max"]
@@ -95,7 +96,7 @@ def get_slow_log_explain(server_id, db, sql):
     connection, cursor = None, None
     host_info = cache.Cache().get_host_info(server_id)
     try:
-        connection, cursor = db_util.DBUtil().get_conn_and_cur(settings.MySQL_Host_Tmp)
+        connection, cursor = db_util.DBUtil().get_conn_and_cur(host_info)
         cursor.execute("use {0};".format(db))
         cursor.execute("explain {0};".format(sql))
         for row in cursor.fetchall():
@@ -116,6 +117,11 @@ def get_slow_log_explain(server_id, db, sql):
     finally:
         db_util.DBUtil().close(connection, cursor)
     return result
+
+def review_slow_log(checksum, comment):
+    sql = "update mysql_web.mysql_slow_query_review set comments='{0}', is_reviewed=1 where checksum={1}".format(comment, checksum)
+    db_util.DBUtil().execute(settings.MySQL_Host, sql)
+    return "ok"
 
 def get_float(value):
     return str("%.5f" % value)

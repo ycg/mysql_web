@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MySQL Report</title>
+</head>
+<style type="text/css">
+    table.gridtable {
+        font-family: verdana, arial, sans-serif;
+        font-size: 11px;
+        color: #333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+
+    table.gridtable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #dedede;
+    }
+
+    table.gridtable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
+</style>
+<body>
+<div>
+    <table class="gridtable">
+        <tr>
+            <th colspan="9">MySQL Tablesspace Report</th>
+        </tr>
+        <tr>
+            <th>Host</th>
+            <th>Rows</th>
+            <th>Data_T</th>
+            <th>Index_T</th>
+            <th>Total</th>
+            <th>File_T</th>
+            <th>Free_T</th>
+            <th>Table_C</th>
+            <th>Last Update Time</th>
+        </tr>
+        {% for info in tablespace_infos %}
+            <tr>
+                <td>{{ info.host_info.remark }}</td>
+                <td>{{ info.rows_total }}</td>
+                <td>{{ info.data_total }}</td>
+                <td>{{ info.index_total }}</td>
+                <td>{{ info.total }}</td>
+                <td>{{ info.file_total }}</td>
+                <td>{{ info.free_total }}</td>
+                <td>{{ info.table_count }}</td>
+                <td>{{ info.last_update_time }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+</br>
+<div>
+    <table class="gridtable">
+        <tr>
+            <th colspan="9">MySQL Slow Log Report</th>
+        </tr>
+        <tr>
+            <th>Host</th>
+        </tr>
+    </table>
+</div>
+</br>
+</body>
+</html>

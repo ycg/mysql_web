@@ -40,7 +40,7 @@ class MonitorServer(threading.Thread):
                 #self.__cache.join_thread_pool(self.monitor_host_status)
                 #self.__cache.join_thread_pool(self.monitor_host_for_cpu_and_io)
             if(self.__times % settings.TABLE_CHECK_INTERVAL == 0):
-               self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
+                self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
             time.sleep(1)
             self.__times += 1
 

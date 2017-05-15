@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
 #yum install openssl-devel python-devel libffi-devel -y
-#pip install flask flask-login threadpool pymysql DBUtils paramiko
+#pip install flask flask-login gevent threadpool pymysql DBUtils paramiko
 
 import json, os, gzip, StringIO, base64
 import settings
 from flask import Flask, render_template, request, app, redirect, make_response, helpers
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
-from monitor import user_login, base_class, alarm, new_slow_log
+from monitor import user_login, base_class, alarm, new_slow_log, report
 from flask_login import login_user, login_required
 from flask_login import LoginManager, current_user
+from gevent import pywsgi
 
 #region load data on run
 
@@ -25,8 +26,8 @@ mysql_cache.load_all_host_infos()
 monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
-#alarm.AlarmServer().start()
 slow_log.load_slow_log_table_config()
+monitor_server.invoke_check_tablespace_method()
 
 #endregion
 
@@ -112,6 +113,12 @@ def sort_tablespace(host_id, sort_type):
         if(len(table_list) > 50):
             table_list = table_list[0:50]
         return render_template("tablespace_dispaly.html", host_tablespace_infos=None, tablespace_status=table_list)
+
+@app.route("/tablespace/report")
+@login_required
+def send_tablespace_report_mail():
+    report.send_report_everyday()
+    return "send ok"
 
 #endregion
 
@@ -361,4 +368,6 @@ def get_chart_data_by_host_id(host_id):
 #endregion
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=int("5000"), use_reloader=False)
+    server = pywsgi.WSGIServer(("0.0.0.0", 5000), app)
+    server.serve_forever()
+    #app.run(debug=True, host="0.0.0.0", port=int("5000"), use_reloader=False)

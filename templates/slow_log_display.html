@@ -89,6 +89,9 @@
             <th>
 
             </th>
+            <th>
+
+            </th>
         </tr>
         <tr>
             <th>
@@ -126,6 +129,9 @@
             </th>
             <th>
                 Max
+            </th>
+            <th>
+                Status
             </th>
             <th>
 
@@ -173,13 +179,20 @@
                 <td>
                     {{ status.Lock_time_max }}
                 </td>
+                <td>
+                    {% if(status.is_reviewed == 0) %}
+                        Œ¥…Û∫À
+                    {% else %}
+                        “—…Û∫À
+                    {% endif %}
+                </td>
                 <td class="text-center">
                     <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>Detail</button>
                     <button class="btn btn-xs btn-primary">Review</button>
                 </td>
             </tr>
             <tr style="display: none" id="{{ status.checksum }}">
-                <td colspan="13">
+                <td colspan="14">
                     {{ status.fingerprint }}
                 </td>
             </tr>
