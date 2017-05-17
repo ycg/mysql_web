@@ -181,14 +181,14 @@
                 </td>
                 <td>
                     {% if(status.is_reviewed == 0) %}
-                        Œ¥…Û∫À
+                        Not Reviewed
                     {% else %}
-                        “—…Û∫À
+                        Reviewed
                     {% endif %}
                 </td>
                 <td class="text-center">
                     <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>Detail</button>
-                    <button class="btn btn-xs btn-primary">Review</button>
+                    <button class="btn btn-xs btn-primary" onclick=show_review_dialog_modal("{{ status.checksum }}")>Review</button>
                 </td>
             </tr>
             <tr style="display: none" id="{{ status.checksum }}">

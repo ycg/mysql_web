@@ -1,13 +1,16 @@
+import json
 import db_util, base_class, settings, traceback, cache
 
 order_by_options = {1: "last_seen", 2: "Query_time_sum", 3: "ts_cnt", 4: "Lock_time_sum"}
 
-def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=1, page_number=1):
+def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=1, page_number=1, status=2):
     where_sql = ""
     if(len(start_datetime) > 0):
         where_sql += " and a.last_seen >= '{0}'".format(start_datetime)
     if(len(stop_datetime) > 0):
         where_sql += " and a.last_seen <= '{0}'".format(stop_datetime)
+    if(status != 2 and status < 2):
+        where_sql += " and a.is_reviewed = {0}".format(status)
 
     sql = """select a.checksum, a.fingerprint, a.first_seen, a.last_seen, a.is_reviewed,
                     b.serverid_max, b.db_max, b.user_max, b.ts_min, b.ts_max, sum(b.ts_cnt) ts_cnt,
@@ -118,10 +121,27 @@ def get_slow_log_explain(server_id, db, sql):
         db_util.DBUtil().close(connection, cursor)
     return result
 
-def review_slow_log(checksum, comment):
+def review_slow_log(checksum, user_id, comment):
     sql = "update mysql_web.mysql_slow_query_review set comments='{0}', is_reviewed=1 where checksum={1}".format(comment, checksum)
     db_util.DBUtil().execute(settings.MySQL_Host, sql)
     return "ok"
+
+def update_review_detail(reviewed_id, is_reviewed, comments, checksum):
+    sql = "update mysql_web.mysql_slow_query_review set comments='{0}', is_reviewed={1} ,reviewed_id={2}, reviewed_on=now() " \
+          "where checksum={3};".format(comments, is_reviewed, reviewed_id, checksum)
+    db_util.DBUtil().fetchone(settings.MySQL_Host, sql)
+
+def get_review_detail_by_checksum(checksum):
+    sql = "select is_reviewed, comments, reviewed_on, reviewed_id " \
+          "from mysql_web.mysql_slow_query_review where checksum={0}".format(checksum)
+    info = base_class.BaseClass(None)
+    result = db_util.DBUtil().fetchone(settings.MySQL_Host, sql)
+    info.checksum = checksum
+    info.reviewed_id = result["reviewed_id"]
+    info.is_reviewed = result["is_reviewed"]
+    info.comments = result["comments"] if result["comments"] else ""
+    info.reviewed_on = result["reviewed_on"].strftime('%Y-%m-%d %H:%M:%S') if result["reviewed_on"] else ""
+    return json.dumps(info, default=lambda o: o.__dict__, skipkeys=True, ensure_ascii=False)
 
 def get_float(value):
     return str("%.5f" % value)

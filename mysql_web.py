@@ -5,10 +5,10 @@
 
 import json, os, gzip, StringIO, base64
 import settings
-from flask import Flask, render_template, request, app, redirect, make_response, helpers
+from flask import Flask, render_template, request, app, session, redirect, url_for, g
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
 from monitor import user_login, base_class, alarm, new_slow_log, report
-from flask_login import login_user, login_required
+from flask_login import login_user, login_required, logout_user
 from flask_login import LoginManager, current_user
 from gevent import pywsgi
 
@@ -54,6 +54,7 @@ def get_mysql_data_by_id(id):
 @app.route("/status", methods=['GET', 'POST'])
 @login_required
 def get_status_data():
+    print(current_user.id, current_user.username)
     return gzip_compress(get_monitor_data(data_status=mysql_cache.get_all_status_infos(keys=json.loads(request.values["keys"]))))
 
 @app.route("/status/<int:id>")
@@ -183,7 +184,7 @@ def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_en
 @app.route("/slowlog")
 @login_required
 def slow_log_home():
-    return render_template("new_slow_log_home.html", host_infos=mysql_cache.get_all_host_infos())
+    return render_template("new_slow_log_home.html", host_infos=mysql_cache.get_all_host_infos(), user_infos=mysql_cache.get_mysql_web_user_infos())
 
 @app.route("/slowlog/<int:query_type_id>")
 @login_required
@@ -216,7 +217,8 @@ def new_get_slow_logs():
                                                                 start_datetime=request.form["start_datetime"],
                                                                 stop_datetime=request.form["stop_datetime"],
                                                                 order_by_type=int(request.form["order_by_options"]),
-                                                                page_number=page_number),
+                                                                page_number=page_number,
+                                                                status=int(request.form["slow_log_status"])),
                            slow_log_infos=None,
                            page_number=page_number,
                            page_list=get_page_number_list(page_number))
@@ -229,6 +231,10 @@ def new_get_slow_log_detail(checksum, host_id):
 @app.route("/newslowlog/explain/<int:checksum>/<int:host_id>")
 def get_explain_infos(checksum, host_id):
     return render_template("slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, host_id))
+
+@app.route("/newslowlog/review/detail/<int:checksum>")
+def get_review_detail(checksum):
+    return new_slow_log.get_review_detail_by_checksum(checksum)
 
 def get_page_number_list(page_number):
     if(page_number <= 5):
@@ -342,6 +348,12 @@ def login_verfiy():
     if(user_tmp.verify_password(request.form["passWord"], result) == True):
         login_user(user_tmp)
     return json.dumps(result, default=lambda o: o.__dict__)
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
 
 @login_manager.user_loader
 def load_user(user_id):

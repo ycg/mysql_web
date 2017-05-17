@@ -1100,7 +1100,7 @@
     </thead>
     <tbody>
         {% for status in data_repl %}
-            {% if(status.io_status and status.is_slave == 1) %}
+            {% if(status.is_slave == 1) %}
                 <tr>
                     <td>
                         {{ status.host_info.remark }}

@@ -1,31 +1,43 @@
-<form class="form-inline row" action="/newslowlog/" method="post" role="form" id="slow_log_form">
-    <div class="form-group col-md-2">
-        <select id="host_ids" name="host_ids" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
-            {% for info in host_infos %}
-                <option value="{{ info.host_id }}">{{ info.remark }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div class="form-group col-md-2">
-        <select id="order_by_options" name="order_by_options" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
-            <option value="1">Last Seen</option>
-            <option value="2">Query Time</option>
-            <option value="3">Query Count</option>
-            <option value="4">Lock Time</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <input id="start_datetime" name="start_datetime" type="text" value="" class="form_datetime form-control" readonly>
-        -
-        <input id="stop_datetime" name="stop_datetime" type="text" value="" class="form_datetime form-control" readonly>
-    </div>
-    <div class="form-group">
+<div class="row">
+    <form action="/newslowlog/" method="post" class="form-inline col-md-12" role="form" id="slow_log_form">
+        <div class="form-group" style="width: 180px">
+            <select id="host_ids" name="host_ids" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
+                {% for info in host_infos %}
+                    <option value="{{ info.host_id }}">{{ info.remark }}</option>
+                {% endfor %}
+            </select>
+        </div>
         &nbsp;&nbsp;
-        <button type="submit" class="btn btn-primary">Query</button>
+        <div class="form-group" style="width: 180px">
+            <select id="order_by_options" name="order_by_options" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
+                <option value="1">Last Seen</option>
+                <option value="2">Query Time</option>
+                <option value="3">Query Count</option>
+                <option value="4">Lock Time</option>
+            </select>
+        </div>
         &nbsp;&nbsp;
-        <button type="reset" class="btn btn-default">Reset</button>
-    </div>
-</form>
+        <div class="form-group" style="width: 180px">
+            <select id="slow_log_status" name="slow_log_status" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
+                <option value="2">ALL</option>
+                <option value="1">Reviewed</option>
+                <option value="0">Not Reviewed</option>
+            </select>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group">
+            <input id="start_datetime" name="start_datetime" type="text" value="" class="form_datetime form-control" readonly>
+            -
+            <input id="stop_datetime" name="stop_datetime" type="text" value="" class="form_datetime form-control" readonly>
+        </div>
+        <div class="form-group">
+            &nbsp;&nbsp;
+            <button type="submit" class="btn btn-primary">Query</button>
+            &nbsp;&nbsp;
+            <button type="reset" class="btn btn-default">Reset</button>
+        </div>
+    </form>
+</div>
 </br>
 <div class="row">
     <div id="display_slow_log" class="col-md-12"></div>
@@ -61,10 +73,44 @@
                 <h4 class="modal-title" id="exampleModalLabel">Review</h4>
             </div>
             <div class="modal-body">
+                <form class="form-horizontal" role="form" method="post">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Review_By:</label>
+                        <div class="col-sm-10">
+                            <select id="users" class="form-control">
+                                <option value="0" selected>None</option>
+                                {% for info in user_infos %}
+                                    <option value="{{ info.user_id }}">{{ info.user_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Review_On:</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="review_on" value="" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Status:</label>
+                        <div class="col-sm-10">
+                            <select id="review_status" class="form-control">
+                                <option value="1">Reviewed</option>
+                                <option value="0" selected>Not Reviewed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Comments:</label>
+                        <div class="col-sm-10">
+                            <textarea id="comments" name="comments" class="form-control" style="resize: none" placeholder="please input review slow log comment" rows=8></textarea>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-primary">Save</button>
             </div>
         </div>
     </div>
@@ -84,6 +130,7 @@
 </div>
 
 <script type="text/javascript">
+    var slow_log_checksum = 0;
     $(".selectpicker").selectpicker({liveSearch: true});
     $(".form_datetime").datetimepicker({
         format: "yyyy-mm-dd hh:ii",
@@ -92,8 +139,8 @@
         pickerPosition: "bottom-left"
     });
 
-    $(document).ready(function() {
-        $("#slow_log_form").ajaxForm(function(data){
+    $(document).ready(function () {
+        $("#slow_log_form").ajaxForm(function (data) {
             $("#display_slow_log").html(data);
         });
     });
@@ -124,11 +171,12 @@
     function get_slow_logs_by_page_number(page_number) {
         show_loading();
         host_ids = $("#host_ids").val();
+        slow_log_status = $("#slow_log_status").val();
         start_datetime = $("#start_datetime").val();
         stop_datetime = $("#stop_datetime").val();
         order_by_options = $("#order_by_options").val();
 
-        var post_data = "page_number="+page_number+"&host_ids="+host_ids+"&start_datetime="+start_datetime+"&stop_datetime="+stop_datetime+"&order_by_options="+order_by_options
+        var post_data = "page_number=" + page_number + "&slow_log_status=" + slow_log_status + "&host_ids=" + host_ids + "&start_datetime=" + start_datetime + "&stop_datetime=" + stop_datetime + "&order_by_options=" + order_by_options
         $.post("/newslowlog/", post_data, function (data) {
             $("#display_slow_log").html(data);
             hide_loading();
@@ -142,5 +190,33 @@
 
     function hide_loading() {
         $("#loading").modal("hide")
+    }
+
+    function show_review_dialog_modal(checksum) {
+        var url = "/newslowlog/review/detail/" + checksum
+        $.get(url, "", function (data) {
+            obj = JSON.parse(data)
+            slow_log_checksum = obj.checksum;
+            $("#comments").val(obj.comments);
+            $("#review_on").val(obj.reviewed_on);
+            set_option_selected("#users", obj.reviewed_id)
+            set_option_selected("#review_status", obj.is_reviewed)
+        })
+
+        $("#review").modal({backdrop: "static", keyboard: false});
+        $("#review").modal("show")
+    }
+
+    function set_option_selected(id_name, value) {
+        $(id_name).each(function () {
+            $(this).find("option").each(function () {
+                if ($(this).val() == value) {
+                    $(this).attr("selected", true);
+                }
+                else {
+                    $(this).attr("selected", false);
+                }
+            });
+        });
     }
 </script>
