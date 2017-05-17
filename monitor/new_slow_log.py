@@ -121,15 +121,11 @@ def get_slow_log_explain(server_id, db, sql):
         db_util.DBUtil().close(connection, cursor)
     return result
 
-def review_slow_log(checksum, user_id, comment):
-    sql = "update mysql_web.mysql_slow_query_review set comments='{0}', is_reviewed=1 where checksum={1}".format(comment, checksum)
-    db_util.DBUtil().execute(settings.MySQL_Host, sql)
-    return "ok"
-
 def update_review_detail(reviewed_id, is_reviewed, comments, checksum):
     sql = "update mysql_web.mysql_slow_query_review set comments='{0}', is_reviewed={1} ,reviewed_id={2}, reviewed_on=now() " \
           "where checksum={3};".format(comments, is_reviewed, reviewed_id, checksum)
     db_util.DBUtil().fetchone(settings.MySQL_Host, sql)
+    return "save success"
 
 def get_review_detail_by_checksum(checksum):
     sql = "select is_reviewed, comments, reviewed_on, reviewed_id " \

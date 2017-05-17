@@ -36,9 +36,9 @@ class MonitorServer(threading.Thread):
             if(self.__times % settings.UPDATE_INTERVAL == 0):
                 self.__cache.join_thread_pool(self.get_mysql_status)
             if(self.__times % settings.LINUX_UPDATE_INTERVAL == 0):
-                pass
-                #self.__cache.join_thread_pool(self.monitor_host_status)
-                #self.__cache.join_thread_pool(self.monitor_host_for_cpu_and_io)
+                if(settings.LINUX_OS):
+                    self.__cache.join_thread_pool(self.monitor_host_status)
+                    self.__cache.join_thread_pool(self.monitor_host_for_cpu_and_io)
             if(self.__times % settings.TABLE_CHECK_INTERVAL == 0):
                 self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
             time.sleep(1)

@@ -3,7 +3,7 @@
 #yum install openssl-devel python-devel libffi-devel -y
 #pip install flask flask-login gevent threadpool pymysql DBUtils paramiko
 
-import json, os, gzip, StringIO, base64
+import json, os, gzip, StringIO, base64, sys
 import settings
 from flask import Flask, render_template, request, app, session, redirect, url_for, g
 from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
@@ -13,6 +13,9 @@ from flask_login import LoginManager, current_user
 from gevent import pywsgi
 
 #region load data on run
+
+reload(sys)
+sys.setdefaultencoding("UTF-8")
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -236,6 +239,13 @@ def get_explain_infos(checksum, host_id):
 def get_review_detail(checksum):
     return new_slow_log.get_review_detail_by_checksum(checksum)
 
+@app.route("/newslowlog/review/update", methods=['POST'])
+def update_review_detail():
+    return new_slow_log.update_review_detail(int(request.form["users"]),
+                                             int(request.form["review_status"]),
+                                             request.form["comments"],
+                                             int(request.form["checksum"]))
+
 def get_page_number_list(page_number):
     if(page_number <= 5):
         page_list = range(1, 10)
@@ -380,6 +390,10 @@ def get_chart_data_by_host_id(host_id):
 #endregion
 
 if __name__ == '__main__':
-    server = pywsgi.WSGIServer(("0.0.0.0", 5000), app)
-    server.serve_forever()
-    #app.run(debug=True, host="0.0.0.0", port=int("5000"), use_reloader=False)
+    if(settings.LINUX_OS):
+        print("linux start ok.")
+        server = pywsgi.WSGIServer(("0.0.0.0", 5000), app)
+        server.serve_forever()
+    if(settings.WINDOWS_OS):
+        print("windows start ok.")
+        app.run(debug=True, host="0.0.0.0", port=int("5000"), use_reloader=False)

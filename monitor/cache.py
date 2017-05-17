@@ -1,4 +1,4 @@
-import base_class, host_info, collections, db_util, settings, mysql_branch, threadpool
+import base_class, host_info, collections, db_util, settings, mysql_branch, threadpool, tablespace
 
 class Cache(object):
     __number = False
@@ -171,7 +171,7 @@ class Cache(object):
     def check_master_and_slave_relation(self):
         for key, value in self.__repl_infos.items():
             result = db_util.DBUtil().fetchone(self.__host_infos[key], "show slave status;")
-            if(result != None):
+            if(result != None and int(result["Read_Master_Log_Pos"]) > 0):
                 value.is_slave = 1
                 value.master_host_id = 0
                 value.host_info.role = "S"
@@ -188,10 +188,14 @@ class Cache(object):
 
     def check_mysql_server_version_and_branch(self):
         for host_info in self.__host_infos.values():
-            result = db_util.DBUtil().fetchall(host_info, "show global variables where variable_name in ('version', 'version_comment', 'datadir');")
-            str_branch = result[2]["Value"]
-            host_info.version = result[1]["Value"]
-            host_info.mysql_data_dir = result[0]["Value"]
+            result = db_util.DBUtil().fetchall(host_info, "show global variables where variable_name in ('version', 'version_comment', 'datadir', 'innodb_buffer_pool_size');")
+            data = {}
+            for row in result:
+                data[row.get("Variable_name")] = row.get("Value")
+            host_info.version = data["version"]
+            str_branch = data["version_comment"]
+            host_info.mysql_data_dir = data["datadir"]
+            host_info.innodb_buffer_pool_size = tablespace.get_data_length(long(data["innodb_buffer_pool_size"]))
             if(str_branch.find(mysql_branch.MySQLBranch.Percona.name) >= 0):
                 host_info.branch = mysql_branch.MySQLBranch.Percona
             elif(str_branch.find(mysql_branch.MySQLBranch.Mariadb.name) >= 0):

@@ -98,7 +98,7 @@
                         <td>
                             {{ status.cpu_15 }}
                         </td>
-                        <td {% if(status.cpu_user > 80) %} class="text-danger" {% endif %}>
+                        <td {% if(status.cpu_user > 50) %} class="text-danger" {% endif %}>
                             {{ status.cpu_user }}
                         </td>
                         <td {% if(status.cpu_system > 20) %} class="text-danger" {% endif %}>

@@ -2,60 +2,79 @@
 <table class="table table-condensed table-hover table-bordered">
     <thead>
         <tr>
+            <th colspan="2" class="text-center">
+                Host
+            </th>
+            <th colspan="5" class="text-center">
+                Status
+            </th>
+            <th colspan="2" class="text-center">
+                Thread
+            </th>
+            <th colspan="2" class="text-center">
+                Net
+            </th>
+            <th colspan="4" class="text-center">
+                MySQL
+            </th>
+            <th>
+            </th>
+        </tr>
+        <tr>
             <th>
                 Remark
             </th>
-            <th>
+            <th class="text-center">
                 Role
             </th>
-            <th>
+            <th class="text-center">
                 Running
             </th>
-            <th>
+            <th class="text-center">
                 QPS
             </th>
-            <th>
+            <th class="text-center">
                 TPS
             </th>
-            <th>
+            <th class="text-center">
                 Trxs
             </th>
-            <th>
+            <th title="buffer pool size" class="text-center">
+                B_P_Z
+            </th>
+            <th class="text-center">
                 Threads
             </th>
-            <th>
+            <th class="text-center">
                 Threads_R
             </th>
-            <th>
+            <th class="text-center">
                 Send_B
             </th>
-            <th>
+            <th class="text-center">
                 Rece_B
             </th>
-            <th>
+            <th class="text-center">
                 Uptime(Day)
             </th>
-            <th>
+            <th class="text-center">
                 Version
             </th>
-            <th>
+            <th class="text-center">
                 Port
             </th>
-            <th>
+            <th class="text-center">
                 User
-            </th>
-            <th>
-
             </th>
             <th>
 
             </th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="text-center">
     {% for data in mysql_infos %}
         <tr>
-            <td>
+            <td class="text-left">
                 {{ data.remark }}
             </td>
             <td>
@@ -72,6 +91,9 @@
             </td>
             <td>
                 {{ data.trxs }}
+            </td>
+            <td>
+                {{ data.innodb_buffer_pool_size }}
             </td>
             <td {% if(data.threads > 1000) %} class="text-danger" {% endif %}>
                 {{ data.threads }}
@@ -99,9 +121,6 @@
             </td>
             <td class="text-center">
                 <a href="javascript:void(0)" onclick=start("/mysql/{{ data.key }}","mysql")>Details</a>
-            </td>
-            <td class="text-center">
-                <a href="javascript:void(0)" onclick=stop("/tablespace/{{ data.key }}","tablespace")>Tablespace</a>
             </td>
         </tr>
     {% endfor %}

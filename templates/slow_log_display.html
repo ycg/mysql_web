@@ -130,7 +130,7 @@
             <th>
                 Max
             </th>
-            <th>
+            <th class="text-center">
                 Status
             </th>
             <th>
@@ -155,7 +155,7 @@
                 <td>
                     {{ status.last_seen }}
                 </td>
-                <td>
+                <td {% if(status.ts_cnt > 10) %} class="text-danger" {% endif %}>
                     {{ status.ts_cnt }}
                 </td>
                 <td>
@@ -179,7 +179,7 @@
                 <td>
                     {{ status.Lock_time_max }}
                 </td>
-                <td>
+                <td class="text-center">
                     {% if(status.is_reviewed == 0) %}
                         Not Reviewed
                     {% else %}

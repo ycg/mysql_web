@@ -1,5 +1,5 @@
 <div class="row">
-    <form action="/newslowlog/" method="post" class="form-inline col-md-12" role="form" id="slow_log_form">
+    <form action="/newslowlog/" method="post" class="form-inline col-md-12" target="nm_iframe" role="form" id="slow_log_form">
         <div class="form-group" style="width: 180px">
             <select id="host_ids" name="host_ids" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
                 {% for info in host_infos %}
@@ -73,11 +73,11 @@
                 <h4 class="modal-title" id="exampleModalLabel">Review</h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" role="form" method="post">
+                <form class="form-horizontal" id="slow_log_review_detail" role="form" target="nm_iframe" action="/newslowlog/review/update" method="post">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Review_By:</label>
                         <div class="col-sm-10">
-                            <select id="users" class="form-control">
+                            <select id="users" name="users" class="form-control">
                                 <option value="0" selected>None</option>
                                 {% for info in user_infos %}
                                     <option value="{{ info.user_id }}">{{ info.user_name }}</option>
@@ -88,13 +88,13 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Review_On:</label>
                         <div class="col-sm-10">
-                            <input type="text" id="review_on" value="" class="form-control" readonly>
+                            <input type="text" id="review_on" name="review_on" value="" class="form-control" readonly>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Status:</label>
                         <div class="col-sm-10">
-                            <select id="review_status" class="form-control">
+                            <select id="review_status" name="review_status" class="form-control">
                                 <option value="1">Reviewed</option>
                                 <option value="0" selected>Not Reviewed</option>
                             </select>
@@ -110,7 +110,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-primary" onclick="update_review_detail()">Save</button>
             </div>
         </div>
     </div>
@@ -139,9 +139,43 @@
         pickerPosition: "bottom-left"
     });
 
+    function ajaxSubmit(frm, fn, efn) {
+        var dataPara = getFormJson(frm);
+        $.ajax({
+            url: frm.action,
+            type: frm.method,
+            data: dataPara,
+            success: fn,
+            error: efn
+        });
+    }
+
+    function getFormJson(frm) {
+        var o = {};
+        var a = $(frm).serializeArray();
+        $.each(a, function () {
+            if (o[this.name] !== undefined) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    }
+
     $(document).ready(function () {
-        $("#slow_log_form").ajaxForm(function (data) {
-            $("#display_slow_log").html(data);
+        $("#slow_log_form").bind("submit", function () {
+            show_loading();
+            ajaxSubmit(this, function (data) {
+                $("#display_slow_log").html(data);
+                hide_loading();
+            }, function () {
+                hide_loading();
+            });
+            return false;
         });
     });
 
@@ -170,15 +204,17 @@
 
     function get_slow_logs_by_page_number(page_number) {
         show_loading();
-        host_ids = $("#host_ids").val();
-        slow_log_status = $("#slow_log_status").val();
-        start_datetime = $("#start_datetime").val();
-        stop_datetime = $("#stop_datetime").val();
-        order_by_options = $("#order_by_options").val();
+        var host_ids = $("#host_ids").val();
+        var slow_log_status = $("#slow_log_status").val();
+        var start_datetime = $("#start_datetime").val();
+        var stop_datetime = $("#stop_datetime").val();
+        var order_by_options = $("#order_by_options").val();
 
         var post_data = "page_number=" + page_number + "&slow_log_status=" + slow_log_status + "&host_ids=" + host_ids + "&start_datetime=" + start_datetime + "&stop_datetime=" + stop_datetime + "&order_by_options=" + order_by_options
         $.post("/newslowlog/", post_data, function (data) {
             $("#display_slow_log").html(data);
+            hide_loading();
+        }).error(function () {
             hide_loading();
         })
     }
@@ -193,10 +229,10 @@
     }
 
     function show_review_dialog_modal(checksum) {
+        slow_log_checksum = checksum;
         var url = "/newslowlog/review/detail/" + checksum
         $.get(url, "", function (data) {
-            obj = JSON.parse(data)
-            slow_log_checksum = obj.checksum;
+            var obj = JSON.parse(data);
             $("#comments").val(obj.comments);
             $("#review_on").val(obj.reviewed_on);
             set_option_selected("#users", obj.reviewed_id)
@@ -217,6 +253,14 @@
                     $(this).attr("selected", false);
                 }
             });
+        });
+    }
+
+    function update_review_detail() {
+        var json_data = getFormJson($("#slow_log_review_detail"))
+        json_data["checksum"] = slow_log_checksum
+        $.post("/newslowlog/review/update", json_data, function (data) {
+            alert(data)
         });
     }
 </script>
