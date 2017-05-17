@@ -1028,6 +1028,64 @@
             </tbody>
         </table>
     </div>
+    <div class="col-md-5">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+
+                    </th>
+                    <th colspan="5" rowspan="1" class="text-center">
+                        Change(Insert) Buffer
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th class="text-center">
+                        Free
+                    </th>
+                    <th class="text-center">
+                        Merges
+                    </th>
+                    <th title="merged inserts" class="text-center">
+                        M_Inserts
+                    </th>
+                    <th title="merged deletes" class="text-center">
+                        M_Deletes
+                    </th>
+                    <th title="merge delete marks" class="text-center">
+                        M_D_Marks
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% for status in data_innodb %}
+                <tr>
+                    <td class="text-left">
+                        {{ status.host_info.remark }}
+                    </td>
+                    <td>
+                        {{ status.innodb_ibuf_free_list }}
+                    </td>
+                    <td>
+                        {{ status.innodb_ibuf_merges }}
+                    </td>
+                    <td>
+                        {{ status.innodb_ibuf_merged_inserts }}
+                    </td>
+                    <td>
+                        {{ status.innodb_ibuf_merged_deletes }}
+                    </td>
+                    <td>
+                        {{ status.innodb_ibuf_merged_delete_marks }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endif %}
 

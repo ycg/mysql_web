@@ -223,6 +223,21 @@ class MonitorServer(threading.Thread):
         innodb_info.innodb_pages_created = int(mysql_status_new["Innodb_pages_created"]) - int(mysql_status_old["Innodb_pages_created"])
         innodb_info.innodb_pages_written = int(mysql_status_new["Innodb_pages_written"]) - int(mysql_status_old["Innodb_pages_written"])
 
+        #change(insert) buffer
+        if(mysql_status_old.has_key("Innodb_ibuf_free_list")):
+            innodb_info.innodb_ibuf_free_list = int(mysql_status_new["Innodb_ibuf_free_list"])
+            innodb_info.innodb_ibuf_merges = int(mysql_status_new["Innodb_ibuf_merges"]) - int(mysql_status_old["Innodb_ibuf_merges"])
+            innodb_info.innodb_ibuf_merged_inserts = int(mysql_status_new["Innodb_ibuf_merged_inserts"]) - int(mysql_status_old["Innodb_ibuf_merged_inserts"])
+            innodb_info.innodb_ibuf_merged_deletes = int(mysql_status_new["Innodb_ibuf_merged_deletes"]) - int(mysql_status_old["Innodb_ibuf_merged_deletes"])
+            innodb_info.innodb_ibuf_merged_delete_marks = int(mysql_status_new["Innodb_ibuf_merged_delete_marks"]) - int(mysql_status_old["Innodb_ibuf_merged_delete_marks"])
+        else:
+            innodb_info.innodb_ibuf_merges = 0
+            innodb_info.innodb_ibuf_free_list = 0
+            innodb_info.innodb_ibuf_merged_inserts = 0
+            innodb_info.innodb_ibuf_merged_deletes = 0
+            innodb_info.innodb_ibuf_merged_delete_marks = 0
+
+
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         self.get_binlog_size_total(mysql_variables["log_bin"], status_info, cursor)
         if(host_info.is_slave):
