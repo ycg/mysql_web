@@ -1,0 +1,142 @@
+<ul id="myTab" class="nav nav-tabs">
+    <li class="active">
+        <a href="#basics_config" data-toggle="tab">Basics</a>
+    </li>
+    <li>
+        <a href="#email_config" data-toggle="tab">Email</a>
+    </li>
+</ul>
+
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade in active" id="basics_config">
+        <br>
+        <form class="form-horizontal" id="basics_form_detail" role="form" target="nm_iframe" action="/config/update" method="post">
+            <div class="form-group">
+                <label class="col-md-2 control-label">Status Refresh(S):</label>
+                <div class="col-md-3">
+                    <select class="show-tick bs-select-hidden form-control" id="status_refresh" name="status_refresh">
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">OS Refresh(S):</label>
+                <div class="col-md-3">
+                    <select class="show-tick bs-select-hidden form-control" id="linux_os_refresh" name="linux_os_refresh">
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Innodb Engine Refresh(S):</label>
+                <div class="col-md-3">
+                     <select class="show-tick bs-select-hidden form-control" id="innodb_engine_refresh" name="innodb_engine_refresh">
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+            </div>
+            <br>
+        </form>
+        <div class="row">
+            <div class="col-md-1">
+                <button class="btn-primary form-control" onclick="update_basics_config()">Save</button>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="email_config">
+        <br>
+        <form class="form-horizontal" id="email_form_detail" role="form" target="nm_iframe" action="/config/update" method="post">
+            <div class="form-group">
+                <label class="col-md-1 control-label">Host:</label>
+                <div class="col-md-3">
+                    <input type="text" value="{{ config_info.host }}" class="form-control" id="email_host" name="email_host">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-1 control-label">Port:</label>
+                <div class="col-md-3">
+                    <input type="text" value="{{ config_info.port }}" class="form-control" id="email_port" name="email_port">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-1 control-label">User:</label>
+                <div class="col-md-3">
+                    <input type="text" value="{{ config_info.user }}" class="form-control" id="email_user" name="email_user">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-1 control-label">Password:</label>
+                <div class="col-md-3">
+                    <input type="password" value="{{ config_info.password }}" class="form-control" id="email_password" name="email_password">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-1 control-label">SendUsers:</label>
+                <div class="col-md-5">
+                    <input type="text" value="{{ config_info.send_users }}" class="form-control" id="email_send_users" name="email_send_users">
+                </div>
+            </div>
+            </br>
+        </form>
+        <div class="row">
+            <div class="col-md-1">
+                <button class="btn-primary form-control" onclick="update_email_config()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>
+
+<script type="text/javascript">
+    function update_email_config() {
+        var obj = get_form_json($("#email_form_detail"))
+        obj.update_type = 2
+        $.post("/config/update", obj, function (data) {
+            alert(data)
+        });
+    }
+
+    function update_basics_config() {
+        var obj = get_form_json($("#basics_form_detail"))
+        obj.update_type = 1
+        $.post("/config/update", obj, function (data) {
+            alert(data)
+        });
+    }
+
+    function set_option_selected(id_name, value) {
+        $(id_name).each(function () {
+            $(this).find("option").each(function () {
+                if ($(this).val() == value) {
+                    $(this).attr("selected", true);
+                }
+                else {
+                    $(this).attr("selected", false);
+                }
+            });
+        });
+    }
+
+    set_option_selected("#status_refresh", {{ config_info.status_refresh }})
+    set_option_selected("#linux_os_refresh", {{ config_info.linux_os_refresh }})
+    set_option_selected("#innodb_engine_refresh", {{ config_info.innodb_engine_refresh }})
+</script>

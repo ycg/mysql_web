@@ -389,6 +389,49 @@ def get_chart_data_by_host_id(host_id):
 
 #endregion
 
+#region config
+
+@app.route("/config")
+@login_required
+def get_config_html():
+    return render_template("config.html", config_info=get_config_options_value())
+
+@app.route("/config/update", methods=["POST"])
+@login_required
+def update_config_options():
+    obj = get_object_from_json(request.form)
+    if (int(obj.update_type) == 1):
+        settings.UPDATE_INTERVAL = int(obj.status_refresh)
+        settings.LINUX_UPDATE_INTERVAL = int(obj.linux_os_refresh)
+        settings.INNODB_UPDATE_INTERVAL = int(obj.innodb_engine_refresh)
+    if (int(obj.update_type) == 2):
+        settings.EMAIL_HOST = obj.email_host
+        settings.EMAIL_PORT = obj.email_port
+        settings.EMAIL_USER = obj.email_user
+        settings.EMAIL_PASSWORD = obj.email_password
+        settings.EMAIL_SEND_USERS = obj.email_send_users
+    return "save success."
+
+def get_config_options_value():
+    info = base_class.BaseClass(None)
+    info.host = settings.EMAIL_HOST
+    info.port = settings.EMAIL_PORT
+    info.user = settings.EMAIL_USER
+    info.password = settings.EMAIL_PASSWORD
+    info.send_users = settings.EMAIL_SEND_USERS
+    info.status_refresh = settings.UPDATE_INTERVAL
+    info.linux_os_refresh = settings.LINUX_UPDATE_INTERVAL
+    info.innodb_engine_refresh = settings.INNODB_UPDATE_INTERVAL
+    return info
+
+def get_object_from_json(json_value):
+    obj = base_class.BaseClass(None)
+    for key, value in dict(json_value).items():
+        setattr(obj, key, value[0])
+    return obj
+
+#endregion
+
 if __name__ == '__main__':
     if(settings.LINUX_OS):
         print("linux start ok.")

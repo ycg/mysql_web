@@ -82,7 +82,7 @@ function myActive(id_name) {
     });
 }
 
-var id_names = ["sql", "slowlog", "tablespace", "general", "user", "thread", "chart"]
+var id_names = ["sql", "slowlog", "tablespace", "general", "user", "thread", "chart", "config"]
 
 function search_div(id_name) {
     if ($.inArray(id_name, id_names) >= 0) {
@@ -129,4 +129,31 @@ function ungzip_new(string) {
     var data = pako.ungzip(binData);
     var strData = String.fromCharCode.apply(null, new Uint16Array(data));
     return strData;
+}
+
+function ajaxSubmit(frm, fn, efn) {
+    var dataPara = get_form_json(frm);
+    $.ajax({
+        url: frm.action,
+        type: frm.method,
+        data: dataPara,
+        success: fn,
+        error: efn
+    });
+}
+
+function get_form_json(frm) {
+    var o = {};
+    var a = $(frm).serializeArray();
+    $.each(a, function () {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
 }
