@@ -1,0 +1,253 @@
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered table-hover">
+            <thead class="text-center">
+                <tr>
+                    <th colspan="2" class="text-center">
+
+                    </th>
+                    <th colspan="5" class="text-center">
+                        Backup
+                    </th>
+                    <th colspan="3" class="text-center">
+                        Status
+                    </th>
+                    <th colspan="2" class="text-center">
+                        Operator
+                    </th>
+                </tr>
+                <tr class="text-center">
+                    <th class="text-center">
+                        Name
+                    </th>
+                    <th class="text-center">
+                        Host
+                    </th>
+                    <th class="text-center">
+                        Tool
+                    </th>
+                    <th class="text-center">
+                        Mode
+                    </th>
+                    <th class="text-center">
+                        Cycle
+                    </th>
+                    <th class="text-center">
+                        Time
+                    </th>
+                    <th class="text-center">
+                        Directory
+                    </th>
+                    <th class="text-center">
+                        Result
+                    </th>
+                    <th class="text-center">
+                        Success_C
+                    </th>
+                    <th class="text-center">
+                        Error_C
+                    </th>
+                    <th class="text-center">
+
+                    </th>
+                    <th class="text-center">
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% for key, value in backup_infos.items() %}
+                    <tr>
+                        <td hidden>
+                            {{ key }}
+                        </td>
+                        <td hidden>
+                            {{ value.backup_host_id }}
+                        </td>
+                        <td>
+                            {{ value.backup_name }}
+                        </td>
+                        <td>
+                            {{ value.host_name }}
+                        </td>
+                        <td>
+                            {{ value.backup_tool }}
+                        </td>
+                        <td>
+                            {{ value.backup_mode }}
+                        </td>
+                        <td>
+                            {{ value.backup_cycle }}
+                        </td>
+                        <td>
+                            {{ value.backup_time }}
+                        </td>
+                        <td>
+                            {{ value.backup_directory }}
+                        </td>
+                        <th>
+
+                        </th>
+                        <th>
+
+                        </th>
+                        <th>
+
+                        </th>
+                        <th>
+                        </th>
+                        <th>
+                        </th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<button type="button" onclick="show_backup_dialog()" class="btn btn-primary">Backup</button>
+
+<div class="modal fade" id="backup_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="exampleModalLabel">Backup</h4>
+            </div>
+            <div class="modal-body row text-center">
+                <form class="form-horizontal" id="backup_detail_form" role="form" target="nm_iframe" action="" method="post">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">备份名称:</label>
+                        <div class="col-md-7">
+                            <input class="form-control" type="text" id="backup_name" name="backup_name" required>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">数据源:</label>
+                        <div class="col-md-7">
+                            <select class="selectpicker show-tick bs-select-hidden form-control" id="backup_host_id" name="backup_host_id" required>
+                                {% for info in host_infos %}
+                                    <option value="{{ info.host_id }}">{{ info.remark }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">备份工具:</label>
+                        <div class="col-md-7">
+                             <select class="selectpicker show-tick bs-select-hidden form-control" id="backup_tool" name="backup_tool" required>
+                                <option value="1" selected>mysqldump</option>
+                                <option value="2">xtrabackup</option>
+                                <option value="3">mydumper</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">备份方式:</label>
+                        <div class="col-md-7">
+                             <select class="selectpicker show-tick bs-select-hidden form-control" id="backup_mode" name="backup_mode" required>
+                                <option value="1" selected>全量备份</option>
+                                <option value="2">全量+增量备份</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">备份周期:</label>
+                        <div class="col-md-7">
+                             <select class="selectpicker show-tick bs-select-hidden form-control" id="backup_cycle" name="backup_cycle" required>
+                                <option value="1" selected>每周日全量其余增量</option>
+                                <option value="2">每十五天一次全量其余增量</option>
+                                <option value="2">每三十天一次全量其余增量</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">备份保存天数:</label>
+                        <div class="col-md-7">
+                             <select class="selectpicker show-tick bs-select-hidden form-control" id="backup_save_days" name="backup_save_days" required>
+                                <option value="7" selected>7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">是否压缩:</label>
+                        <div class="col-md-7">
+                            <select class="selectpicker show-tick bs-select-hidden form-control" id="backup_compress" name="backup_compress" required>
+                                <option value="0">否</option>
+                                <option value="1" selected>是</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">备份时间:</label>
+                        <div class="col-md-7">
+                             <input id="backup_time" name="backup_time" type="text" value="" class="form_datetime form-control" readonly required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">备份目录:</label>
+                        <div class="col-md-7">
+                             <input type="text" id="backup_directory" name="backup_directory" value="" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">备份上传机器:</label>
+                        <div class="col-md-7">
+                            <select class="selectpicker show-tick bs-select-hidden form-control" id="backup_upload_host" name="backup_upload_host" required>
+                                <option value="0">存储机器1</option>
+                                <option value="1">存储机器2</option>
+                                <option value="2">存储机器3</option>
+                                <option value="3">存储机器4</option>
+                                <option value="4">存储机器5</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="reset" class="btn btn-default" onclick="reset_form_data()">Reset</button>
+                <button type="button" class="btn btn-primary" onclick="add_backup_task()">Add Backup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(".selectpicker").selectpicker({liveSearch: true});
+    $(".form_datetime").datetimepicker({
+        startView:1,
+        format: "hh:ii",
+        autoclose: true,
+        todayBtn: true,
+        pickerPosition: "bottom-left"
+    });
+
+    function show_backup_dialog() {
+        $("#backup_detail").modal("show");
+    }
+
+    function get_select_value() {
+        console.log(get_form_json("#backup_detail_form"))
+    }
+
+    function reset_form_data() {
+        $("#backup_detail_form")[0].reset()
+    }
+
+    function add_backup_task() {
+        var json_data = get_form_json($("#backup_detail_form"))
+        $.post("/backup/add", json_data, function (data) {
+            alert(data)
+        });
+    }
+</script>

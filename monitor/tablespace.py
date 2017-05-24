@@ -23,7 +23,7 @@ class TableInfo():
 def get_table_infos(host_info):
     table_infos = {}
     sql = "select table_schema, table_name, DATA_LENGTH, INDEX_LENGTH, TABLE_ROWS, AUTO_INCREMENT, create_time from information_schema.tables " \
-          "where table_schema != 'mysql' and table_schema != 'information_schema' and table_schema != 'performance_schema'";
+          "where table_schema != 'mysql' and table_schema != 'information_schema' and table_schema != 'performance_schema' and table_schema != 'sys'";
     for row in db_util.DBUtil().fetchall(host_info, sql):
         table_info = TableInfo()
         table_info.schema = row["table_schema"]
@@ -127,6 +127,8 @@ def convert_bytes(table_info):
     table_info.diff = get_data_length(table_info.diff)
 
 def insert_tablespace_data(host_info, table_infos):
+    if(len(table_infos) <= 0):
+        return
     value_list = []
     value_format = "({0},'{1}','{2}',{3},{4},{5},{6},{7},{8},{9},date(now()))"
     sql = "insert into mysql_web.mysql_data_size_log (host_id, `schema`, table_name, data_size, total_size, index_size, rows, auto_increment, file_size, free_size, `date`) values"
@@ -181,3 +183,4 @@ def analysis_table_data(host_info):
           "select sum(data_size), sum(index_size), sum(rows), sum(auto_increment), sum(file_size), sum(diff) from mysql_web.mysql_data_size_log" \
           "where host_id={0} group by `date`;".format(host_info.key)'''
 
+print(get_data_length(2097148))

@@ -20,14 +20,7 @@ create table host_infos
     modified_time timestamp not null default current_timestamp on update current_timestamp
 ) comment = 'mysql账户信息' ;
 
-#insert into host_infos (host, port, user, password, remark) values
-#("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"),
-#("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");
 #insert into host_infos (host, port, user, password, remark) values ("192.168.11.128", 3306, "yangcg", "yangcaogui", "Monitor");
-#host_info1 = host_info.HoseInfo("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master")
-#host_info2 = host_info.HoseInfo("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave")
-#self.__host_infos[host_info1.key] = host_info1
-#self.__host_infos[host_info2.key] = host_info2'''
 
 DROP TABLE mysql_status_log;
 CREATE TABLE mysql_status_log
@@ -191,6 +184,8 @@ CREATE TABLE mysql_web_user_info
     updated_time TIMESTAMP NOT NULL DEFAULT current_timestamp on UPDATE CURRENT_TIMESTAMP
 );
 
+insert into mysql_web_user_info (user_name, user_password) values("yangcg", md5("yangcaogui"));
+
 -- -----------------------------------------------------------
 -- 慢查询配置表
 -- -----------------------------------------------------------
@@ -311,3 +306,39 @@ CREATE TABLE `mysql_slow_query_review_history` (
   #KEY `idx_query_time_max` (`Query_time_max`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- -------------------------------------------------------------------
+
+-- ---------------------------------------------------------
+-- 备份任务计划表
+-- ---------------------------------------------------------
+CREATE TABLE backup_task
+(
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  host_id MEDIUMINT NOT NULL,
+  backup_name VARCHAR(30) NOT NULL,
+  backup_tool TINYINT NOT NULL,
+  backup_mode TINYINT NOT NULL,
+  backup_cycle VARCHAR(30) NOT NULL,
+  backup_time TIME NOT NULL,
+  backup_save_days MEDIUMINT UNSIGNED NOT NULL,
+  backup_compress TINYINT UNSIGNED NOT NULL,
+  backup_upload_host TINYINT UNSIGNED NOT NULL,
+  created_time TIMESTAMP NOT NULL DEFAULT now(),
+  updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ---------------------------------------------------------
+-- 备份任务计划日志表
+-- ---------------------------------------------------------
+CREATE TABLE backup_task
+(
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  backup_id INT NOT NULL,
+  backup_file VARCHAR(100) NOT NULL,
+  backup_size BIGINT UNSIGNED NOT NULL,
+  backup_start TIMESTAMP NOT NULL,
+  backup_stop TIMESTAMP NOT NULL,
+  backup_status TINYINT NOT NULL,
+  backup_result VARCHAR(100) NOT NULL DEFAULT '',
+  backup_compress TINYINT UNSIGNED NOT NULL,
+  created_time TIMESTAMP NOT NULL DEFAULT now()
+);

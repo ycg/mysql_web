@@ -1,3 +1,4 @@
+import os
 import base_class, host_info, collections, db_util, settings, mysql_branch, threadpool, tablespace
 
 class Cache(object):
@@ -188,7 +189,7 @@ class Cache(object):
 
     def check_mysql_server_version_and_branch(self):
         for host_info in self.__host_infos.values():
-            result = db_util.DBUtil().fetchall(host_info, "show global variables where variable_name in ('version', 'version_comment', 'datadir', 'innodb_buffer_pool_size');")
+            result = db_util.DBUtil().fetchall(host_info, "show global variables where variable_name in ('version', 'version_comment', 'datadir', 'pid_file', 'innodb_buffer_pool_size');")
             data = {}
             for row in result:
                 data[row.get("Variable_name")] = row.get("Value")
@@ -202,4 +203,6 @@ class Cache(object):
                 host_info.branch = mysql_branch.MySQLBranch.Mariadb
             else:
                 host_info.branch = mysql_branch.MySQLBranch.MySQL
-
+            host_info.mysql_pid_file = data["pid_file"]
+            if(os.path.exists(host_info.mysql_pid_file) == False):
+                host_info.mysql_pid_file = os.path.join(host_info.mysql_data_dir, host_info.mysql_pid_file)
