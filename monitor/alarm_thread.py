@@ -3,7 +3,8 @@
 #实现邮件告警，以及数据库健康检查状态的report发送
 #告警，包括CPU，内存，线程数，qps和tps等等
 
-import threading, time, cache, mail_util, enum, db_util, settings, mysql_status, base_class
+import pymysql, threading, time
+import cache, mail_util, enum, db_util, settings, mysql_status
 
 class AlarmEnum(enum.Enum):
     ReplStatus = 0
@@ -56,9 +57,17 @@ class AlarmThread(threading.Thread):
             db_util.DBUtil.fetchall(sql)
 
 @enum.unique
+class LogType(enum.Enum):
+    Processlist = 1
+    Innodb_Status = 2
+    Slave_Status = 3
+    Lock_Status = 4
+
+@enum.unique
 class ExceptionType(enum.Enum):
     Repl_Delay = 1
     Repl_Fail = 2
+    CPU = 3
 
 @enum.unique
 class ExceptionLevel(enum.Enum):
@@ -74,37 +83,54 @@ class AlarmLog(threading.Thread):
 
     def run(self):
         while(True):
-            time.sleep(settings.UPDATE_INTERVAL)
+            time.sleep(settings.LINUX_UPDATE_INTERVAL)
             cache.Cache().join_thread_pool(self.check_status)
 
     def check_status(self, host_info):
-        self.check_os_status(cache.Cache().get_linux_info(host_info.key))
-        self.check_mysql_status(cache.Cache().get_status_infos(host_info.key))
-        self.check_innodb_status(cache.Cache().get_innodb_infos(host_info.key))
-        self.check_replication_status(cache.Cache().get_repl_info(host_info.key))
+        self.check_os_status(host_info)
+        self.check_mysql_status(host_info)
+        self.check_innodb_status(host_info)
+        self.check_replication_status(host_info)
 
-    def check_os_status(self, os_info):
-        pass
+    def check_os_status(self, host_info):
+        os_info = cache.Cache().get_linux_info(host_info.key)
+        if(os_info.cpu_system > 20 or os_info.cpu_user > 80 or os_info.cpu_idle < 50):
+            self.insert_alarm_log(host_info.key, ExceptionType.CPU, ExceptionLevel.Serious, LogType.Processlist)
+            self.insert_alarm_log(host_info.key, ExceptionType.CPU, ExceptionLevel.Serious, LogType.Lock_Status)
+            self.insert_alarm_log(host_info.key, ExceptionType.CPU, ExceptionLevel.Serious, LogType.Innodb_Status)
 
-    def check_mysql_status(self, status_info):
-        pass
+    def check_mysql_status(self, host_info):
+        mysql_status = cache.Cache().get_status_infos(host_info.key)
 
-    def check_innodb_status(self, innodb_info):
-        pass
+    def check_innodb_status(self, host_info):
+        innodb_info = cache.Cache().get_innodb_infos(host_info.key)
 
-    def check_replication_status(self, repl_info):
-        pass
-        '''if(repl_info.io_status != "Yes" or repl_info.sql_status != "Yes"):
-            log_text = ""
-            result = mysql_status.get_show_slave_status(repl_info.host_info.key)
-            for key, value in result.items():
-                log_text = key + ":" + value + "\n"
-            self.insert_alarm_log(repl_info.host_info.key, ExceptionType.Repl_Fail.value, ExceptionLevel.Serious.value, log_text)'''
+    def check_replication_status(self, host_info):
+        repl_info = cache.Cache().get_repl_info(host_info.key)
+        if(host_info.is_master):
+            return
+        if(hasattr(repl_info, "master_log_pos") == False):
+            return
+        if(repl_info.io_status != "Yes" or repl_info.sql_status != "Yes"):
+            self.insert_alarm_log(host_info.key, ExceptionType.Repl_Fail, ExceptionLevel.Serious, LogType.Slave_Status)
+        if(repl_info.seconds_Behind_Master > 5):
+            self.insert_alarm_log(host_info.key, ExceptionType.Repl_Delay, ExceptionLevel.Serious, LogType.Processlist)
 
-    def insert_alarm_log(self, host_id, type, level, log_text):
+    def insert_alarm_log(self, host_id, type, level, log_type):
+        log_text = ""
+        if(log_type == LogType.Lock_Status):
+            log_text = mysql_status.get_log_text(mysql_status.get_innodb_lock_status(host_id))
+        elif(log_type == LogType.Processlist):
+            log_text = mysql_status.get_log_text(mysql_status.get_show_processlist(host_id))
+        elif(log_type == LogType.Slave_Status):
+            log_text = mysql_status.get_log_text(mysql_status.get_show_slave_status(host_id))
+        elif(log_type == LogType.Innodb_Status):
+            log_text = mysql_status.get_log_text(mysql_status.get_show_engine_innodb_status(host_id))
+        if(len(log_text) <= 0):
+            return
         conn, cur = db_util.DBUtil().get_conn_and_cur(settings.MySQL_Host)
-        cur.execute("insert into mysql_web.mysql_exception(host_id, exception_type, level) VALUES ({0}, {1}, {2});".format(host_id, type, level))
-        cur.execute("insert into mysql_web.mysql_exception_log(id, log_text) VALUES ({0}, '{1}');".format(cur.lastrowid, log_text))
+        cur.execute("insert into mysql_web.mysql_exception(host_id, exception_type, level, log_type) VALUES ({0}, {1}, {2}, {3});".format(host_id, type.value, level.value, log_type.value))
+        cur.execute("insert into mysql_web.mysql_exception_log(id, log_text) VALUES ({0}, '{1}');".format(cur.lastrowid, pymysql.escape_string(log_text)))
         db_util.DBUtil().close(conn, cur)
 
 class AlarmParameter():

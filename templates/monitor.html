@@ -152,10 +152,10 @@
                         <td>
                             {{ status.memory_free_total }}
                         </td>
-                        <td {% if(status.swap_total > 0) %} class="text-danger" {% endif %}>
+                        <td>
                             {{ status.swap_total }}
                         </td>
-                        <td {% if(status.swap_free > 0) %} class="text-danger" {% endif %}>
+                        <td>
                             {{ status.swap_free }}
                         </td>
                     </tr>
@@ -163,7 +163,7 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-5">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>

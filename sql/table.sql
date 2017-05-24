@@ -131,7 +131,8 @@ CREATE TABLE mysql_exception
 (
     id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     host_id MEDIUMINT NOT NULL,
-    exception_type tinyint unsigned not null,
+    exception_type TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    log_type TINYINT UNSIGNED NOT NULL DEFAULT 0,
     level TINYINT UNSIGNED NOT NULL,
     created_time TIMESTAMP NOT NULL DEFAULT NOW()
 ) COMMENT = 'mysql exception';
@@ -141,7 +142,7 @@ DROP TABLE mysql_exception_log;
 CREATE TABLE mysql_exception_log
 (
     id INT UNSIGNED NOT NULL PRIMARY KEY,
-    log_text TEXT NOT NULL DEFAULT ''
+    log_text MEDIUMTEXT NOT NULL
 ) COMMENT = 'mysql exception log';
 
 #慢日志和查询日志pt工具对应的表配置

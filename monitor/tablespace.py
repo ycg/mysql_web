@@ -182,5 +182,3 @@ def analysis_table_data(host_info):
     sql = "insert into mysql_web.mysql_data_size_for_day (host_id, data_size_incr)" \
           "select sum(data_size), sum(index_size), sum(rows), sum(auto_increment), sum(file_size), sum(diff) from mysql_web.mysql_data_size_log" \
           "where host_id={0} group by `date`;".format(host_info.key)'''
-
-print(get_data_length(2097148))

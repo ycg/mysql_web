@@ -1,7 +1,7 @@
 import db_util, cache
 
 def get_show_processlist(host_id):
-    return get_mysql_status_fetchall(host_id, "show full processlist;")
+    return get_mysql_status_fetchall(host_id, "SELECT * FROM information_schema.processlist where COMMAND != 'Sleep';")
 
 def get_show_slave_status(host_id):
     return get_mysql_status_fetchone(host_id, "show slave status;")
@@ -46,6 +46,20 @@ def get_mysql_status_fetchone(host_id, sql):
 def get_mysql_status_fetchall(host_id, sql):
     return db_util.DBUtil().fetchone(cache.Cache().get_host_info(host_id), sql)
 
+def get_log_text(result):
+    number = 0
+    log_list = []
+    if(isinstance(result, list)):
+        for value_dict in result:
+            number += 1
+            log_list.append("*************************** {0}. row ***************************\n".format(number))
+            append_log_list(value_dict, log_list)
+    elif(isinstance(result, dict)):
+        append_log_list(result, log_list)
+    if(len(log_list) > 0):
+        return "".join(log_list)
+    return ""
 
-
-
+def append_log_list(value_dict, log_list):
+    for key, value in value_dict.items():
+        log_list.append("{0}: {1}\n".format(key, value))
