@@ -29,6 +29,7 @@ import os, paramiko, argparse, sys, time
 #5.脚本示例
 #python mysql_auto_install.py --host=192.168.11.129 --version=5.6 --package=/opt/mysql-5.6.tar.gz
 #--host：需要安装的主机ip
+#--port：指定mysql端口，多实例安装需要用到
 #--version：安装包的版本
 #--package：安装包路径
 #--data-dir：指定数据存储目录
@@ -36,8 +37,8 @@ import os, paramiko, argparse, sys, time
 
 error = "error"
 output = "output"
-data_dir = "/mysql_data"
-binlog_dir = "/mysql_binlog"
+data_dir = "/mysql/data"
+binlog_dir = "/mysql/binlog"
 base_dir = "/usr/local/mysql"
 
 def check_arguments():
@@ -50,6 +51,7 @@ def check_arguments():
     parser.add_argument("--base-dir", type=str, dest="base_dir", help="mysql base dir", default=base_dir)
     parser.add_argument("--binlog-dir", type=str, dest="binlog_dir", help="mysql bin log dir", default=binlog_dir)
     parser.add_argument("--package", type=str, dest="package", help="mysql install package path")
+    parser.add_argument("--gtid", type=int, dest="gtid", help="binlog use gtid mode", default=0)
     args = parser.parse_args()
 
     if not args.host or not args.version:
@@ -78,15 +80,16 @@ def mysql_install(args):
     execute_remote_shell(host_client, "rm -rf {0}".format(base_dir))
     execute_remote_shell(host_client, "rm -rf {0}".format(data_dir))
     execute_remote_shell(host_client, "rm -rf {0}".format(binlog_dir))
-    execute_remote_shell(host_client, "mkdir {0}".format(base_dir))
-    execute_remote_shell(host_client, "mkdir {0}".format(data_dir))
-    execute_remote_shell(host_client, "mkdir {0}".format(binlog_dir))
+    execute_remote_shell(host_client, "mkdir -p {0}".format(base_dir))
+    execute_remote_shell(host_client, "mkdir -p {0}".format(data_dir))
+    execute_remote_shell(host_client, "mkdir -p {0}".format(binlog_dir))
 
     #生成配置文件并同步到远程机器
     print("\n--------------------------2.geneate mysql config-------------------------------")
     server_id = get_server_id(host_client, args)
-    buffer_pool_size , buffer_pool_instance = get_mysql_buffer_pool_size(host_client)
+    buffer_pool_size, buffer_pool_instance = get_mysql_buffer_pool_size(host_client)
     config_value = mysql_config.format(server_id, args.port, base_dir, data_dir, buffer_pool_size, buffer_pool_instance, binlog_dir)
+    config_value = check_use_gtid_mode(args, config_value)
     write_mysql_conf_to_file(args, config_value)
 
     #拷贝二进制包和解压
@@ -133,6 +136,11 @@ def get_server_id(host_client, args):
     result = execute_remote_shell(host_client, "ip addr | grep inet | grep -v 127.0.0.1 | grep -v inet6 "
                                                "| awk \'{ print $2}\' | awk -F \"/\" \'{print $1}\' | awk -F \".\" \'{print $4}\'")
     return args.port + result[output][0].replace("\n", "")
+
+def check_use_gtid_mode(args, config_value):
+    if(args.gtid == 1):
+        config_value = config_value + "\n" + gtid_config
+    return config_value
 
 def check_mysqld_pid_is_exists(host_client):
     number = 1
@@ -229,8 +237,8 @@ innodb_buffer_pool_instances = {5}
 innodb_buffer_pool_load_at_startup = 1
 innodb_buffer_pool_dump_at_shutdown = 1
 innodb_lru_scan_depth = 2000
-#innodb_file_format = Barracuda
-#innodb_file_format_max = Barracuda
+innodb_file_format = Barracuda
+innodb_file_format_max = Barracuda
 innodb_purge_threads = 8
 innodb_large_prefix = 1
 innodb_thread_concurrency = 0
@@ -259,14 +267,12 @@ master_info_repository = TABLE
 relay_log_info_repository = TABLE
 relay_log_recovery = ON
 log_slave_updates = 1
-#gtid
-#gtid_mode = ON
-#enforce_gtid_consistency = ON
+slave_max_allowed_packet = 1G
 
 #slow_log
 slow_query_log = 1
 long_query_time = 2
-log_output = TABLE
+log_output = FILE
 slow_query_log_file = slow.log
 log_queries_not_using_indexes = 1
 log_throttle_queries_not_using_indexes = 30
@@ -274,12 +280,12 @@ log_slow_admin_statements = 1
 log_slow_slave_statements = 1
 
 #thread buffer size
-tmp_table_size = 10M
-max_heap_table_size = 10M
+tmp_table_size = 256M
+max_heap_table_size = 256M
 sort_buffer_size = 128K
 join_buffer_size = 128K
 read_buffer_size = 512K
-read_rnd_buffer_size = 1M
+read_rnd_buffer_size = 512K
 key_buffer_size = 10M
 
 #other
@@ -307,6 +313,10 @@ wait_timeout = 300
 interactive_timeout = 300
 connect_timeout = 20
 """)
+
+gtid_config = """
+gtid_mode = ON
+enforce_gtid_consistency = ON"""
 
 if(__name__ == "__main__"):
     mysql_install(check_arguments())

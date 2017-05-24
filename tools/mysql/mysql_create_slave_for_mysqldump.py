@@ -1,31 +1,30 @@
 # -*- coding: utf-8 -*-
 
-import pymysql, time, argparse, sys, random, string, commands
+import pymysql, time, argparse, sys, commands, os
 
 '''
-#自动创建从库
-#一丶mysqldump创建
-    1.首先从主库进行备份，备份在本地
-    2.然后导入到从库
+grant replication slave on *.* to 'sys_repl'@'%' identified by 'yangcaogui';
 
-#二丶xtrabackup备份
-    1.首先检测有没有安装
-    2.slave机器进行备份
-    3.把安装包同步到本地机器
-    4.数据库恢复
-    5.启动
-
-可能有的问题：
-1.xtrabackup --远程备份问题
-2.大数据库备份问题
-3.是否是gtid操作
-
-python mysql_auto_create_slave.py --host=192.168.11.130 --user=yangcg --password=yangcaogui \
---master-host=192.168.11.129 --master-user=yangcg --master-password=yangcaogui \
---base-dir=/usr/local/mysql --charset=utf8 --repl-user=sys_repl --repl-password=yangcaogui
+python mysql_create_slave_for_mysqldump.py
+--host=192.168.11.130 --user=yangcg --password=yangcaogui --port=3306 \
+--master-host=192.168.11.129 --master-user=yangcg --master-password=yangcaogui --prot=3306
+--repl-user=sys_repl --repl-password=yangcaogui
 '''
 
-import os
+#参数详解
+#--host：从库地址
+#--port：从库端口
+#--user：从库用于执行sql的用户
+#--password：从库用户密码
+
+#--master-host
+#--master-port
+#--master-user
+#--master-password
+
+#--base-dir：mysql命令路径
+#--charset：设置字符集
+#--repl-mode：binlog模式[1-POS] or [2-GTID]
 
 def check_arguments():
     parser = argparse.ArgumentParser()
@@ -38,16 +37,17 @@ def check_arguments():
     parser.add_argument("--master-user", type=str, dest="master_user", help="mysql master user")
     parser.add_argument("--master-password", type=str, dest="master_password", help="mysql master password")
 
-    parser.add_argument("--base-dir", type=str, dest="base_dir", help="mysql base dir", default="/usr/local/mysql/")
-    parser.add_argument("--charset", type=str, dest="charset", help="mysql charset", default="utf8")
+    parser.add_argument("--base-dir", type=str, dest="base_dir", help="mysql base dir", default="/usr/local/mysql/bin")
+    parser.add_argument("--charset", type=str, dest="charset", help="mysql charset", default="utf8mb4")
     parser.add_argument("--mysqldump-path", type=str, dest="mysqldump_path", help="mysql dump path", default="/opt/master_data.sql")
-    parser.add_argument("--repl-user", type=str, dest="repl_user", help="mysql replication user name", default="sys_repl_"+get_password(2))
-    parser.add_argument("--repl-password", type=str, dest="repl_password", help="mysql replication user password", default=get_password(10))
+    parser.add_argument("--repl-user", type=str, dest="repl_user", help="mysql replication user name")
+    parser.add_argument("--repl-password", type=str, dest="repl_password", help="mysql replication user password")
     parser.add_argument("--repl-mode", type=int, dest="repl_mode", help="mysql replication mode [1-POS] or [2-GTID]", default=1)
     args = parser.parse_args()
 
     if not args.host or not args.port or not args.user or not args.password or \
-       not args.master_host or not args.master_port or not args.master_user or not args.master_password:
+       not args.master_host or not args.master_port or not args.master_user or not args.master_password or \
+       not args.repl_user or not args.repl_password:
         sys.exit(1)
     return args
 
@@ -55,8 +55,10 @@ def check_accout_is_ok(args):
     execute_sql_for_slave(args, "select 2;")
     execute_sql_for_master(args, "select 1;")
 
-def create_slave_for_mysqldump(args):
+def create_slave(args):
     check_accout_is_ok(args)
+    os.system("PATH=$PATH:{0}".format(args.base_dir))
+
     #1.创建备份
     print("\n-------------------------------1.create mysqldump data-------------------------------------")
     execute_sql_for_slave(args, "stop slave;")
@@ -71,40 +73,15 @@ def create_slave_for_mysqldump(args):
     os.system("mysql -h{0} -u{1} -p{2} -P{3} --max-allowed-packet=1G --default-character-set={4} < {5}"
               .format(args.host, args.user, args.password, args.port, args.charset, args.mysqldump_path))
 
-    #3.创建用户，如果没有指定用户，则自动创建用户-先要监测用户时候存在，如果存在则不创建
-    print("\n-------------------------------3.create replication user-----------------------------------")
-    create_replication_user(args)
-
     #4.进行change master操作
-    print("\n-------------------------------4.change master operation-----------------------------------")
+    print("\n-------------------------------3.change master operation-----------------------------------")
     change_master(args)
 
     #5.监测从库状态是否正确，如果没有异常，则创建从库成功
-    print("\n-------------------------------5.check slave status is ok----------------------------------")
+    print("\n-------------------------------4.check slave status is ok----------------------------------")
     check_slave_is_ok(args)
 
-    print("\n-------------------------------6.create slave is ok----------------------------------------")
-
-def create_slave_for_xtrabackup(args):
-    #1.全量备份
-    shell = "innobackupex --defaults-file={0} --no-timestamp " \
-            "--host={1} --user={2} --password='{3}' --port={4} /slave_bak/" \
-            .format("/etc/my.cnf", args.master_host, args.master_user, args.master_password, args.master_port)
-
-    #2.scp数据拷贝到目标机器
-    shell = "scp /slave_bak/ root@{0}:/slave_bak/".format(args.host)
-
-    #3.在目标机器进行恢复操作
-    shell = "innobackupex  --defaults-file=/etc/my.cnf  --apply-log --use-momery=2G /slave_bak/"
-
-    #4.拷贝数据到目标目录，如果不想改，需要修改配置文件数据目录路径
-    shell = "mv /slave_bak/ /mysql_data/"
-
-    #5.启动数据库
-    shell = "mysqld --defaults-file=/etc/my.cnf &"
-
-    #6.change master操作，需要分为POS和GTID设置
-    pass
+    print("\n-------------------------------5.create slave is ok----------------------------------------")
 
 def change_master(args):
     if(args.repl_mode == 1):
@@ -123,16 +100,14 @@ def check_slave_is_ok(args):
     number = 1
     while(number <= 5):
         result = execute_sql_for_slave(args, "show slave status;")
-        if(result[0]["Slave_IO_Running"] != "Yes" or result[0]["Slave_SQL_Running"] != "Yes"):
+        if(len(result) > 0):
+            result = result[0]
+        if(result["Slave_IO_Running"] != "Yes" or result["Slave_SQL_Running"] != "Yes"):
             print(result["Last_Error"])
         else:
             print("IO Thread: Yes | SQL Thread: Yes")
         number = number + 1
         time.sleep(1)
-
-def create_replication_user(args):
-    execute_sql_for_master(args, "grant replication slave, replication client on *.* to {0}@'%' identified by '{1}';".format(args.repl_user, args.repl_password))
-    execute_sql_for_master(args, "flush privileges;")
 
 def execute_sql_for_slave(args, sql):
     return execute_sql(args.host, args.port, args.user, args.password, args.charset, sql)
@@ -144,7 +119,6 @@ def execute_sql(host, port, user, password, charset, sql):
     cursor = None
     connection = None
     try:
-        print(host, port, user, password, charset, sql)
         connection = pymysql.connect(host=host, port=port, user=user, password=password, charset=charset, cursorclass=pymysql.cursors.DictCursor)
         cursor = connection.cursor()
         cursor.execute(sql)
@@ -155,19 +129,5 @@ def execute_sql(host, port, user, password, charset, sql):
         if(connection != None):
             connection.close()
 
-def get_password(length):
-    #随机出数字的个数
-    numOfNum = random.randint(1,length-1)
-    numOfLetter = length - numOfNum
-    #选中numOfNum个数字
-    slcNum = [random.choice(string.digits) for i in range(numOfNum)]
-    #选中numOfLetter个字母
-    slcLetter = [random.choice(string.ascii_letters) for i in range(numOfLetter)]
-    #打乱这个组合
-    slcChar = slcNum + slcLetter
-    random.shuffle(slcChar)
-    #生成密码
-    password = ''.join([i for i in slcChar])
-    return password
-
-create_slave_for_mysqldump(check_arguments())
+if(__name__ == "__main__"):
+    create_slave(check_arguments())
