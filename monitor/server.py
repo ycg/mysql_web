@@ -267,15 +267,18 @@ class MonitorServer(threading.Thread):
 
             repl_info.rpl_semi_sync_master_net_waits = int(mysql_status_new["Rpl_semi_sync_master_net_waits"])
             repl_info.rpl_semi_sync_master_net_wait_time = int(mysql_status_new["Rpl_semi_sync_master_net_wait_time"]) - int(mysql_status_old["Rpl_semi_sync_master_net_wait_time"])
-            repl_info.rpl_semi_sync_master_net_avg_wait_time = int(mysql_status_new["Rpl_semi_sync_master_net_avg_wait_time"]) - int(mysql_status_old["Rpl_semi_sync_master_net_avg_wait_time"])
+            repl_info.rpl_semi_sync_master_net_avg_wait_time = int(mysql_status_new["Rpl_semi_sync_master_net_avg_wait_time"])
 
             repl_info.rpl_semi_sync_master_tx_waits = int(mysql_status_new["Rpl_semi_sync_master_tx_waits"])
             repl_info.rpl_semi_sync_master_tx_wait_time = int(mysql_status_new["Rpl_semi_sync_master_tx_wait_time"]) - int(mysql_status_old["Rpl_semi_sync_master_tx_wait_time"])
-            repl_info.rpl_semi_sync_master_tx_avg_wait_time = int(mysql_status_new["Rpl_semi_sync_master_tx_avg_wait_time"]) - int(mysql_status_old["Rpl_semi_sync_master_tx_avg_wait_time"])
+            repl_info.rpl_semi_sync_master_tx_avg_wait_time = int(mysql_status_new["Rpl_semi_sync_master_tx_avg_wait_time"])
 
+            #主库收到正常确认以及超时未成功确认的事务个数
             repl_info.rpl_semi_sync_master_no_tx = int(mysql_status_new["Rpl_semi_sync_master_no_tx"])
             repl_info.rpl_semi_sync_master_yes_tx = int(mysql_status_new["Rpl_semi_sync_master_yes_tx"])
             repl_info.rpl_semi_sync_master_no_times = int(mysql_status_new["Rpl_semi_sync_master_no_times"])
+
+            repl_info.rpl_semi_sync_master_wait_sessions = int(mysql_status_new["Rpl_semi_sync_master_wait_sessions"])
         else:
             repl_info.rpl_semi_sync = 0
 

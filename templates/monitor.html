@@ -1146,16 +1146,16 @@
                         SQL
                     </th>
                     <th>
-                        Log
+                        M_Log
                     </th>
                     <th>
-                        Log_Pos
+                        M_Log_Pos
                     </th>
                     <th>
-                        Log
+                        S_Log
                     </th>
                     <th>
-                        Log_Pos
+                        S_Log_Pos
                     </th>
                     <th>
                         Retrieved_GTID
@@ -1207,10 +1207,10 @@
                             <td>
                                 {{ status.slave_execute_gtid_set }}
                             </td>
-                            <td {% if(status.delay_pos_count > 10000) %} class="text-danger" {% endif %}>
+                            <td class="text-center" {% if(status.delay_pos_count > 10000) %} class="text-danger text-center" {% endif %}>
                                 {{ status.delay_pos_count }}
                             </td>
-                            <td {% if(status.seconds_Behind_Master > 0) %} class="text-danger" {% endif %}>
+                            <td class="text-center" {% if(status.seconds_Behind_Master > 0) %} class="text-danger text-center" {% endif %}>
                                 {{ status.seconds_Behind_Master }}
                             </td>
                             <td>
@@ -1231,7 +1231,7 @@
                 <tr>
                     <th>
                     </th>
-                    <th colspan="11" rowspan="1" class="text-center">
+                    <th colspan="12" rowspan="1" class="text-center">
                         Replication Semi Sync
                     </th>
                 </tr>
@@ -1272,6 +1272,9 @@
                     <th>
                         Net_Avg_Wait_Time
                     </th>
+                    <th>
+                        Wait_Sessions
+                    </th>
                 </tr>
             </thead>
             <tbody class="text-center">
@@ -1281,25 +1284,25 @@
                             <td class="text-left">
                                 {{ status.host_info.remark }}
                             </td>
-                            <td>
+                            <td class="text-success">
                                 {{ status.rpl_semi_sync_master_status }}
                             </td>
                             <td>
                                 {{ status.rpl_semi_sync_master_clients }}
                             </td>
-                            <td>
+                            <td class="text-success">
                                 {{ status.rpl_semi_sync_slave_status }}
                             </td>
                             <td>
                                 {{ status.rpl_semi_sync_master_yes_tx }}
                             </td>
-                            <td>
+                            <td {% if(status.rpl_semi_sync_master_no_tx > 0) %} class="text-danger" {% endif %}>
                                 {{ status.rpl_semi_sync_master_no_tx }}
                             </td>
                             <td>
                                 {{ status.rpl_semi_sync_master_tx_waits }}
                             </td>
-                            <td>
+                            <td {% if(status.rpl_semi_sync_master_tx_wait_time > 0) %} class="text-danger" {% endif %}>
                                 {{ status.rpl_semi_sync_master_tx_wait_time }}
                             </td>
                             <td>
@@ -1308,11 +1311,14 @@
                             <td>
                                 {{ status.rpl_semi_sync_master_net_waits }}
                             </td>
-                            <td>
+                            <td {% if(status.rpl_semi_sync_master_net_wait_time > 0) %} class="text-danger" {% endif %}>
                                 {{ status.rpl_semi_sync_master_net_wait_time }}
                             </td>
                             <td>
                                 {{ status.rpl_semi_sync_master_net_avg_wait_time }}
+                            </td>
+                            <td {% if(status.rpl_semi_sync_master_wait_sessions > 0) %} class="text-danger" {% endif %}>
+                                {{ status.rpl_semi_sync_master_wait_sessions }}
                             </td>
                         </tr>
                     {% endif %}

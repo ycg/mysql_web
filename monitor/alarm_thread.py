@@ -4,7 +4,7 @@
 #告警，包括CPU，内存，线程数，qps和tps等等
 
 import pymysql, threading, time
-import cache, mail_util, enum, db_util, settings, mysql_status
+import cache, mail_util, enum, db_util, settings, mysql_status, base_class
 
 class AlarmEnum(enum.Enum):
     ReplStatus = 0
@@ -67,7 +67,7 @@ class LogType(enum.Enum):
 class ExceptionType(enum.Enum):
     Repl_Delay = 1
     Repl_Fail = 2
-    CPU = 3
+    CPU_High = 3
     Thread = 4
 
 @enum.unique
@@ -136,6 +136,29 @@ class AlarmLog(threading.Thread):
         cur.execute("insert into mysql_web.mysql_exception(host_id, exception_type, level, log_type) VALUES ({0}, {1}, {2}, {3});".format(host_id, type.value, level.value, log_type.value))
         cur.execute("insert into mysql_web.mysql_exception_log(id, log_text) VALUES ({0}, '{1}');".format(cur.lastrowid, pymysql.escape_string(log_text)))
         db_util.DBUtil().close(conn, cur)
+
+def get_execption_logs(query_parameters):
+    sql = """select t1.id, t1.host_id, t3.remark, exception_type, log_type, level, t1.created_time
+             from mysql_web.mysql_exception t1
+             left join mysql_web.mysql_exception_log t2 on t1.id = t2.id
+             left join mysql_web.host_infos t3 on t1.host_id = t3.host_id
+             order by t1.id desc limit 20;"""
+
+    result_list = []
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
+        info = base_class.BaseClass(None)
+        info.id = row["id"]
+        info.host_id = row["host_id"]
+        info.remark = row["remark"]
+        info.exception_type = ((ExceptionType)(row["exception_type"])).name
+        info.log_type = ((LogType)(row["log_type"])).name
+        info.level = ((ExceptionLevel)(row["level"])).name
+        info.created_time = row["created_time"]
+        result_list.append(info)
+    return result_list
+
+def get_exception_log_text(log_id):
+    sql = "select * from mysql_web.mysql_exception_log where id = {0};".format(log_id)
 
 class AlarmParameter():
     #status

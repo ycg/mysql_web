@@ -1,0 +1,58 @@
+{% if(mysql_logs != None) %}
+    <table class="table table-hover table-bordered">
+        <thead>
+        <tr>
+            <th colspan="5" rowspan="1" class="text-center">
+                MySQL Log
+            </th>
+            <th>
+
+            </th>
+        </tr>
+        <tr>
+            <th>
+                Host
+            </th>
+            <th>
+                Problem
+            </th>
+            <th>
+                Type
+            </th>
+            <th>
+                Level
+            </th>
+            <th>
+                Created_Time
+            </th>
+            <th>
+
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for status in mysql_logs %}
+            <tr>
+                <td>
+                    {{ status.remark }}
+                </td>
+                <td>
+                    {{ status.exception_type }}
+                </td>
+                <td>
+                    {{ status.log_type }}
+                </td>
+                <td>
+                    {{ status.level }}
+                </td>
+                <td>
+                    {{ status.created_time }}
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-primary btn-xs">Detail</button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

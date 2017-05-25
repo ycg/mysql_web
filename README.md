@@ -5,7 +5,7 @@ mysql monitor web</br>
 2.安装MySQL数据库</br>
 3.如果要监控OS，需要设置ssh免密码登录</br>
 4.安装如下依赖包</br>
-    &nbsp;&nbsp;执行install.sh脚本
+    &nbsp;&nbsp;执行install.sh脚本</br>
 5.在setting.py设置MySQL_Host相关账户信息</br>
     &nbsp;&nbsp;MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")</br>
 6.导入sql/table.sql的SQL脚本</br>
