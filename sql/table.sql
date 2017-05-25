@@ -201,13 +201,16 @@ CREATE TABLE `mysql_slow_query_review` (
   `reviewed_on` datetime DEFAULT NULL,
   `reviewed_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   `is_reviewed` TINYINT NOT NULL DEFAULT 0,
+  `created_time` TIMESTAMP NOT NULL DEFAULT NOW(),
+  `modified_time` TIMESTAMP NOT NULL DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP,
   `comments` text,
-  PRIMARY KEY (`checksum`),
-  KEY `idx_last_seen` (`last_seen`) USING BTREE
+  PRIMARY KEY (`checksum`)
+  #KEY `idx_last_seen` (`last_seen`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `mysql_slow_query_review_history`;
 CREATE TABLE `mysql_slow_query_review_history` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `serverid_max` smallint(4) NOT NULL DEFAULT '0',
   `db_max` varchar(30) DEFAULT NULL,
   `user_max` varchar(30) DEFAULT NULL,
@@ -302,7 +305,10 @@ CREATE TABLE `mysql_slow_query_review_history` (
   `Filesort_sum` float DEFAULT NULL,
   `Filesort_on_disk_cnt` float DEFAULT NULL,
   `Filesort_on_disk_sum` float DEFAULT NULL,
-  PRIMARY KEY (`checksum`,`ts_min`,`ts_max`)
+  `created_time` TIMESTAMP NOT NULL DEFAULT NOW(),
+  `modified_time` TIMESTAMP NOT NULL DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP,
+  KEY `idx_checksum` (`checksum`)
+  #PRIMARY KEY (`checksum`,`ts_min`,`ts_max`)
   #KEY `idx_serverid_max` (`serverid_max`) USING BTREE,
   #KEY `idx_query_time_max` (`Query_time_max`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

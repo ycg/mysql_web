@@ -34,9 +34,13 @@ import os, paramiko, argparse, sys, time
 #--package：安装包路径
 #--data-dir：指定数据存储目录
 #--binlog-dir：指定binlog存储目录
+#--gtid：是否使用gtid模式
+#--semi-sync：是否使用半同步模式来保证数据的一致性
 
 error = "error"
 output = "output"
+mysql_5_6 = "5.6"
+mysql_5_7 = "5.7"
 data_dir = "/mysql/data"
 binlog_dir = "/mysql/binlog"
 base_dir = "/usr/local/mysql"
@@ -46,12 +50,13 @@ def check_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, dest="host", help="mysql host")
     parser.add_argument("--port", type=str, dest="port", help="mysql port", default="3306")
-    parser.add_argument("--version", type=str, dest="version", help="mysql version", default="5.6")
+    parser.add_argument("--version", type=str, dest="version", help="mysql version", default=mysql_5_6)
     parser.add_argument("--data-dir", type=str, dest="data_dir", help="mysql data dir", default=data_dir)
     parser.add_argument("--base-dir", type=str, dest="base_dir", help="mysql base dir", default=base_dir)
     parser.add_argument("--binlog-dir", type=str, dest="binlog_dir", help="mysql bin log dir", default=binlog_dir)
     parser.add_argument("--package", type=str, dest="package", help="mysql install package path")
     parser.add_argument("--gtid", type=int, dest="gtid", help="binlog use gtid mode", default=0)
+    parser.add_argument("--semi-sync", type=int, dest="semi_sync", help="repl semi sync mode", default=0)
     args = parser.parse_args()
 
     if not args.host or not args.version:
@@ -90,6 +95,7 @@ def mysql_install(args):
     buffer_pool_size, buffer_pool_instance = get_mysql_buffer_pool_size(host_client)
     config_value = mysql_config.format(server_id, args.port, base_dir, data_dir, buffer_pool_size, buffer_pool_instance, binlog_dir)
     config_value = check_use_gtid_mode(args, config_value)
+    config_value = check_use_repl_semi_sync(args, config_value)
     write_mysql_conf_to_file(args, config_value)
 
     #拷贝二进制包和解压
@@ -105,7 +111,7 @@ def mysql_install(args):
 
     #初始化数据和启动mysql
     print("\n--------------------------4.init mysql data------------------------------------")
-    if(args.version == "5.6"):
+    if(args.version == mysql_5_6):
         execute_remote_shell(host_client, "yum install -y perl-Module-Install.noarch")
         execute_remote_shell(host_client, "{0}/scripts/mysql_install_db --defaults-file=/etc/my.cnf --basedir={1}".format(base_dir, base_dir))
     else:
@@ -142,6 +148,13 @@ def check_use_gtid_mode(args, config_value):
         config_value = config_value + "\n" + gtid_config
     return config_value
 
+def check_use_repl_semi_sync(args, config_value):
+    if(args.semi_sync == 1):
+        config_value = config_value + "\n" + rpl_semi_sync_config
+        if(args.version == mysql_5_7):
+            config_value = config_value + "\n" + "rpl_semi_sync_master_wait_point=AFTER_SYNC"
+    return config_value
+
 def check_mysqld_pid_is_exists(host_client):
     number = 1
     while(number <= 10):
@@ -153,8 +166,8 @@ def check_mysqld_pid_is_exists(host_client):
                 return True
             else:
                 print("mysqld init pid is exists.")
-        time.sleep(0.5)
-        number = number + 1
+        time.sleep(1)
+        number += 1
     return True
 
 def get_mysql_buffer_pool_size(host_client):
@@ -194,6 +207,8 @@ def execute_remote_shell(host_client, shell):
     except:
         host_client.close()
     return result
+
+#region mysql config
 
 mysql_config = ("""
 [client]
@@ -268,6 +283,7 @@ relay_log_info_repository = TABLE
 relay_log_recovery = ON
 log_slave_updates = 1
 slave_max_allowed_packet = 1G
+plugin_load = "rpl_semi_sync_master=semisync_master.so;rpl_semi_sync_slave=semisync_slave.so"
 
 #slow_log
 slow_query_log = 1
@@ -317,6 +333,20 @@ connect_timeout = 20
 gtid_config = """
 gtid_mode = ON
 enforce_gtid_consistency = ON"""
+
+rpl_semi_sync_config = """
+#master
+rpl_semi_sync_master_enabled = 0
+rpl_semi_sync_master_timeout = 999999999
+rpl_semi_sync_master_trace_level = 32
+rpl_semi_sync_master_wait_no_slave = ON
+rpl_semi_sync_master_wait_for_slave_count = 1
+#slave
+rpl_semi_sync_slave_enabled = 0
+rpl_semi_sync_slave_trace_level = 32
+"""
+
+#endregion
 
 if(__name__ == "__main__"):
     mysql_install(check_arguments())

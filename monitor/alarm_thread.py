@@ -68,6 +68,7 @@ class ExceptionType(enum.Enum):
     Repl_Delay = 1
     Repl_Fail = 2
     CPU = 3
+    Thread = 4
 
 @enum.unique
 class ExceptionLevel(enum.Enum):
@@ -101,6 +102,9 @@ class AlarmLog(threading.Thread):
 
     def check_mysql_status(self, host_info):
         mysql_status = cache.Cache().get_status_infos(host_info.key)
+        if(mysql_status.threads_run_count > 10):
+            self.insert_alarm_log(host_info.key, ExceptionType.Thread, ExceptionLevel.Serious, LogType.Processlist)
+            self.insert_alarm_log(host_info.key, ExceptionType.Thread, ExceptionLevel.Serious, LogType.Lock_Status)
 
     def check_innodb_status(self, host_info):
         innodb_info = cache.Cache().get_innodb_infos(host_info.key)

@@ -1108,120 +1108,219 @@
 {% endif %}
 
 {% if(data_repl != None) %}
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th>
-
-            </th>
-            <th colspan="2" rowspan="1" class="text-center">
-                Slave Status
-            </th>
-            <th colspan="2" rowspan="1" class="text-center">
-                Master Log
-            </th>
-            <th colspan="2" rowspan="1" class="text-center">
-                Slave Log
-            </th>
-            <th colspan="2" rowspan="1" class="text-center">
-                GTID
-            </th>
-            <th colspan="3" rowspan="1" class="text-center">
-                Pos Delay
-            </th>
-            <th>
-
-            </th>
-        </tr>
-        <tr>
-            <th>
-                Host
-            </th>
-            <th>
-                IO
-            </th>
-            <th>
-                SQL
-            </th>
-            <th>
-                M_Log
-            </th>
-            <th>
-                M_Log_Pos
-            </th>
-            <th>
-                S_Log
-            </th>
-            <th>
-                S_Log_Pos
-            </th>
-            <th>
-                Retrieved_GTID
-            </th>
-            <th>
-                Executed_GTID
-            </th>
-            <th>
-                Delay_Pos
-            </th>
-            <th>
-                Seconds_Behind
-            </th>
-            <th>
-                Error_Msg
-            </th>
-            <th>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for status in data_repl %}
-            {% if(status.is_slave == 1) %}
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered table-hover">
+            <thead>
                 <tr>
-                    <td>
-                        {{ status.host_info.remark }}
-                    </td>
-                    <td {% if(status.io_status != "Yes") %} class="text-danger" {% endif %}>
-                        {{ status.io_status }}
-                    </td>
-                    <td {% if(status.sql_status != "Yes") %} class="text-danger" {% endif %}>
-                        {{ status.sql_status }}
-                    </td>
-                    <td>
-                        {{ status.master_log_file }}
-                    </td>
-                    <td>
-                        {{ status.master_log_pos }}
-                    </td>
-                    <td>
-                        {{ status.slave_log_file }}
-                    </td>
-                    <td>
-                        {{ status.slave_log_pos }}
-                    </td>
-                    <td>
-                        {{ status.slave_retrieved_gtid_set }}
-                    </td>
-                    <td>
-                        {{ status.slave_execute_gtid_set }}
-                    </td>
-                    <td {% if(status.delay_pos_count > 10000) %} class="text-danger" {% endif %}>
-                        {{ status.delay_pos_count }}
-                    </td>
-                    <td {% if(status.seconds_Behind_Master > 0) %} class="text-danger" {% endif %}>
-                        {{ status.seconds_Behind_Master }}
-                    </td>
-                    <td>
-                        {{ status.error_message }}
-                    </td>
-                    <td class="text-center">
-                        <a href="javascript:void(0)" onclick=start("/replication/{{ status.host_info.key }}","repl")>Details</a>
-                    </td>
+                    <th>
+
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Slave Status
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Master Log
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Slave Log
+                    </th>
+                    <th colspan="2" rowspan="1" class="text-center">
+                        GTID
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        Delay
+                    </th>
+                    <th>
+
+                    </th>
                 </tr>
-            {% endif %}
-        {% endfor %}
-    </tbody>
-</table>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        IO
+                    </th>
+                    <th>
+                        SQL
+                    </th>
+                    <th>
+                        Log
+                    </th>
+                    <th>
+                        Log_Pos
+                    </th>
+                    <th>
+                        Log
+                    </th>
+                    <th>
+                        Log_Pos
+                    </th>
+                    <th>
+                        Retrieved_GTID
+                    </th>
+                    <th>
+                        Executed_GTID
+                    </th>
+                    <th>
+                        Pos
+                    </th>
+                    <th>
+                        Seconds
+                    </th>
+                    <th>
+                        Error
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_repl %}
+                    {% if(status.is_slave == 1) %}
+                        <tr>
+                            <td>
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td {% if(status.io_status != "Yes") %} class="text-danger" {% endif %}>
+                                {{ status.io_status }}
+                            </td>
+                            <td {% if(status.sql_status != "Yes") %} class="text-danger" {% endif %}>
+                                {{ status.sql_status }}
+                            </td>
+                            <td>
+                                {{ status.master_log_file }}
+                            </td>
+                            <td>
+                                {{ status.master_log_pos }}
+                            </td>
+                            <td>
+                                {{ status.slave_log_file }}
+                            </td>
+                            <td>
+                                {{ status.slave_log_pos }}
+                            </td>
+                            <td>
+                                {{ status.slave_retrieved_gtid_set }}
+                            </td>
+                            <td>
+                                {{ status.slave_execute_gtid_set }}
+                            </td>
+                            <td {% if(status.delay_pos_count > 10000) %} class="text-danger" {% endif %}>
+                                {{ status.delay_pos_count }}
+                            </td>
+                            <td {% if(status.seconds_Behind_Master > 0) %} class="text-danger" {% endif %}>
+                                {{ status.seconds_Behind_Master }}
+                            </td>
+                            <td>
+                                {{ status.error_message }}
+                            </td>
+                            <td class="text-center">
+                                <a href="javascript:void(0)" onclick=start("/replication/{{ status.host_info.key }}","repl")>Details</a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-12">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                    </th>
+                    <th colspan="11" rowspan="1" class="text-center">
+                        Replication Semi Sync
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        Master_Status
+                    </th>
+                    <th>
+                        Master_Clients
+                    </th>
+                    <th>
+                        Slave_Status
+                    </th>
+                    <th>
+                        Master_Yes_Tx
+                    </th>
+                    <th>
+                        Master_No_Tx
+                    </th>
+                    <th>
+                        Tx_Waits
+                    </th>
+                    <th>
+                        Tx_Wait_Time
+                    </th>
+                    <th>
+                        Tx_Avg_Wait_Time
+                    </th>
+                    <th>
+                        Net_Waits
+                    </th>
+                    <th>
+                        Net_Wait_Time
+                    </th>
+                    <th>
+                        Net_Avg_Wait_Time
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% for status in data_repl %}
+                    {% if(status.rpl_semi_sync == 1) %}
+                        <tr>
+                            <td class="text-left">
+                                {{ status.host_info.remark }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_status }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_clients }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_slave_status }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_yes_tx }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_no_tx }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_tx_waits }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_tx_wait_time }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_tx_avg_wait_time }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_net_waits }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_net_wait_time }}
+                            </td>
+                            <td>
+                                {{ status.rpl_semi_sync_master_net_avg_wait_time }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endif %}
 
 {% if(data_engine_innodb != None) %}

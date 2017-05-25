@@ -239,9 +239,9 @@ class MonitorServer(threading.Thread):
 
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
+        repl_info = self.__cache.get_repl_info(host_info.key)
         self.get_binlog_size_total(mysql_variables["log_bin"], status_info, cursor)
         if(host_info.is_slave):
-            repl_info = self.__cache.get_repl_info(host_info.key)
             result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
             repl_info.read_only = mysql_variables["read_only"]
             repl_info.error_message = result["Last_Error"]
@@ -257,6 +257,27 @@ class MonitorServer(threading.Thread):
             repl_info.delay_pos_count = repl_info.master_log_pos - repl_info.slave_log_pos
             #mysql-5.7没有这个状态参数，暂时不需要
             #repl_info.slave_status = mysql_status_new["Slave_running"]
+
+        #4.-----------------------------------------------------获取replcation semi_sync-------------------------------------------------------------------
+        if(mysql_status_new.has_key("Rpl_semi_sync_master_status")):
+            repl_info.rpl_semi_sync = 1
+            repl_info.rpl_semi_sync_slave_status = mysql_status_new["Rpl_semi_sync_slave_status"]
+            repl_info.rpl_semi_sync_master_status = mysql_status_new["Rpl_semi_sync_master_status"]
+            repl_info.rpl_semi_sync_master_clients = int(mysql_status_new["Rpl_semi_sync_master_clients"])
+
+            repl_info.rpl_semi_sync_master_net_waits = int(mysql_status_new["Rpl_semi_sync_master_net_waits"])
+            repl_info.rpl_semi_sync_master_net_wait_time = int(mysql_status_new["Rpl_semi_sync_master_net_wait_time"]) - int(mysql_status_old["Rpl_semi_sync_master_net_wait_time"])
+            repl_info.rpl_semi_sync_master_net_avg_wait_time = int(mysql_status_new["Rpl_semi_sync_master_net_avg_wait_time"]) - int(mysql_status_old["Rpl_semi_sync_master_net_avg_wait_time"])
+
+            repl_info.rpl_semi_sync_master_tx_waits = int(mysql_status_new["Rpl_semi_sync_master_tx_waits"])
+            repl_info.rpl_semi_sync_master_tx_wait_time = int(mysql_status_new["Rpl_semi_sync_master_tx_wait_time"]) - int(mysql_status_old["Rpl_semi_sync_master_tx_wait_time"])
+            repl_info.rpl_semi_sync_master_tx_avg_wait_time = int(mysql_status_new["Rpl_semi_sync_master_tx_avg_wait_time"]) - int(mysql_status_old["Rpl_semi_sync_master_tx_avg_wait_time"])
+
+            repl_info.rpl_semi_sync_master_no_tx = int(mysql_status_new["Rpl_semi_sync_master_no_tx"])
+            repl_info.rpl_semi_sync_master_yes_tx = int(mysql_status_new["Rpl_semi_sync_master_yes_tx"])
+            repl_info.rpl_semi_sync_master_no_times = int(mysql_status_new["Rpl_semi_sync_master_no_times"])
+        else:
+            repl_info.rpl_semi_sync = 0
 
         #self.insert_status_log(status_info)
         self.__db_util.close(connection, cursor)

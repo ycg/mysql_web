@@ -3,12 +3,13 @@
 import pymysql, time, argparse, sys, commands, os
 
 '''
+grant all on *.* to 'yangcg'@'%' identified by 'yangcaogui';
 grant replication slave on *.* to 'sys_repl'@'%' identified by 'yangcaogui';
 
-python mysql_create_slave_for_mysqldump.py
---host=192.168.11.130 --user=yangcg --password=yangcaogui --port=3306 \
---master-host=192.168.11.129 --master-user=yangcg --master-password=yangcaogui --prot=3306
---repl-user=sys_repl --repl-password=yangcaogui
+python mysql_create_slave_for_mysqldump.py \
+--host=slave1 --user=yangcg --password=yangcaogui --port=3306 \
+--master-host=master --master-user=yangcg --master-password=yangcaogui --master-port=3306 \
+--repl-user=sys_repl --repl-password=yangcaogui --repl-mode=2
 '''
 
 #参数详解
@@ -93,6 +94,7 @@ def change_master(args):
         sql = "change master to master_auto_position=1,"
     sql = sql + " master_host='{0}', master_port={1}, master_user='{2}', master_password='{3}';"\
                 .format(args.master_host, args.master_port, args.repl_user, args.repl_password)
+    sql += "flush privileges;"
     execute_sql_for_slave(args, sql)
     execute_sql_for_slave(args, "start slave;")
 
