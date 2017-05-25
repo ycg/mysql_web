@@ -1,33 +1,25 @@
+# -*- coding: utf-8 -*-
+
 import time, argparse, sys, pymysql, datetime
 from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.row_event import WriteRowsEvent, UpdateRowsEvent, DeleteRowsEvent
 
-#使用的第三方模块
 #pip install mysql-replication
-#git地址：https://github.com/noplay/python-mysql-replication
 
-#调用示例
-#1.查看当前Master使用的log-file并从头开始读取
 #1.python binlog_util.py --host=192.168.11.128 --user=yancg --password=123456 --port=3310
-#2.默认读取log-file文件并从start-pos位置读取，如果pos不正确将报错
+
 #2.python binlog_util.py --host=192.168.11.128 --user=yancg --password=123456 --port=3310 --log-file=mysql_bin.000009 --start-pos=123
 #3.python binlog_util.py --host=192.168.11.128 --user=yancg --password=123456 --port=3310 --log-file=mysql_bin.000009 --start-pos=123 --databases=db1 --tables=t1
 #4.python binlog_util.py --host=192.168.11.128 --user=yancg --password=123456 --port=3310 --log-file=mysql_bin.000009 --start-pos=123 --out-file=/opt/my.txt
-#5生成闪回的SQL语句
+
 #5.python binlog_util.py --host=192.168.11.128 --user=yancg --password=123456 --port=3310 --log-file=mysql_bin.000009 --start-pos=123 --out-file=/opt/my.txt -B
-#6.根据时间进行筛选
+
 #6.python binlog_util.py --host=192.168.11.128 --user=yancg --password=123456 --port=3310 --log-file=mysql_bin.000010 --start-datetime='2011-06-01 20:00:00'
 #6.python binlog_util.py --host=192.168.11.128 --user=yancg --password=123456 --port=3310 --log-file=mysql_bin.000010 --end-datetime='2019-06-01 20:00:00'
 #6.python binlog_util.py --host=192.168.11.128 --user=yancg --password=123456 --port=3310 --log-file=mysql_bin.000010 --start-datetime='2016-09-01 20:00:00' --end-datetime='2019-06-01 20:00:00'
-#7.根据start和end pos来解析binlog日志
+
 #7.python binlog_util.py --host=192.168.11.128 --user=yancg --password=123456 --port=3310 --log-file=mysql_bin.000010 --start-pos=512 --end-pos=1228
 
-#程序简介
-#默认sql存放的路径为/tmp/binlog.sql
-#如果想过滤一些表的sql，需要先写databases参数
-#如果加上log-file参数，默认值读取log-file指定的二进制日志
-#start-datetime和end-datetime参数，这样更容易进行二进制日志的筛选
-#参数列表：
 #--start-pos
 #--end-pos
 #--start-datetime
@@ -37,10 +29,13 @@ from pymysqlreplication.row_event import WriteRowsEvent, UpdateRowsEvent, Delete
 #--tables
 #-B
 
+reload(sys)
+sys.setdefaultencoding('UTF-8')
+
 connection_settings = {}
-insert_sql = "INSERT INTO `{0}`.`{1}` ({2}) VALUES ({3});"
-update_sql = "UPDATE `{0}`.`{1}` set {2} WHERE {3};"
 delete_sql = "DELETE FROM `{0}`.`{1}` WHERE {2};"
+update_sql = "UPDATE `{0}`.`{1}` set {2} WHERE {3};"
+insert_sql = "INSERT INTO `{0}`.`{1}` ({2}) VALUES ({3});"
 
 def sql_format(dic, split_value):
     list = []
