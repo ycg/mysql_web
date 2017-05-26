@@ -5,6 +5,9 @@
     <li>
         <a href="#email_config" data-toggle="tab">Email</a>
     </li>
+    <li>
+        <a href="#alarm_config" data-toggle="tab">Alarm</a>
+    </li>
 </ul>
 
 <div id="myTabContent" class="tab-content">
@@ -57,7 +60,7 @@
         </form>
         <div class="row">
             <div class="col-md-1">
-                <button class="btn-primary form-control" onclick="update_basics_config()">Save</button>
+                <button class="btn-primary form-control" onclick=update_config_values("basics_form_detail",1)>Save</button>
             </div>
         </div>
     </div>
@@ -98,16 +101,78 @@
         </form>
         <div class="row">
             <div class="col-md-1">
-                <button class="btn-primary form-control" onclick="update_email_config()">Save</button>
+                <button class="btn-primary form-control" onclick=update_config_values("email_form_detail","2")>Save</button>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="alarm_config">
+        <br>
+        <form class="form-horizontal" id="alarm_form_detail" role="form" target="nm_iframe" action="/config/update" method="post">
+            <div class="form-group">
+                <label class="col-md-2 control-label">CPU User(>):</label>
+                <div class="col-md-3">
+                    <select class="show-tick bs-select-hidden form-control" id="cpu_user" name="cpu_user">
+                        <option value="50">50</option>
+                        <option value="60">60</option>
+                        <option value="70">70</option>
+                        <option value="80">80</option>
+                        <option value="85">85</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">CPU Sys(>):</label>
+                <div class="col-md-3">
+                    <select class="show-tick bs-select-hidden form-control" id="cpu_sys" name="cpu_sys">
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Thread Run Count(>):</label>
+                <div class="col-md-3">
+                    <select class="show-tick bs-select-hidden form-control" id="thread_run_count" name="thread_run_count">
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">Rpl Delay(s):</label>
+                <div class="col-md-3">
+                    <select class="show-tick bs-select-hidden form-control" id="rpl_delay" name="rpl_delay">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+            </div>
+            </br>
+        </form>
+        <div class="row">
+            <div class="col-md-1">
+                <button class="btn-primary form-control">Save</button>
             </div>
         </div>
     </div>
 </div>
 
-<iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>
-
 <script type="text/javascript">
-    function update_email_config() {
+    /*function update_email_config() {
         var obj = get_form_json($("#email_form_detail"))
         obj.update_type = 2
         $.post("/config/update", obj, function (data) {
@@ -121,7 +186,7 @@
         $.post("/config/update", obj, function (data) {
             alert(data)
         });
-    }
+    }*/
 
     function set_option_selected(id_name, value) {
         $(id_name).each(function () {
@@ -136,7 +201,15 @@
         });
     }
 
-    set_option_selected("#status_refresh", {{ config_info.status_refresh }})
-    set_option_selected("#linux_os_refresh", {{ config_info.linux_os_refresh }})
-    set_option_selected("#innodb_engine_refresh", {{ config_info.innodb_engine_refresh }})
+    function update_config_values(form_name, config_type) {
+        var obj = get_form_json($("#" + form_name));
+        obj.update_type = config_type;
+        $.post("/config/update", obj, function (data) {
+            alert(data);
+        });
+    }
+
+    set_option_selected("#status_refresh", {{ config_info.status_refresh }});
+    set_option_selected("#linux_os_refresh", {{ config_info.linux_os_refresh }});
+    set_option_selected("#innodb_engine_refresh", {{ config_info.innodb_engine_refresh }});
 </script>

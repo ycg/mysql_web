@@ -370,7 +370,7 @@ class MonitorServer(threading.Thread):
             host_client.connect(host_info.host, port=22, username="root")
 
             #获取cpu和io数据的标记位
-            stdin, stdout, stderr = host_client.exec_command("iostat 1 2")
+            stdin, stdout, stderr = host_client.exec_command("iostat -xk 1 2")
             result_list = stdout.readlines()
             io_flag = "Device"
             cpu_flag = "avg-cpu"
@@ -382,24 +382,57 @@ class MonitorServer(threading.Thread):
                     io_flag_index = number
                 elif(line.find(cpu_flag) >= 0):
                     cpu_flag_index = number
-                number = number + 1
+                number += 1
 
             io_list = result_list[io_flag_index:]
             cpu_list = result_list[cpu_flag_index:]
+            io_column_names = self.remove_empty_string(result_list[io_flag_index - 1])
 
             #解析io数据
+            util = 0
+            await = 0
+            svctm = 0
+            io_qps = 0
             io_tps = 0
             io_read = 0
             io_write = 0
             for str in io_list:
+                number_tmp = 0
                 io_tmp = self.remove_empty_string(str)
-                if(len(io_tmp) > 0):
-                    io_tps = io_tps + float(io_tmp[1])
-                    io_read = io_read + float(io_tmp[2])
-                    io_write = io_write + float(io_tmp[3])
-            linux_info.io_tps = io_tps
-            linux_info.io_read = io_read
-            linux_info.io_write = io_write
+
+                if(len(io_tmp) <= 0):
+                    continue
+                for column_name in io_column_names:
+                    if(column_name == "%util"):
+                        util += float(io_tmp[number_tmp])
+                    if(column_name == "await"):
+                        await += float(io_tmp[number_tmp])
+                    if(column_name == "svctm"):
+                        svctm += float(io_tmp[number_tmp])
+                    if(column_name == "r/s"):
+                        io_qps += float(io_tmp[number_tmp])
+                    if(column_name == "w/s"):
+                        io_tps += float(io_tmp[number_tmp])
+                    if(column_name == "rkB/s"):
+                        io_read += float(io_tmp[number_tmp])
+                    if(column_name == "wkB/s"):
+                        io_write += float(io_tmp[number_tmp])
+                    number_tmp += 1
+                '''if(len(io_tmp) > 0):
+                    util += float(io_tmp[11])
+                    await += float(io_tmp[12])
+                    svctm += float(io_tmp[9])
+                    io_qps += float(io_tmp[3])
+                    io_tps += float(io_tmp[4])
+                    io_read += float(io_tmp[5])
+                    io_write += float(io_tmp[6])'''
+            linux_info.util = util
+            linux_info.await = await
+            linux_info.svctm = svctm
+            linux_info.io_qps = int(io_qps)
+            linux_info.io_tps = int(io_tps)
+            linux_info.io_read = int(io_read)
+            linux_info.io_write = int(io_write)
 
             #解析cpu数据，因为cpu只有一行数据
             cpu_tmp = self.remove_empty_string(cpu_list[0])
@@ -429,16 +462,21 @@ class MonitorServer(threading.Thread):
         linux_info.cpu_15 = cpu_value[2]
 
     def monitor_host_for_net(self, host_client, linux_info):
-        net_send_byte, net_receive_byte = 0, 0
+        net_send_byte, net_receive_byte, number = 0, 0, 0
         stdin, stdout, stderr = host_client.exec_command("cat /proc/net/dev")
         for line in stdout.readlines():
-            if(line.find("eth") >= 0):
+            number += 1
+            if(number >= 3):
+                new_list = [x for x in line.split(" ") if x != ""]
+                net_send_byte += long(new_list[9])
+                net_receive_byte += long(new_list[1])
+            '''if(line.find("eth") >= 0):
                 value_list = []
                 for value in line.split(" "):
                     if(len(value) > 0):
                         value_list.append(value)
                 net_send_byte = net_send_byte + long(value_list[9])
-                net_receive_byte = net_receive_byte + long(value_list[1])
+                net_receive_byte = net_receive_byte + long(value_list[1])'''
 
         linux_info.net_send_old = linux_info.net_send_new
         linux_info.net_receive_old = linux_info.net_receive_new
@@ -452,7 +490,7 @@ class MonitorServer(threading.Thread):
         id_tmp = 0
         max_disk_value = 0
         total_disk_value = 0
-        stdin, stdout, stderr = host_client.exec_command("df")
+        stdin, stdout, stderr = host_client.exec_command("df | grep -v 'tmpfs'")
         for line in stdout.readlines():
             id_tmp = id_tmp + 1
             if(id_tmp == 1):
@@ -473,7 +511,7 @@ class MonitorServer(threading.Thread):
                     total_disk_value = total_disk_value + int(values[1])
                 elif(list_len == 5):
                     total_disk_value = total_disk_value + int(values[0])
-        linux_info.disk_value = str(max_disk_value) + "%"
+        linux_info.disk_value = str(max_disk_value)
         linux_info.total_disk_value = str(total_disk_value / 1024 / 1024)
 
     def monitor_host_for_memory(self, host_client, linux_info):

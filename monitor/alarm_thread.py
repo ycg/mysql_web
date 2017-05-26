@@ -96,9 +96,9 @@ class AlarmLog(threading.Thread):
     def check_os_status(self, host_info):
         os_info = cache.Cache().get_linux_info(host_info.key)
         if(os_info.cpu_system > 20 or os_info.cpu_user > 80 or os_info.cpu_idle < 50):
-            self.insert_alarm_log(host_info.key, ExceptionType.CPU, ExceptionLevel.Serious, LogType.Processlist)
-            self.insert_alarm_log(host_info.key, ExceptionType.CPU, ExceptionLevel.Serious, LogType.Lock_Status)
-            self.insert_alarm_log(host_info.key, ExceptionType.CPU, ExceptionLevel.Serious, LogType.Innodb_Status)
+            self.insert_alarm_log(host_info.key, ExceptionType.CPU_High, ExceptionLevel.Serious, LogType.Processlist)
+            self.insert_alarm_log(host_info.key, ExceptionType.CPU_High, ExceptionLevel.Serious, LogType.Lock_Status)
+            self.insert_alarm_log(host_info.key, ExceptionType.CPU_High, ExceptionLevel.Serious, LogType.Innodb_Status)
 
     def check_mysql_status(self, host_info):
         mysql_status = cache.Cache().get_status_infos(host_info.key)
