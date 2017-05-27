@@ -240,9 +240,9 @@ class MonitorServer(threading.Thread):
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         repl_info = self.__cache.get_repl_info(host_info.key)
+        result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
         self.get_binlog_size_total(mysql_variables["log_bin"], status_info, cursor)
         if(host_info.is_slave):
-            result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
             repl_info.read_only = mysql_variables["read_only"]
             repl_info.error_message = result["Last_Error"]
             repl_info.io_status = result["Slave_IO_Running"]
@@ -253,10 +253,8 @@ class MonitorServer(threading.Thread):
             repl_info.slave_log_pos = int(result["Exec_Master_Log_Pos"])
             repl_info.slave_retrieved_gtid_set = result["Retrieved_Gtid_Set"]
             repl_info.slave_execute_gtid_set = result["Executed_Gtid_Set"]
-            repl_info.seconds_Behind_Master = result["Seconds_Behind_Master"] if result["Seconds_Behind_Master"] else 0
+            repl_info.seconds_behind_master = result["Seconds_Behind_Master"] if result["Seconds_Behind_Master"] else 0
             repl_info.delay_pos_count = repl_info.master_log_pos - repl_info.slave_log_pos
-            #mysql-5.7没有这个状态参数，暂时不需要
-            #repl_info.slave_status = mysql_status_new["Slave_running"]
 
         #4.-----------------------------------------------------获取replcation semi_sync-------------------------------------------------------------------
         if(mysql_status_new.has_key("Rpl_semi_sync_master_status")):
@@ -418,14 +416,6 @@ class MonitorServer(threading.Thread):
                     if(column_name == "wkB/s"):
                         io_write += float(io_tmp[number_tmp])
                     number_tmp += 1
-                '''if(len(io_tmp) > 0):
-                    util += float(io_tmp[11])
-                    await += float(io_tmp[12])
-                    svctm += float(io_tmp[9])
-                    io_qps += float(io_tmp[3])
-                    io_tps += float(io_tmp[4])
-                    io_read += float(io_tmp[5])
-                    io_write += float(io_tmp[6])'''
             linux_info.util = util
             linux_info.await = await
             linux_info.svctm = svctm
@@ -511,8 +501,8 @@ class MonitorServer(threading.Thread):
                     total_disk_value = total_disk_value + int(values[1])
                 elif(list_len == 5):
                     total_disk_value = total_disk_value + int(values[0])
-        linux_info.disk_value = str(max_disk_value)
-        linux_info.total_disk_value = str(total_disk_value / 1024 / 1024)
+        linux_info.disk_value = int(max_disk_value)
+        linux_info.total_disk_value = int(total_disk_value / 1024 / 1024)
 
     def monitor_host_for_memory(self, host_client, linux_info):
         memory_free_total = 0

@@ -2,7 +2,7 @@
 <table class="table table-condensed table-hover table-bordered">
     <thead>
         <tr>
-            <th colspan="2" class="text-center">
+            <th colspan="3" class="text-center">
                 Host
             </th>
             <th colspan="5" class="text-center">
@@ -22,10 +22,13 @@
         </tr>
         <tr>
             <th>
-                Remark
+                Host
             </th>
             <th class="text-center">
                 Role
+            </th>
+            <th class="text-center">
+                Master_Name
             </th>
             <th class="text-center">
                 Running
@@ -78,7 +81,16 @@
                 {{ data.remark }}
             </td>
             <td>
-                {{ data.role }}
+                {% if(data.is_slave and data.is_master) %}
+                    M,S
+                {% elif(data.is_master) %}
+                    M
+                {% elif(data.is_slave) %}
+                    S
+                {% endif %}
+            </td>
+            <td>
+                {{ data.master_name }}
             </td>
             <td class="text-success">
                 Yes

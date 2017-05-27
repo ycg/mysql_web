@@ -219,7 +219,7 @@
                         <td>
                             {{ status.total_disk_value }}G
                         </td>
-                        <td>
+                        <td {% if(status.disk_value > 75) %} class="text-danger" {% endif %}>
                             {{ status.disk_value }}
                         </td>
                         <td>
@@ -237,7 +237,7 @@
                         <td {% if(status.await > 5) %} class="text-danger" {% endif %}>
                             {{ status.await }}
                         </td>
-                        <td {% if(status.await > status.svctm) %} class="text-danger" {% endif %}>
+                        <td {% if(status.await > (status.svctm + 10)) %} class="text-danger" {% endif %}>
                             {{ status.svctm }}
                         </td>
                         <td {% if(status.util > 70) %} class="text-danger" {% endif %}>
@@ -390,7 +390,7 @@
                     <td>
                         {{ status.host_info.remark }}
                     </td>
-                    <td>
+                    <td {% if(status.connections_usage_rate > 80) %} class="text-danger" {% endif %}>
                         {{ status.threads_count }}
                     </td>
                     <td {% if(status.threads_run_count > 5) %} class="text-danger" {% endif %}>
@@ -405,7 +405,7 @@
                     <td>
                         {{ status.connections_per }}
                     </td>
-                    <td>
+                    <td {% if(status.connections_usage_rate > 80) %} class="text-danger" {% endif %}>
                         {{ status.connections_usage_rate }}
                     </td>
                     <td>
@@ -1208,7 +1208,7 @@
             </thead>
             <tbody>
                 {% for status in data_repl %}
-                    {% if(status.is_slave == 1) %}
+                    {% if(status.host_info.is_slave) %}
                         <tr>
                             <td>
                                 {{ status.host_info.remark }}
@@ -1240,8 +1240,8 @@
                             <td class="text-center" {% if(status.delay_pos_count > 10000) %} class="text-danger text-center" {% endif %}>
                                 {{ status.delay_pos_count }}
                             </td>
-                            <td class="text-center" {% if(status.seconds_Behind_Master > 0) %} class="text-danger text-center" {% endif %}>
-                                {{ status.seconds_Behind_Master }}
+                            <td class="text-center" {% if(status.seconds_behind_master > 0) %} class="text-danger text-center" {% endif %}>
+                                {{ status.seconds_behind_master }}
                             </td>
                             <td>
                                 {{ status.error_message }}

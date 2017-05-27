@@ -22,7 +22,8 @@ class TableInfo():
 
 def get_table_infos(host_info):
     table_infos = {}
-    sql = "select table_schema, table_name, DATA_LENGTH, INDEX_LENGTH, TABLE_ROWS, AUTO_INCREMENT, create_time from information_schema.tables " \
+    sql = "select table_schema, table_name, DATA_LENGTH, INDEX_LENGTH, TABLE_ROWS, AUTO_INCREMENT, create_time, engine " \
+          "from information_schema.tables " \
           "where table_schema != 'mysql' and table_schema != 'information_schema' and table_schema != 'performance_schema' and table_schema != 'sys'";
     for row in db_util.DBUtil().fetchall(host_info, sql):
         table_info = TableInfo()
