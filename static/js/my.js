@@ -157,3 +157,34 @@ function get_form_json(frm) {
     });
     return o;
 }
+
+$(function () {
+    $(document).on('click', '.accordion-toggle', function(event) {
+        event.stopPropagation();
+        var $this = $(this);
+        var parent = $this.data('parent');
+        var actives = parent && $(parent).find('.collapse.in');
+
+        // From bootstrap itself
+        if (actives && actives.length) {
+            actives.data('collapse');
+            actives.collapse('hide');
+        }
+
+        var target = $this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, ''); //strip for ie7
+        $(target).collapse('toggle');
+    });
+})
+
+function changeFeedback(id)
+{
+    var str = document.getElementById(id).className;
+    var tag = str.substring(25,str.length);
+    if(tag == "right")
+    {
+        document.getElementById(id).className = "glyphicon glyphicon-menu-down";
+    }else
+    {
+        document.getElementById(id).className = "glyphicon glyphicon-menu-right";
+    }
+}

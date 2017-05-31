@@ -35,9 +35,19 @@ def get_table_infos(host_info):
         table_info.auto_increment = row["AUTO_INCREMENT"] if row["AUTO_INCREMENT"] else 0
         table_info.total_size = long(table_info.data_size) + long(table_info.index_size)
         table_info.create_time = row["create_time"]
+        table_info.has_primary_key = check_table_has_primary_key(table_info.schema, table_info.t_name)
         table_name = row["table_schema"] + "." + row["table_name"]
         table_infos[table_name] = table_info
     return table_infos
+
+def check_table_has_primary_key(table_schema, table_name):
+    sql = "select count(1) as row_count from information_schema.COLUMNS where table_schema='{0}' and table_name='{1}' and column_key='PRI'".format(table_schema, table_name)
+    result = db_util.DBUtil().fetchone(settings.MySQL_Host, sql)
+    if(result == None):
+        return False
+    elif(int(result["row_count"]) == 1):
+        return True
+    return False
 
 def get_data_length(data_length):
     if(data_length < KB):

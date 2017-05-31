@@ -1237,10 +1237,10 @@
                             <td>
                                 {{ status.slave_execute_gtid_set }}
                             </td>
-                            <td class="text-center" {% if(status.delay_pos_count > 10000) %} class="text-danger text-center" {% endif %}>
+                            <td {% if(status.delay_pos_count > 10000) %} class="text-danger text-center" {% else %} class="text-center" {% endif %}>
                                 {{ status.delay_pos_count }}
                             </td>
-                            <td class="text-center" {% if(status.seconds_behind_master > 0) %} class="text-danger text-center" {% endif %}>
+                            <td {% if(status.seconds_behind_master > 0) %} class="text-danger text-center" {% else %} class="text-center" {% endif %}>
                                 {{ status.seconds_behind_master }}
                             </td>
                             <td>

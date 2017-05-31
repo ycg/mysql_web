@@ -3,14 +3,15 @@
 #yum install openssl-devel python-devel libffi-devel -y
 #pip install flask flask-login gevent threadpool pymysql DBUtils paramiko
 
-import json, os, gzip, StringIO, base64, sys
-import settings
-from flask import Flask, render_template, request, app, session, redirect, url_for, g
-from monitor import cache, server, slow_log, mysql_status, alarm_thread, tablespace, general_log, execute_sql, user, thread, chart
-from monitor import user_login, base_class, alarm, new_slow_log, report
-from flask_login import login_user, login_required, logout_user
-from flask_login import LoginManager, current_user
 from gevent import pywsgi
+import json, os, gzip, StringIO, base64, sys
+from flask import Flask, render_template, request, app, redirect, url_for
+from flask_login import login_user, login_required, logout_user, LoginManager, current_user
+
+import settings
+from backup import backup
+from monitor import user_login, base_class, new_slow_log, report, alarm_thread
+from monitor import cache, server, slow_log, mysql_status, tablespace, general_log, execute_sql, user, thread, chart
 
 #region load data on run
 
@@ -31,6 +32,7 @@ monitor_server.load()
 monitor_server.start()
 slow_log.load_slow_log_table_config()
 monitor_server.invoke_check_tablespace_method()
+#alarm_thread.AlarmLog().start()
 
 #endregion
 
@@ -429,6 +431,34 @@ def get_object_from_json(json_value):
     for key, value in dict(json_value).items():
         setattr(obj, key, value[0])
     return obj
+
+#endregion
+
+#region backup
+
+@app.route("/backup")
+@login_required
+def get_backup_html():
+    return render_template("backup.html", backup_infos=backup.backup_infos, host_infos=mysql_cache.get_all_host_infos())
+
+@app.route("/backup/add", methods=["POST"])
+@login_required
+def add_backup_task():
+    return backup.add_backup(get_object_from_json(request.form))
+
+#endregion
+
+#region mysql exception log
+
+@app.route("/mysql_log/all", methods=["POST"])
+@login_required
+def get_mysql_exception_logs():
+    return render_template("mysql_exception_log_display.html", mysql_logs=alarm_thread.get_execption_logs(get_object_from_json(request.form)))
+
+@app.route("/mysql_log/")
+@login_required
+def get_mysql_exception_log_html():
+    return render_template("mysql_exception_log.html", host_infos=mysql_cache.get_all_host_infos())
 
 #endregion
 
