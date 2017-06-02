@@ -113,18 +113,26 @@ def execute_check_tablespace():
 @login_required
 def sort_tablespace(host_id, sort_type):
     if(host_id <= 0):
-        return render_template("tablespace_dispaly.html", host_tablespace_infos=tablespace.sort_tablespace(sort_type), tablespace_status=None)
+        return get_table_html(tablespace_list=tablespace.sort_tablespace(sort_type))
     else:
         table_list = tablespace.sort_tablespace_by_host_id(host_id, sort_type)
         if(len(table_list) > 50):
             table_list = table_list[0:50]
-        return render_template("tablespace_dispaly.html", host_tablespace_infos=None, tablespace_status=table_list)
+        return get_table_html(table_list=table_list)
 
 @app.route("/tablespace/report")
 @login_required
 def send_tablespace_report_mail():
     report.send_report_everyday()
     return "send ok"
+
+@app.route("/tablespace/table/detail", methods=["POST"])
+@login_required
+def get_table_detail():
+    return get_table_html(table_detail=tablespace.get_table_info(int(request.form["host_id"]), request.form["table_schema"], request.form["table_name"]))
+
+def get_table_html(tablespace_list=None, table_list=None, table_detail=None):
+    return render_template("tablespace_dispaly.html", host_tablespace_infos=tablespace_list, tablespace_status=table_list, table_detail_info=table_detail)
 
 #endregion
 

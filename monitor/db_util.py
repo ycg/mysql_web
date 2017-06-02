@@ -1,3 +1,4 @@
+import base_class
 import pymysql
 from DBUtils.PooledDB import PooledDB
 
@@ -77,3 +78,12 @@ class DBUtil(object):
                             use_unicode=False, charset="utf8", cursorclass=pymysql.cursors.DictCursor,reset=False, autocommit=True)
             self.__connection_pools[host_info.key] = pool
         return self.__connection_pools[host_info.key].connection()
+
+    def get_list_infos(self, host_info, sql):
+        result = []
+        for row in self.fetchall(host_info, sql):
+            info = base_class.BaseClass(None)
+            for key, value in row.items():
+                setattr(info, key, value)
+            result.append(info)
+        return result

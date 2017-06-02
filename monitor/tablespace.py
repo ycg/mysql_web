@@ -22,7 +22,7 @@ class TableInfo():
 
 def get_table_infos(host_info):
     table_infos = {}
-    sql = "select table_schema, table_name, DATA_LENGTH, INDEX_LENGTH, TABLE_ROWS, AUTO_INCREMENT, create_time, engine " \
+    sql = "select table_schema, table_name, DATA_LENGTH, INDEX_LENGTH, TABLE_ROWS, AUTO_INCREMENT, create_time, engine, update_time " \
           "from information_schema.tables " \
           "where table_schema != 'mysql' and table_schema != 'information_schema' and table_schema != 'performance_schema' and table_schema != 'sys'";
     for row in db_util.DBUtil().fetchall(host_info, sql):
@@ -35,7 +35,8 @@ def get_table_infos(host_info):
         table_info.auto_increment = row["AUTO_INCREMENT"] if row["AUTO_INCREMENT"] else 0
         table_info.total_size = long(table_info.data_size) + long(table_info.index_size)
         table_info.create_time = row["create_time"]
-        table_info.has_primary_key = check_table_has_primary_key(table_info.schema, table_info.t_name)
+        table_info.update_time = row["update_time"] if row["update_time"] else ''
+        #table_info.has_primary_key = check_table_has_primary_key(table_info.schema, table_info.t_name)
         table_name = row["table_schema"] + "." + row["table_name"]
         table_infos[table_name] = table_info
     return table_infos
@@ -187,6 +188,31 @@ def sort_tablespace_by_host_id(host_id, sort_type):
         return sorted(infos, cmp=lambda x,y:cmp(x.file_size_o, y.file_size_o), reverse=True)
     else:
         return sorted(infos, cmp=lambda x,y:cmp(x.free_size, y.free_size), reverse=True)
+
+#region get table detail
+
+def get_table_info(host_id, table_schema, table_name):
+    infos = cache.Cache().get_tablespace_info(host_id).detail
+    for table_info in infos:
+        if(table_info.schema == table_schema and table_info.t_name == table_name):
+            table_info.index_infos = get_table_indexs(host_id, table_schema, table_name)
+            table_info.column_infos = get_table_columns(host_id, table_schema, table_name)
+            return table_info
+    return None
+
+def get_table_indexs(host_id, table_schema, table_name):
+    sql = """select index_name, non_unique, seq_in_index, column_name, collation, cardinality, nullable, index_type
+             from information_schema.STATISTICS
+             where table_schema = '{0}' and table_name = '{1}';""".format(table_schema, table_name)
+    return db_util.DBUtil().get_list_infos(cache.Cache().get_host_info(host_id), sql)
+
+def get_table_columns(host_id, table_schema, table_name):
+    sql = """select column_name, ordinal_position, column_default, is_nullable, column_type, column_key, extra
+             from information_schema.COLUMNS
+             where table_schema = '{0}' and table_name = '{1}';""".format(table_schema, table_name)
+    return db_util.DBUtil().get_list_infos(cache.Cache().get_host_info(host_id), sql)
+
+#endregion
 
 '''
 def analysis_table_data(host_info):

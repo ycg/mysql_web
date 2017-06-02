@@ -18,17 +18,39 @@
         </select>
     </div>
     <div class="col-md-2">
+        <input class="form-control" placeholder="plase input table name">
+    </div>
+    <div class="col-md-2">
         <button class="btn btn-primary" onclick="select_sort_type_and_host_id()">Query</button>
     </div>
 </div>
 <br>
 <div class="row">
-    <div class="col-md-8" id="tablespace_info"></div>
+    <div class="col-md-9" id="tablespace_info"></div>
 </div>
 
+<div class="modal fade" id="table_detail_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+    <div class="modal-dialog" role="document" style="width: 1000px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="exampleModalLabel">Table Detail</h4>
+            </div>
+            <div class="modal-body" id="table_detail">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script language="JavaScript">
-    host_id = 0
-    sort_type_id = 1;
+    var host_id = 0
+    var sort_type_id = 1;
     $(".selectpicker").selectpicker({liveSearch: true});
 
     function select_sort_type_and_host_id() {
@@ -40,6 +62,15 @@
     function query_tablespace_info() {
         $.get("/tablespace/sort/" + host_id + "/" + sort_type_id, "", function (data) {
             $("#tablespace_info").html(data);
+        })
+    }
+
+    function get_table_detail(table_schema, table_name) {
+        var json_data="host_id="+host_id+"&table_schema="+table_schema+"&table_name="+table_name
+        $.post("/tablespace/table/detail", json_data, function (data) {
+            $("#table_detail").html(data);
+            $("#table_detail_dialog").modal({backdrop: "static"});
+            $("#table_detail_dialog").modal("show")
         })
     }
 
