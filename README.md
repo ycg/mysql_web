@@ -4,14 +4,14 @@
 2.安装MySQL数据库</br>
 3.如果要监控OS，需要设置ssh免密码登录</br>
 4.安装如下依赖包</br>
->>>>执行install.sh脚本</br>
+    执行install.sh脚本</br>
 5.在setting.py设置MySQL_Host相关账户信息</br>
->>>>MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")</br>
+    MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")</br>
 6.导入sql/table.sql的SQL脚本</br>
 7.在mysql_web.host_infos添加MySQL数据库用户</br>
->>>>insert into host_infos (host, port, user, password, remark) values</br>
->>>>("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"),</br>
->>>>("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");</br>
+    insert into host_infos (host, port, user, password, remark) values</br>
+    ("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"),</br>
+    ("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");</br>
 8.添加系统登录账号insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yangcaogui", md5("123456"));</br>
 9.启动python mysql_web.py runserver</br>
 10.如果要监控慢查询还要进行几步配置</br>
