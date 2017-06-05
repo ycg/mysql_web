@@ -2,31 +2,31 @@
     <table class="table table-hover table-bordered">
         <thead>
         <tr>
-            <th>
+            <th class="text-left">
                 Table_Name
             </th>
-            <th>
+            <th class="text-center">
                 Rows
             </th>
-            <th>
+            <th class="text-center">
                 Data
             </th>
-            <th>
+            <th class="text-center">
                 Index
             </th>
-            <th>
+            <th class="text-center">
                 Total
             </th>
-            <th>
+            <th class="text-center">
                 File
             </th>
-            <th>
+            <th class="text-center">
                 Free
             </th>
-            <th>
+            <th class="text-center">
                 Create_Time
             </th>
-            <th>
+            <th class="text-center">
                 Update_Time
             </th>
             <th>
@@ -34,10 +34,10 @@
             </th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="text-center">
         {% for status in tablespace_status %}
             <tr>
-                <td>
+                <td class="text-left">
                     {{ status.schema }}.{{ status.t_name }}
                 </td>
                 <td>
@@ -71,6 +71,17 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <div class="text-center">
+        <ul class="pagination pagination-centered">
+            <li><a href="javascript:void(0)" onclick="get_table_infos_for_page_number(1)">&laquo;</a></li>
+            {% for number in page_list %}
+                <li {% if(number == page_number) %} class="active" {% endif %}>
+                    <a href="javascript:void(0)" onclick="get_table_infos_for_page_number({{ number }})">{{ number }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endif %}
 
 {% if(host_tablespace_infos != None) %}

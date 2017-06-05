@@ -109,16 +109,16 @@ def execute_check_tablespace():
     monitor_server.invoke_check_tablespace_method()
     return "invoke ok, please wait."
 
-@app.route("/tablespace/sort/<int:host_id>/<int:sort_type>")
+@app.route("/tablespace/sort/", methods=["POST"])
 @login_required
-def sort_tablespace(host_id, sort_type):
-    if(host_id <= 0):
-        return get_table_html(tablespace_list=tablespace.sort_tablespace(sort_type))
+def sort_tablespace():
+    json_obj = get_object_from_json(request.form)
+    if(json_obj.host_id <= 0):
+        return get_table_html(tablespace_list=tablespace.sort_tablespace(json_obj.sort_type_id))
     else:
-        table_list = tablespace.sort_tablespace_by_host_id(host_id, sort_type)
-        if(len(table_list) > 50):
-            table_list = table_list[0:50]
-        return get_table_html(table_list=table_list)
+        return get_table_html(page_number=json_obj.page_number,
+                              page_list=get_page_number_list(json_obj.page_number),
+                              table_list=tablespace.sort_tablespace_by_host_id(json_obj.host_id, json_obj.sort_type_id, json_obj.page_number, json_obj.table_name))
 
 @app.route("/tablespace/report")
 @login_required
@@ -131,8 +131,13 @@ def send_tablespace_report_mail():
 def get_table_detail():
     return get_table_html(table_detail=tablespace.get_table_info(int(request.form["host_id"]), request.form["table_schema"], request.form["table_name"]))
 
-def get_table_html(tablespace_list=None, table_list=None, table_detail=None):
-    return render_template("tablespace_dispaly.html", host_tablespace_infos=tablespace_list, tablespace_status=table_list, table_detail_info=table_detail)
+def get_table_html(tablespace_list=None, table_list=None, table_detail=None, page_number=1, page_list=None):
+    return render_template("tablespace_dispaly.html", host_tablespace_infos=tablespace_list, tablespace_status=table_list, table_detail_info=table_detail, page_number=page_number, page_list=page_list)
+
+@app.route("/tablespace/search", methods=["POST"])
+@login_required
+def search_table():
+    return get_table_html(table_list=tablespace.search_table(int(request.form["host_id"]), request.form["table_name"]))
 
 #endregion
 
@@ -260,7 +265,7 @@ def get_page_number_list(page_number):
     if(page_number <= 5):
         page_list = range(1, 10)
     else:
-        page_list = range(page_number-5, page_number + 6)
+        page_list = range(page_number - 5, page_number + 6)
     return page_list
 
 #endregion
@@ -437,7 +442,10 @@ def get_config_options_value():
 def get_object_from_json(json_value):
     obj = base_class.BaseClass(None)
     for key, value in dict(json_value).items():
-        setattr(obj, key, value[0])
+        if(value[0].isdigit()):
+            setattr(obj, key, int(value[0]))
+        else:
+            setattr(obj, key, value[0])
     return obj
 
 #endregion

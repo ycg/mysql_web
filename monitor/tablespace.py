@@ -9,6 +9,8 @@ M = K * 1024
 G = M * 1024
 T = G * 1024
 
+Table_Page_Size = 20
+
 class TableInfo():
     diff = 0
     value = 0
@@ -162,32 +164,46 @@ def insert_host_tablespace_data(info):
 def sort_tablespace(sort_type):
     infos = cache.Cache().get_all_tablespace_infos()
     if(sort_type == 1):
-        return sorted(infos, cmp=lambda x,y:cmp(x.rows_total, y.rows_total), reverse=True)
+        return sorted(infos, cmp=lambda x, y: cmp(x.rows_total, y.rows_total), reverse=True)
     elif(sort_type == 2):
-        return sorted(infos, cmp=lambda x,y:cmp(x.data_total_o, y.data_total_o), reverse=True)
+        return sorted(infos, cmp=lambda x, y: cmp(x.data_total_o, y.data_total_o), reverse=True)
     elif(sort_type == 3):
-        return sorted(infos, cmp=lambda x,y:cmp(x.index_total_o, y.index_total_o), reverse=True)
+        return sorted(infos, cmp=lambda x, y: cmp(x.index_total_o, y.index_total_o), reverse=True)
     elif(sort_type == 4):
-        return sorted(infos, cmp=lambda x,y:cmp(x.total_o, y.total_o), reverse=True)
+        return sorted(infos, cmp=lambda x, y: cmp(x.total_o, y.total_o), reverse=True)
     elif(sort_type == 5):
-        return sorted(infos, cmp=lambda x,y:cmp(x.file_total_o, y.file_total_o), reverse=True)
+        return sorted(infos, cmp=lambda x, y: cmp(x.file_total_o, y.file_total_o), reverse=True)
     else:
-        return sorted(infos, cmp=lambda x,y:cmp(x.free_total_o, y.free_total_o), reverse=True)
+        return sorted(infos, cmp=lambda x, y: cmp(x.free_total_o, y.free_total_o), reverse=True)
 
-def sort_tablespace_by_host_id(host_id, sort_type):
+def sort_tablespace_by_host_id(host_id, sort_type, page_number, table_name):
+    start_index = (page_number - 1) * Table_Page_Size
+    stop_index = start_index + Table_Page_Size
     infos = cache.Cache().get_tablespace_info(host_id).detail
     if(sort_type == 1):
-        return sorted(infos, cmp=lambda x,y:cmp(x.rows_o, y.rows_o), reverse=True)
+        result_table_list = sorted(infos, cmp=lambda x, y: cmp(x.rows_o, y.rows_o), reverse=True)
     elif(sort_type == 2):
-        return sorted(infos, cmp=lambda x,y:cmp(x.data_size_o, y.data_size_o), reverse=True)
+        result_table_list = sorted(infos, cmp=lambda x, y: cmp(x.data_size_o, y.data_size_o), reverse=True)
     elif(sort_type == 3):
-        return sorted(infos, cmp=lambda x,y:cmp(x.index_size_o, y.index_size_o), reverse=True)
+        result_table_list = sorted(infos, cmp=lambda x, y: cmp(x.index_size_o, y.index_size_o), reverse=True)
     elif(sort_type == 4):
-        return sorted(infos, cmp=lambda x,y:cmp(x.total_size_o, y.total_size_o), reverse=True)
+        result_table_list = sorted(infos, cmp=lambda x, y: cmp(x.total_size_o, y.total_size_o), reverse=True)
     elif(sort_type == 5):
-        return sorted(infos, cmp=lambda x,y:cmp(x.file_size_o, y.file_size_o), reverse=True)
+        result_table_list = sorted(infos, cmp=lambda x, y: cmp(x.file_size_o, y.file_size_o), reverse=True)
     else:
-        return sorted(infos, cmp=lambda x,y:cmp(x.free_size, y.free_size), reverse=True)
+        result_table_list = sorted(infos, cmp=lambda x, y: cmp(x.free_size, y.free_size), reverse=True)
+
+    if(len(table_name) > 0):
+        result_table_list = search_table(result_table_list, table_name)
+
+    return result_table_list[start_index: stop_index]
+
+def search_table(table_infos, table_name):
+    result = []
+    for info in table_infos:
+        if(table_name in info.t_name):
+            result.append(info)
+    return result
 
 #region get table detail
 

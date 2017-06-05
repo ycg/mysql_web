@@ -18,7 +18,7 @@
         </select>
     </div>
     <div class="col-md-2">
-        <input class="form-control" placeholder="plase input table name">
+        <input class="form-control" placeholder="plase input table name" id="input_table_name">
     </div>
     <div class="col-md-2">
         <button class="btn btn-primary" onclick="select_sort_type_and_host_id()">Query</button>
@@ -60,7 +60,12 @@
     }
 
     function query_tablespace_info() {
-        $.get("/tablespace/sort/" + host_id + "/" + sort_type_id, "", function (data) {
+        get_table_infos_for_page_number(1)
+    }
+
+    function get_table_infos_for_page_number(page_number) {
+        var json_data="host_id="+host_id+"&sort_type_id="+sort_type_id+"&page_number="+page_number+"&table_name="+$("#input_table_name").val()
+        $.post("/tablespace/sort/", json_data, function (data) {
             $("#tablespace_info").html(data);
         })
     }
