@@ -4,14 +4,14 @@
 2.安装MySQL数据库</br>
 3.如果要监控OS，需要设置ssh免密码登录</br>
 4.安装如下依赖包</br>
->>>> 执行install.sh脚本</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;执行install.sh脚本</br>
 5.在setting.py设置MySQL_Host相关账户信息</br>
->>>> MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")</br>
 6.导入sql/table.sql的SQL脚本</br>
 7.在mysql_web.host_infos添加MySQL数据库用户</br>
->>>> insert into host_infos (host, port, user, password, remark) values</br>
->>>> ("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"),</br>
->>>> ("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert into host_infos (host, port, user, password, remark) values</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"),</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");</br>
 8.添加系统登录账号insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yangcaogui", md5("123456"));</br>
 9.启动python mysql_web.py runserver</br>
 10.如果要监控慢查询还要进行几步配置</br>
@@ -40,12 +40,12 @@
 
 ## 待开发的功能:</br>
 1.邮件报警功能</br>
-·   接下来进行告警界面的开发，可以自定义告警参数</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;接下来进行告警界面的开发，可以自定义告警参数</br>
 2.监控数据入库形成历史数据</br>
 3.登录界面，权限验证</br>
- * 2017-4-28完成基本的登录验证，不过用户名和密码写死的</br>
- * 接下来考虑用户验证从数据库里读取，不过这个不急</br>
- * 2017-05-02完成从数据库进行登录验证，可以在数据库添加多个账户</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2017-4-28完成基本的登录验证，不过用户名和密码写死的</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;接下来考虑用户验证从数据库里读取，不过这个不急</br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2017-05-02完成从数据库进行登录验证，可以在数据库添加多个账户</br>
 4.图标界面支持查看历史数据</br>
 5.2017-05-15:支持相对完整的慢查询收集和显示功能</br>
 6.刚完成半同步复制的监控</br>
