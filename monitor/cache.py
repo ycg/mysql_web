@@ -66,7 +66,7 @@ class Cache(object):
                 if (self.__status_infos.has_key(host_id) == False):
                     self.__status_infos[host_id] = base_class.BaseClass(host_info_temp)
                 if (self.__innodb_infos.has_key(host_id) == False):
-                    self.__innodb_infos[host_id] = base_class.BaseClass(host_info_temp)
+                    self.__innodb_infos[host_id] = self.init_innodb_info(base_class.BaseClass(host_info_temp))
                 if (self.__innodb_status_infos.has_key(host_id) == False):
                     self.__innodb_status_infos[host_id] = base_class.BaseClass(host_info_temp)
                     self.__innodb_status_infos[host_id].buffer_pool_infos = collections.OrderedDict()
@@ -94,6 +94,23 @@ class Cache(object):
             user_info.user_password = row["user_password"]
             user_info.is_deleted = row["is_deleted"]
             self.add_user_info(user_info)
+
+    def init_innodb_info(self, innodb_info):
+        innodb_info.innodb_ibuf_size = 0
+        innodb_info.innodb_ibuf_merges = 0
+        innodb_info.innodb_ibuf_free_list = 0
+        innodb_info.innodb_ibuf_merged_inserts = 0
+        innodb_info.innodb_ibuf_merged_deletes = 0
+        innodb_info.innodb_ibuf_merged_delete_marks = 0
+        innodb_info.innodb_ibuf_merges_old = 0
+        innodb_info.innodb_ibuf_merges_new = 0
+        innodb_info.innodb_ibuf_merged_inserts_old = 0
+        innodb_info.innodb_ibuf_merged_deletes_old = 0
+        innodb_info.innodb_ibuf_merged_delete_marks_old = 0
+        innodb_info.innodb_ibuf_merged_inserts_new = 0
+        innodb_info.innodb_ibuf_merged_deletes_new = 0
+        innodb_info.innodb_ibuf_merged_delete_marks_new = 0
+        return innodb_info
 
     def join_thread_pool(self, method_name):
         requests = threadpool.makeRequests(method_name, list(self.get_all_host_infos()), None)

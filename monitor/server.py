@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import time, threadpool, cache, threading, db_util, enum, settings, paramiko, collections, base_class, mysql_branch, tablespace
+import time, threadpool, threading, enum, paramiko, collections
+import cache, db_util, settings, base_class, mysql_branch, tablespace
 
 class MonitorEnum(enum.Enum):
     mysql = 4
@@ -225,18 +226,12 @@ class MonitorServer(threading.Thread):
 
         #change(insert) buffer
         if(mysql_status_old.has_key("Innodb_ibuf_free_list")):
+            innodb_info.innodb_ibuf_size = int(mysql_status_new["Innodb_ibuf_size"])
             innodb_info.innodb_ibuf_free_list = int(mysql_status_new["Innodb_ibuf_free_list"])
             innodb_info.innodb_ibuf_merges = int(mysql_status_new["Innodb_ibuf_merges"]) - int(mysql_status_old["Innodb_ibuf_merges"])
             innodb_info.innodb_ibuf_merged_inserts = int(mysql_status_new["Innodb_ibuf_merged_inserts"]) - int(mysql_status_old["Innodb_ibuf_merged_inserts"])
             innodb_info.innodb_ibuf_merged_deletes = int(mysql_status_new["Innodb_ibuf_merged_deletes"]) - int(mysql_status_old["Innodb_ibuf_merged_deletes"])
             innodb_info.innodb_ibuf_merged_delete_marks = int(mysql_status_new["Innodb_ibuf_merged_delete_marks"]) - int(mysql_status_old["Innodb_ibuf_merged_delete_marks"])
-        else:
-            innodb_info.innodb_ibuf_merges = 0
-            innodb_info.innodb_ibuf_free_list = 0
-            innodb_info.innodb_ibuf_merged_inserts = 0
-            innodb_info.innodb_ibuf_merged_deletes = 0
-            innodb_info.innodb_ibuf_merged_delete_marks = 0
-
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         repl_info = self.__cache.get_repl_info(host_info.key)
@@ -555,6 +550,8 @@ class MonitorServer(threading.Thread):
             self.get_latest_deadlock(host_info, innodb_status["LATEST DETECTED DEADLOCK"])
         if(innodb_status.has_key("TRANSACTIONS") == True):
             self.get_transactions_info(host_info, innodb_status["TRANSACTIONS"])
+        if(innodb_status.has_key("INSERT BUFFER AND ADAPTIVE HASH INDEX")):
+            self.get_change_buffer_infos(host_info, innodb_status["INSERT BUFFER AND ADAPTIVE HASH INDEX"])
 
     def get_lsn_info(self, host_info, values):
         info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
@@ -617,7 +614,7 @@ class MonitorServer(threading.Thread):
                     info_tmp.writes_per = line_split[4]
                 elif(line.find("Pending reads") >= 0):
                     info_tmp.pending_reads = split_value
-                num = num + 1
+                num += 1
                 cache.Cache().get_engine_innodb_status_infos(host_info.key).buffer_pool_infos[buffer_pool_name] = info_tmp
 
     def get_latest_deadlock(self, host_info, values):
@@ -680,3 +677,50 @@ class MonitorServer(threading.Thread):
                     if(len(key_name) > 0):
                         innodb_status_infos[key_name].append(str_value)
         return innodb_status_infos
+
+    def get_change_buffer_infos(self, host_info, values):
+        if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
+            row_number = 1
+            innodb_info = self.__cache.get_innodb_infos(host_info.key)
+            for line in values:
+                if("Ibuf" in line):
+                    #第一行格式
+                    #Ibuf: size 1, free list len 461392, seg size 461394, 8352044 merges
+                    lst = line.split(",")
+                    for value in lst:
+                        lst_tmp = value.split(" ")
+                        if("Ibuf" in value):
+                            innodb_info.innodb_ibuf_size = int(lst_tmp[-1])
+                        elif("free" in value):
+                            innodb_info.innodb_ibuf_free_list = int(lst_tmp[-1])
+                        elif("merges" in value):
+                            innodb_info.innodb_ibuf_merges_old = innodb_info.innodb_ibuf_merges_new
+                            innodb_info.innodb_ibuf_merges_new = int(lst_tmp[1])
+                            innodb_info.innodb_ibuf_merges = innodb_info.innodb_ibuf_merges_new - innodb_info.innodb_ibuf_merges_old
+
+                if(row_number == 4):
+                    #第四行格式
+                    #insert 35002969, delete mark 12861407, delete 1301010
+                    lst = line.split(",")
+
+                    #insert
+                    lst_tmp = lst[0].split(" ")
+                    innodb_info.innodb_ibuf_merged_inserts_old = innodb_info.innodb_ibuf_merged_inserts_new
+                    innodb_info.innodb_ibuf_merged_inserts_new = int(lst_tmp[-1])
+                    innodb_info.innodb_ibuf_merged_inserts = innodb_info.innodb_ibuf_merged_inserts_new - innodb_info.innodb_ibuf_merged_inserts_old
+
+                    #delete
+                    lst_tmp = lst[2].split(" ")
+                    innodb_info.innodb_ibuf_merged_deletes_old = innodb_info.innodb_ibuf_merged_deletes_new
+                    innodb_info.innodb_ibuf_merged_deletes_new = int(lst_tmp[-1])
+                    innodb_info.innodb_ibuf_merged_deletes = innodb_info.innodb_ibuf_merged_deletes_new - innodb_info.innodb_ibuf_merged_deletes_old
+
+                    #delete mark
+                    lst_tmp = lst[1].split(" ")
+                    innodb_info.innodb_ibuf_merged_delete_marks_old = innodb_info.innodb_ibuf_merged_delete_marks_new
+                    innodb_info.innodb_ibuf_merged_delete_marks_new = int(lst_tmp[-1])
+                    innodb_info.innodb_ibuf_merged_delete_marks = innodb_info.innodb_ibuf_merged_delete_marks_new - innodb_info.innodb_ibuf_merged_delete_marks_old
+
+                row_number += 1
+
+
