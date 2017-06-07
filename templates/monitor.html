@@ -1213,10 +1213,10 @@
                             <td>
                                 {{ status.host_info.remark }}
                             </td>
-                            <td {% if(status.io_status != "Yes") %} class="text-danger" {% endif %}>
+                            <td {% if(status.io_status != "Yes") %} class="text-danger text-center" {% else %} class="text-center" {% endif %}>
                                 {{ status.io_status }}
                             </td>
-                            <td {% if(status.sql_status != "Yes") %} class="text-danger" {% endif %}>
+                            <td {% if(status.sql_status != "Yes") %} class="text-danger text-center" {% else %} class="text-center" {% endif %}>
                                 {{ status.sql_status }}
                             </td>
                             <td>
@@ -1232,10 +1232,16 @@
                                 {{ status.slave_log_pos }}
                             </td>
                             <td>
-                                {{ status.slave_retrieved_gtid_set }}
+                                {% for value in status.slave_retrieved_gtid_set %}
+                                    {{ value }} </br>
+                                {% endfor %}
+                                <!--{{ status.slave_retrieved_gtid_set }}-->
                             </td>
                             <td>
-                                {{ status.slave_execute_gtid_set }}
+                                {% for value in status.slave_execute_gtid_set %}
+                                    {{ value }} </br>
+                                {% endfor %}
+                                <!--{{ status.slave_execute_gtid_set }}-->
                             </td>
                             <td {% if(status.delay_pos_count > 10000) %} class="text-danger text-center" {% else %} class="text-center" {% endif %}>
                                 {{ status.delay_pos_count }}

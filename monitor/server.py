@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import time, threadpool, threading, enum, paramiko, collections
 import cache, db_util, settings, base_class, mysql_branch, tablespace
+import time, threadpool, threading, enum, paramiko, collections, pymysql
 
 class MonitorEnum(enum.Enum):
     mysql = 4
@@ -49,16 +49,20 @@ class MonitorServer(threading.Thread):
         self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
 
     def get_mysql_status(self, host_info):
+        host_info.is_running = 1
         connection = self.__db_util.get_mysql_connection(host_info)
         cursor = connection.cursor()
-        mysql_status_old = self.get_dic_data(cursor, "show global status;")
+
+        try:
+            mysql_status_old = self.get_dic_data(cursor, "show global status;")
+        except pymysql.err.OperationalError:
+            host_info.is_running = 0
+
         time.sleep(1)
         mysql_status_new = self.get_dic_data(cursor, "show global status;")
         mysql_variables = self.get_dic_data(cursor, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
                                                     "'max_connections', 'table_open_cache', 'table_open_cache_instances', 'innodb_buffer_pool_size', "
                                                     "'read_only', 'log_bin');")
-        #host_info.mysql_data_dir = mysql_variables["datadir"]
-        #host_info.mysql_pid_file = mysql_variables["pid_file"]
         host_info.uptime = int(mysql_status_new["Uptime"]) / 60 / 60 / 24
 
         #1.---------------------------------------------------------获取mysql global status--------------------------------------------------------
@@ -93,7 +97,7 @@ class MonitorServer(threading.Thread):
         status_info.aborted_connects = int(mysql_status_new["Aborted_connects"]) - int(mysql_status_old["Aborted_connects"])
 
         #监控time>1的线程数量
-        result = self.__db_util.fetchone(host_info, "select count(1) as t_count from information_schema.processlist where state <> '' and length(info) > 0 and time > 1;")
+        result = self.__db_util.fetchone(host_info, "select count(1) as t_count from information_schema.processlist where length(state) > 0 and length(info) > 0 and time > 1;")
         if(len(result) > 0):
             status_info.thread_waits_count = int(result["t_count"])
 
@@ -246,10 +250,12 @@ class MonitorServer(threading.Thread):
             repl_info.master_log_pos = int(result["Read_Master_Log_Pos"])
             repl_info.slave_log_file = result["Relay_Master_Log_File"]
             repl_info.slave_log_pos = int(result["Exec_Master_Log_Pos"])
-            repl_info.slave_retrieved_gtid_set = result["Retrieved_Gtid_Set"]
-            repl_info.slave_execute_gtid_set = result["Executed_Gtid_Set"]
+            repl_info.slave_retrieved_gtid_set = result["Retrieved_Gtid_Set"].split(",")
+            repl_info.slave_execute_gtid_set = result["Executed_Gtid_Set"].split(",")
             repl_info.seconds_behind_master = result["Seconds_Behind_Master"] if result["Seconds_Behind_Master"] else 0
             repl_info.delay_pos_count = repl_info.master_log_pos - repl_info.slave_log_pos
+            host_info.io_status = repl_info.io_status
+            host_info.sql_status = repl_info.sql_status
 
         #4.-----------------------------------------------------获取replcation semi_sync-------------------------------------------------------------------
         if(mysql_status_new.has_key("Rpl_semi_sync_master_status")):

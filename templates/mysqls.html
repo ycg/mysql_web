@@ -5,6 +5,9 @@
             <th colspan="4" class="text-center">
                 Host
             </th>
+            <th colspan="2" class="text-center">
+                Slave Status
+            </th>
             <th colspan="5" class="text-center">
                 Status
             </th>
@@ -32,6 +35,12 @@
             </th>
             <th class="text-center">
                 Master_Name
+            </th>
+            <th class="text-center">
+                IO
+            </th>
+            <th class="text-center">
+                SQL
             </th>
             <th class="text-center">
                 Running
@@ -95,8 +104,22 @@
             <td>
                 {{ data.master_name }}
             </td>
-            <td class="text-success">
-                Yes
+            <td {% if(data.io_status != "Yes") %} class="text-danger text-center" {% else %} class="text-center" {% endif %}>
+                {% if(data.is_slave) %}
+                    {{ data.io_status }}
+                {% endif %}
+            </td>
+            <td {% if(data.sql_status != "Yes") %} class="text-danger text-center" {% else %} class="text-center" {% endif %}>
+                {% if(data.is_slave) %}
+                    {{ data.sql_status }}
+                {% endif %}
+            </td>
+            <td {% if(data.is_running == 0) %} class="text-danger text-center" {% else %} class="text-center text-success" {% endif %}>
+                 {% if(data.is_running == 1) %}
+                    Yes
+                 {% else %}
+                     No
+                 {% endif %}
             </td>
             <td>
                 {{ data.qps }}

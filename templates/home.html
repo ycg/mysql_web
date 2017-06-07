@@ -8,9 +8,6 @@
     <script src={{ url_for("static", filename="js/bootstrap.min.js") }} type="text/javascript"></script>
     <script src={{ url_for("static", filename="jquery/jquery-form.js") }} type="text/javascript"></script>
 
-    <!--<script type="text/javascript" src="http://cdn.bootcss.com/bootstrap-select/2.0.0-beta1/js/bootstrap-select.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://cdn.bootcss.com/bootstrap-select/2.0.0-beta1/css/bootstrap-select.css">-->
-
     <script src={{ url_for("static", filename="js/bootstrap-select.js") }} type="text/javascript"></script>
     <link href={{ url_for('static', filename='css/bootstrap-select.css') }} rel="stylesheet" type="text/css">
     <script type="text/javascript" src={{ url_for("static", filename="js/echarts.min.js") }}></script>
@@ -42,59 +39,53 @@
                     <a href="javascript:void(0)" id="backup" class="list-group-item" onclick=stop("/backup","backup")><span class="glyphicon glyphicon-align-justify"> Backup</span></a>-->
                 </div>
 
-                <!--<div class="sidebar">
-                    <div class="navbar navbar-default" id="mycollapse">
-                        <ul class="nav nav-pills nav-stacked">
-                            <li><a href="javascript:void(0)" id="mysql" onclick=start("/mysql","mysql")><span class="glyphicon glyphicon-home"> MySQL</span></a></li>
-                            <li><a href="javascript:void(0)" id="status" onclick=start("/status","status")><span class="glyphicon glyphicon-cog"> Status</span></a></li>
-                            <li><a href="javascript:void(0)" id="innodb" onclick=start("/innodb","innodb")><span class="glyphicon glyphicon-file"> INNODB</span></a></li>
-                            <li><a href="javascript:void(0)" id="repl" onclick=start("/replication","repl")><span class="glyphicon glyphicon-filter"> Replication</span></a></li>
-                            <li><a href="javascript:void(0)" id="os" onclick=start("/os","os")><span class="glyphicon glyphicon-user"> OS</span></a></li>
-                            <li><a href="javascript:void(0)" id="slowlog" onclick=stop("/slowlog","slowlog")><span class="glyphicon glyphicon-log-in"> SlowLog</span></a></li>
-                            <li><a href="javascript:void(0)" id="tablespace" onclick=stop("/tablespace","tablespace")><span class="glyphicon glyphicon-barcode"> Tablespace</span></a></li>
-                            <li><a href="javascript:void(0)" id="sql" onclick=stop("/sql","sql")><span class="glyphicon glyphicon-apple"> SQLExecute</span></a></li>
-                            <li><a href="javascript:void(0)" id="chart" onclick=stop("/chart","chart")><span class="glyphicon glyphicon-cloud"> Chart</span></a></li>
-                            <li>
-                                <a href="#second-level-1" class="second-level accordion-toggle" data-toggle="collapse" data-parent="#mycollapse">
-                                    <i class="pull-left glyphicon glyphicon-user"> User</i><i class="pull-right glyphicon glyphicon-chevron-left"></i>
-                                </a>
-                                <ul class="nav collapse" id="second-level-1">
-                                    <li><a href="javascript:void(0)" id="tablespace" onclick=stop("/tablespace","tablespace")><span class="glyphicon glyphicon-barcode"> Tablespace</span></a></li>
-                                    <li><a href="javascript:void(0)" id="sql" onclick=stop("/sql","sql")><span class="glyphicon glyphicon-apple"> SQLExecute</span></a></li>
-                                    <li><a href="javascript:void(0)" id="chart" onclick=stop("/chart","chart")><span class="glyphicon glyphicon-cloud"> Chart</span></a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="panel-group" id="accordion">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">标题一</a></h4>
+                <!--<div>
+                    <div class="panel-group" id="accordion2">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                                <a class="accordion-toggle" href="#collapseOne">MySQL Monitor</a>
+                            </div>
+                            <div id="collapseOne" class="panel-collapse collapse" style="height: 0px;">
+                                <div class="panel-body">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li class="active"><a href="javascript:void(0)" id="mysql" onclick=start("/mysql","mysql")><span class="glyphicon glyphicon-home"> MySQL</span></a></li>
+                                        <li><a href="javascript:void(0)" id="status" onclick=start("/status","status")><span class="glyphicon glyphicon-cog"> Status</span></a></li>
+                                        <li><a href="javascript:void(0)" id="innodb" onclick=start("/innodb","innodb")><span class="glyphicon glyphicon-file"> INNODB</span></a></li>
+                                        <li><a href="javascript:void(0)" id="repl" onclick=start("/replication","repl")><span class="glyphicon glyphicon-filter"> Replication</span></a></li>
+                                        <li><a href="javascript:void(0)" id="os" onclick=start("/os","os")><span class="glyphicon glyphicon-user"> OS</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        <div id="collapseOne" class="panel-collapse collapse in">
-                            <div class="panel-body">标题一对应的内容</div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+                                <a class="accordion-toggle" href="#collapseTwo">Table</a>
+                            </div>
+                            <div id="collapseTwo" class="panel-collapse collapse" style="height: 0px;">
+                                <div class="panel-body">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li><a href="javascript:void(0)" id="mysql" onclick=start("/mysql","mysql")><span class="glyphicon glyphicon-home"> MySQL</span></a></li>
+                                        <li><a href="javascript:void(0)" id="status" onclick=start("/status","status")><span class="glyphicon glyphicon-cog"> Status</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">标题二</a></h4>
-                        </div>
-                        <div id="collapseTwo" class="panel-collapse collapse">
-                            <div class="panel-body">标题二对应的内容</div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">标题三</a></h4>
-                        </div>
-                        <div id="collapseThree" class="panel-collapse collapse">
-                            <div class="panel-body">标题三对应的内容</div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+                                <a class="accordion-toggle" href="#collapseThree">技术前沿</a>
+                            </div>
+                            <div id="collapseThree" class="panel-collapse in" style="height: 0px;">
+                                <div class="panel-body">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li><a href="#">NoSQL</a></li>
+                                        <li><a href="#">Hadoop</a></li>
+                                        <li><a href="#">WebService</a></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>-->
-
             </div>
             <div id="host_search_div" class="col-md-10">
                 <select id="host_search" class="selectpicker" data-live-search="true" multiple>

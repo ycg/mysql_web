@@ -35,9 +35,9 @@ class DBUtil(object):
             connection, cursor = self.execute_for_db(host_info, sql)
             return cursor.fetchall()
         finally:
-           self.close(connection, cursor)
+            self.close(connection, cursor)
 
-    def execute_for_cursor(self, sql ,connection=None, cursor=None):
+    def execute_for_cursor(self, sql, connection=None, cursor=None):
         return self.cursor_execute(connection, cursor, sql)
 
     def fetchone_for_cursor(self, sql, connection=None, cursor=None):
@@ -87,3 +87,8 @@ class DBUtil(object):
                 setattr(info, key, value)
             result.append(info)
         return result
+
+    def escape(self, string):
+        return pymysql.escape_string(string)
+
+
