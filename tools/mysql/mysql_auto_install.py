@@ -152,7 +152,7 @@ def check_use_repl_semi_sync(args, config_value):
     if(args.semi_sync == 1):
         config_value = config_value + "\n" + rpl_semi_sync_config
         if(args.version == mysql_5_7):
-            config_value = config_value + "\n" + "rpl_semi_sync_master_wait_point=AFTER_SYNC"
+            config_value += "rpl_semi_sync_master_wait_point=AFTER_SYNC"
     return config_value
 
 def check_mysqld_pid_is_exists(host_client):
@@ -211,8 +211,8 @@ def execute_remote_shell(host_client, shell):
 #region mysql config
 
 mysql_config = ("""
-[client]
-default_character_set = utf8mb4
+#[client]
+#default_character_set = utf8mb4
 
 [mysql]
 prompt = "\\u@\\h(\\d) \\\\r:\\\\m:\\\\s>"
@@ -241,6 +241,7 @@ innodb_file_per_table = 1
 transaction_isolation = REPEATABLE-READ
 innodb_log_buffer_size = 16M
 innodb_log_file_size = 256M
+innodb_additional_mem_pool_size = 16M
 innodb_data_file_path = ibdata1:1G:autoextend
 #innodb_log_group_home_dir = ./
 #innodb_log_files_in_group = 2
@@ -335,15 +336,16 @@ gtid_mode = ON
 enforce_gtid_consistency = ON"""
 
 rpl_semi_sync_config = """
-#master
+#rpl semi sync
 rpl_semi_sync_master_enabled = 0
 rpl_semi_sync_master_timeout = 999999999
 rpl_semi_sync_master_trace_level = 32
 rpl_semi_sync_master_wait_no_slave = ON
 rpl_semi_sync_master_wait_for_slave_count = 1
-#slave
 rpl_semi_sync_slave_enabled = 0
 rpl_semi_sync_slave_trace_level = 32
+slave_parallel_workers = 8
+slave_parallel_type = LOGICAL_CLOCK
 """
 
 #endregion
