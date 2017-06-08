@@ -159,12 +159,10 @@ class MonitorServer(threading.Thread):
         innodb_info.rollback = status_info.rollback
         innodb_info.trx_count = status_info.trx_count
 
-        #unod list length
+        #unod list length mysql 没有这个状态值
         if(mysql_status_new.get("Innodb_history_list_length") != None):
             #percona
             innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
-        #mysql 没有这个状态值
-        #innodb_info.history_list_length = 0
 
         #row locks
         if(mysql_status_new.get("Innodb_current_row_locks") != None):

@@ -228,10 +228,10 @@
                         <td>
                             {{ status.io_tps }}
                         </td>
-                        <td>
+                        <td {% if(status.io_read > 500) %} class="text-danger" {% endif %}>
                             {{ status.io_read }}
                         </td>
-                        <td>
+                        <td {% if(status.io_write > 500) %} class="text-danger" {% endif %}>
                             {{ status.io_write }}
                         </td>
                         <td {% if(status.await > 5) %} class="text-danger" {% endif %}>

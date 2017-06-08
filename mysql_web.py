@@ -8,8 +8,7 @@ import json, os, gzip, StringIO, base64, sys
 from flask import Flask, render_template, request, app, redirect, url_for
 from flask_login import login_user, login_required, logout_user, LoginManager, current_user
 
-import settings
-from backup import backup
+import settings, backup
 from monitor import user_login, base_class, new_slow_log, report, alarm_thread
 from monitor import cache, server, slow_log, mysql_status, tablespace, general_log, execute_sql, user, thread, chart
 
@@ -22,7 +21,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 login_manager = LoginManager()
 login_manager.session_protection = "strong"
-login_manager.login_view = "login_home"
+login_manager.login_view = "login_error"
 login_manager.init_app(app=app)
 
 mysql_cache = cache.Cache()
@@ -59,7 +58,7 @@ def get_mysql_data_by_id(id):
 @app.route("/status", methods=['GET', 'POST'])
 @login_required
 def get_status_data():
-    print(current_user.id, current_user.username)
+    #print(current_user.id, current_user.username)
     return gzip_compress(get_monitor_data(data_status=mysql_cache.get_all_status_infos(keys=json.loads(request.values["keys"]))))
 
 @app.route("/status/<int:id>")
@@ -387,6 +386,10 @@ def load_user(user_id):
 @app.route("/login")
 def login_home():
     return render_template("login.html")
+
+@app.route("/login/error")
+def login_error():
+    return "login_error"
 
 #endregion
 

@@ -6,8 +6,13 @@ var post_url = ["/mysql", "/status", "/innodb", "/replication", "/os"]
 
 function myrefresh() {
     if ($.inArray(my_url, post_url) >= 0) {
-        $.post(my_url, {"keys":JSON.stringify(host_ids)}, function (data){
-            $("#data").html(ungzip_new(data));
+        $.post(my_url, {"keys": JSON.stringify(host_ids)}, function (data) {
+            if(data == "login_error") {
+                window.location.href = 'login';
+            }
+            else{
+                $("#data").html(ungzip_new(data));
+            }
         });
     }
     else {
