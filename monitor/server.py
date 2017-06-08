@@ -57,6 +57,7 @@ class MonitorServer(threading.Thread):
             mysql_status_old = self.get_dic_data(cursor, "show global status;")
         except pymysql.err.OperationalError:
             host_info.is_running = 0
+            return
 
         time.sleep(1)
         mysql_status_new = self.get_dic_data(cursor, "show global status;")

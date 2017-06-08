@@ -9,7 +9,7 @@ MySQL_Host = host_info.HoseInfo(host="192.168.11.101", port=3306, user="yangcg",
 ONE_DAY = 24 * 60 * 60
 
 #show global status监控数据更新间隔
-UPDATE_INTERVAL = 3
+UPDATE_INTERVAL = 5
 
 #Linux OS更新间隔
 LINUX_UPDATE_INTERVAL = 5

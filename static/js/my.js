@@ -7,13 +7,21 @@ var post_url = ["/mysql", "/status", "/innodb", "/replication", "/os"]
 function myrefresh() {
     if ($.inArray(my_url, post_url) >= 0) {
         $.post(my_url, {"keys": JSON.stringify(host_ids)}, function (data) {
-            if(data == "login_error") {
+            var login_flag = data.substring(0, 25);
+            if (login_flag == "<p hidden>login_error</p>") {
                 window.location.href = 'login';
             }
-            else{
+            else {
                 $("#data").html(ungzip_new(data));
             }
         });
+
+        /*$.post(my_url, {"keys": JSON.stringify(host_ids)}).success(function (data, status, xhr) {
+            console.log(xhr);
+            $("#data").html(ungzip_new(data));
+        }).success(function (data, status, xhr) {
+            console.log(xhr);
+        });*/
     }
     else {
         $.get(my_url, "", function (data) {

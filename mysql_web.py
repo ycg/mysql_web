@@ -21,7 +21,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 login_manager = LoginManager()
 login_manager.session_protection = "strong"
-login_manager.login_view = "login_error"
+login_manager.login_view = "login_home"
 login_manager.init_app(app=app)
 
 mysql_cache = cache.Cache()
@@ -385,11 +385,7 @@ def load_user(user_id):
 
 @app.route("/login")
 def login_home():
-    return render_template("login.html")
-
-@app.route("/login/error")
-def login_error():
-    return "login_error"
+    return "<p hidden>login_error</p>" + render_template("login.html")
 
 #endregion
 
