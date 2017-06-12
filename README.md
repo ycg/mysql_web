@@ -12,7 +12,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert into host_infos (host, port, user, password, remark) values</br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"),</br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");</br>
-8.添加系统登录账号insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yangcaogui", md5("123456"));</br>
+8.添加系统登录账号
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yangcaogui", md5("123456"));</br>
 9.启动python mysql_web.py runserver</br>
 10.如果要监控慢查询还要进行几步配置</br>
 

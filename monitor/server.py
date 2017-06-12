@@ -54,13 +54,13 @@ class MonitorServer(threading.Thread):
         cursor = connection.cursor()
 
         try:
-            mysql_status_old = self.get_dic_data(cursor, "show global status;")
+            mysql_status_old = self.get_dic_data(cursor, show_global_status_sql)
         except pymysql.err.OperationalError:
             host_info.is_running = 0
             return
 
         time.sleep(1)
-        mysql_status_new = self.get_dic_data(cursor, "show global status;")
+        mysql_status_new = self.get_dic_data(cursor, show_global_status_sql)
         mysql_variables = self.get_dic_data(cursor, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
                                                     "'max_connections', 'table_open_cache', 'table_open_cache_instances', 'innodb_buffer_pool_size', "
                                                     "'read_only', 'log_bin');")
@@ -728,4 +728,126 @@ class MonitorServer(threading.Thread):
 
                 row_number += 1
 
+#region show global status sql
 
+show_global_status_sql = """
+show global status where variable_name in
+(
+'Uptime',
+'Open_files',
+'Opened_files',
+'Bytes_sent',
+'Bytes_received',
+'Questions',
+'Com_select',
+'Com_insert',
+'Com_update',
+'Com_delete',
+'Com_commit',
+'Com_rollback',
+'Innodb_max_trx_id',
+'Connections',
+'Threads_created',
+'Threads_connected',
+'Threads_running',
+'Aborted_clients',
+'Aborted_connects',
+'Binlog_cache_use',
+'Binlog_cache_disk_use',
+'Handler_commit',
+'Handler_rollback',
+'Handler_read_first',
+'Handler_read_key',
+'Handler_read_next',
+'Handler_read_last',
+'Handler_read_rnd',
+'Handler_read_rnd_next',
+'Handler_update',
+'Handler_write',
+'Handler_delete',
+'table_open_cache',
+'table_open_cache_instances',
+'Open_tables',
+'Opened_tables',
+'Table_open_cache_hits',
+'Table_open_cache_misses',
+'Table_open_cache_overflows',
+'Open_files',
+'Opened_files',
+'Created_tmp_files',
+'Created_tmp_tables',
+'Created_tmp_disk_tables',
+'Table_locks_immediate',
+'Table_locks_waited',
+'Select_full_join',
+'Select_scan',
+'Select_full_range_join',
+'Select_range_check',
+'Select_range',
+'Sort_merge_passes',
+'Sort_range',
+'Sort_scan',
+'Innodb_history_list_length',
+'Innodb_current_row_locks',
+'Innodb_row_lock_current_waits',
+'Innodb_log_writes',
+'Innodb_log_write_requests',
+'Innodb_os_log_pending_fsyncs',
+'Innodb_os_log_pending_writes',
+'Innodb_os_log_written',
+'Innodb_log_waits',
+'Innodb_buffer_pool_wait_free',
+'Innodb_row_lock_waits',
+'Innodb_row_lock_time',
+'Innodb_row_lock_time_avg',
+'Innodb_row_lock_time_max',
+'Innodb_buffer_pool_pages_data',
+'Innodb_buffer_pool_pages_dirty',
+'Innodb_buffer_pool_pages_free',
+'Innodb_buffer_pool_pages_total',
+'Innodb_buffer_pool_pages_flushed',
+'Innodb_rows_read',
+'Innodb_rows_updated',
+'Innodb_rows_deleted',
+'Innodb_rows_inserted',
+'Innodb_buffer_pool_reads',
+'Innodb_buffer_pool_write_requests',
+'Innodb_buffer_pool_reads',
+'Innodb_buffer_pool_read_requests',
+'Innodb_data_read',
+'Innodb_data_reads',
+'Innodb_data_writes',
+'Innodb_data_written',
+'Innodb_data_fsyncs',
+'Innodb_data_pending_fsyncs',
+'Innodb_data_pending_reads',
+'Innodb_data_pending_writes',
+'Innodb_page_size',
+'Innodb_pages_read',
+'Innodb_pages_created',
+'Innodb_pages_written',
+'Innodb_ibuf_free_list',
+'Innodb_ibuf_size',
+'Innodb_ibuf_free_list',
+'Innodb_ibuf_merges',
+'Innodb_ibuf_merged_inserts',
+'Innodb_ibuf_merged_deletes',
+'Innodb_ibuf_merged_delete_marks',
+'Rpl_semi_sync_master_status',
+'Rpl_semi_sync_slave_status',
+'Rpl_semi_sync_master_status',
+'Rpl_semi_sync_master_clients',
+'Rpl_semi_sync_master_net_waits',
+'Rpl_semi_sync_master_net_wait_time',
+'Rpl_semi_sync_master_net_avg_wait_time',
+'Rpl_semi_sync_master_tx_waits',
+'Rpl_semi_sync_master_tx_wait_time',
+'Rpl_semi_sync_master_tx_avg_wait_time',
+'Rpl_semi_sync_master_no_tx',
+'Rpl_semi_sync_master_yes_tx',
+'Rpl_semi_sync_master_no_times',
+'Rpl_semi_sync_master_wait_sessions'
+);
+"""
+
+#endregion
