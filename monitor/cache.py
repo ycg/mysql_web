@@ -110,6 +110,18 @@ class Cache(object):
         innodb_info.innodb_ibuf_merged_inserts_new = 0
         innodb_info.innodb_ibuf_merged_deletes_new = 0
         innodb_info.innodb_ibuf_merged_delete_marks_new = 0
+        innodb_info.innodb_mutex_os_waits = 0
+        innodb_info.innodb_mutex_spin_rounds = 0
+        innodb_info.innodb_mutex_spin_waits = 0
+        innodb_info.innodb_s_lock_os_waits = 0
+        innodb_info.innodb_s_lock_spin_rounds = 0
+        innodb_info.innodb_s_lock_spin_waits = 0
+        innodb_info.innodb_x_lock_os_waits = 0
+        innodb_info.innodb_x_lock_spin_rounds = 0
+        innodb_info.innodb_x_lock_spin_waits = 0
+        innodb_info.innodb_mutex_ratio = 0
+        innodb_info.innodb_s_ratio = 0
+        innodb_info.innodb_x_ratio = 0
         return innodb_info
 
     def join_thread_pool(self, method_name):

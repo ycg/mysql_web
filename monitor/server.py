@@ -236,6 +236,32 @@ class MonitorServer(threading.Thread):
             innodb_info.innodb_ibuf_merged_deletes = int(mysql_status_new["Innodb_ibuf_merged_deletes"]) - int(mysql_status_old["Innodb_ibuf_merged_deletes"])
             innodb_info.innodb_ibuf_merged_delete_marks = int(mysql_status_new["Innodb_ibuf_merged_delete_marks"]) - int(mysql_status_old["Innodb_ibuf_merged_delete_marks"])
 
+        #innodb mutex share excl lock
+        if(mysql_status_old.has_key("Innodb_mutex_os_waits")):
+            innodb_info.innodb_mutex_os_waits = int(mysql_status_new["Innodb_mutex_os_waits"]) - int(mysql_status_old["Innodb_mutex_os_waits"])
+            innodb_info.innodb_mutex_spin_rounds = int(mysql_status_new["Innodb_mutex_spin_rounds"]) - int(mysql_status_old["Innodb_mutex_spin_rounds"])
+            innodb_info.innodb_mutex_spin_waits = int(mysql_status_new["Innodb_mutex_spin_waits"]) - int(mysql_status_old["Innodb_mutex_spin_waits"])
+            innodb_info.innodb_s_lock_os_waits = int(mysql_status_new["Innodb_s_lock_os_waits"]) - int(mysql_status_old["Innodb_s_lock_os_waits"])
+            innodb_info.innodb_s_lock_spin_rounds = int(mysql_status_new["Innodb_s_lock_spin_rounds"]) - int(mysql_status_old["Innodb_s_lock_spin_rounds"])
+            innodb_info.innodb_s_lock_spin_waits = int(mysql_status_new["Innodb_s_lock_spin_waits"]) - int(mysql_status_old["Innodb_s_lock_spin_waits"])
+            innodb_info.innodb_x_lock_os_waits = int(mysql_status_new["Innodb_x_lock_os_waits"]) - int(mysql_status_old["Innodb_x_lock_os_waits"])
+            innodb_info.innodb_x_lock_spin_rounds = int(mysql_status_new["Innodb_x_lock_spin_rounds"]) - int(mysql_status_old["Innodb_x_lock_spin_rounds"])
+            innodb_info.innodb_x_lock_spin_waits = int(mysql_status_new["Innodb_x_lock_spin_waits"]) - int(mysql_status_old["Innodb_x_lock_spin_waits"])
+            if(innodb_info.innodb_mutex_os_waits == 0):
+                innodb_info.innodb_mutex_ratio = 0
+            else:
+                innodb_info.innodb_mutex_ratio = round(float(innodb_info.innodb_mutex_os_waits) / float(innodb_info.innodb_mutex_spin_rounds) * 100, 2)
+
+            if(innodb_info.innodb_s_lock_os_waits == 0):
+                innodb_info.innodb_s_ratio = 0
+            else:
+                innodb_info.innodb_s_ratio = round(float(innodb_info.innodb_s_lock_os_waits) / float(innodb_info.innodb_s_lock_spin_rounds) * 100, 2)
+
+            if(innodb_info.innodb_x_lock_os_waits == 0):
+                innodb_info.innodb_x_ratio = 0
+            else:
+                innodb_info.innodb_x_ratio = round(float(innodb_info.innodb_x_lock_os_waits) / float(innodb_info.innodb_x_lock_spin_rounds) * 100, 2)
+
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         repl_info = self.__cache.get_repl_info(host_info.key)
         result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
@@ -846,8 +872,16 @@ show global status where variable_name in
 'Rpl_semi_sync_master_no_tx',
 'Rpl_semi_sync_master_yes_tx',
 'Rpl_semi_sync_master_no_times',
-'Rpl_semi_sync_master_wait_sessions'
+'Rpl_semi_sync_master_wait_sessions',
+'Innodb_mutex_os_waits',
+'Innodb_mutex_spin_rounds',
+'Innodb_mutex_spin_waits',
+'Innodb_s_lock_os_waits',
+'Innodb_s_lock_spin_rounds',
+'Innodb_s_lock_spin_waits',
+'Innodb_x_lock_os_waits',
+'Innodb_x_lock_spin_rounds',
+'Innodb_x_lock_spin_waits'
 );
 """
-
 #endregion

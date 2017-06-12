@@ -1024,7 +1024,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-12">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
@@ -1033,6 +1033,15 @@
                     </th>
                     <th colspan="4" rowspan="1" class="text-center">
                         Innodb Page
+                    </th>
+                    <th colspan="4" rowspan="1" class="text-center">
+                        Mutex Lock
+                    </th>
+                    <th colspan="4" rowspan="1" class="text-center">
+                        Excl Lock
+                    </th>
+                    <th colspan="4" rowspan="1" class="text-center">
+                        Share Lock
                     </th>
                 </tr>
                 <tr>
@@ -1051,12 +1060,48 @@
                     <th>
                         Write
                     </th>
+                    <th>
+                        OS_Waits
+                    </th>
+                    <th>
+                        Spin_Rounds
+                    </th>
+                    <th>
+                        Spin_Waits
+                    </th>
+                    <th>
+                        Aatio(%)
+                    </th>
+                    <th>
+                        OS_Waits
+                    </th>
+                    <th>
+                        Spin_Rounds
+                    </th>
+                    <th>
+                        Spin_Waits
+                    </th>
+                    <th>
+                        Aatio(%)
+                    </th>
+                    <th>
+                        OS_Waits
+                    </th>
+                    <th>
+                        Spin_Rounds
+                    </th>
+                    <th>
+                        Spin_Waits
+                    </th>
+                    <th>
+                        Aatio(%)
+                    </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="text-center">
                 {% for status in data_innodb %}
                 <tr>
-                    <td>
+                    <td class="text-left">
                         {{ status.host_info.remark }}
                     </td>
                     <td>
@@ -1070,6 +1115,42 @@
                     </td>
                     <td>
                         {{ status.innodb_pages_written }}
+                    </td>
+                    <td {% if(status.innodb_mutex_os_waits > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_mutex_os_waits }}
+                    </td>
+                    <td>
+                        {{ status.innodb_mutex_spin_rounds }}
+                    </td>
+                    <td>
+                        {{ status.innodb_mutex_spin_rounds }}
+                    </td>
+                    <td {% if(status.innodb_mutex_ratio > 5) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_mutex_ratio }}
+                    </td>
+                    <td {% if(status.innodb_x_lock_os_waits > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_x_lock_os_waits }}
+                    </td>
+                    <td>
+                        {{ status.innodb_x_lock_spin_rounds }}
+                    </td>
+                    <td>
+                        {{ status.innodb_x_lock_spin_waits }}
+                    </td>
+                    <td {% if(status.innodb_x_ratio > 5) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_x_ratio }}
+                    </td>
+                    <td {% if(status.innodb_s_lock_os_waits > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_s_lock_os_waits }}
+                    </td>
+                    <td>
+                        {{ status.innodb_s_lock_spin_rounds }}
+                    </td>
+                    <td>
+                        {{ status.innodb_s_lock_spin_waits }}
+                    </td>
+                    <td {% if(status.innodb_s_ratio > 5) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_s_ratio }}
                     </td>
                 </tr>
                 {% endfor %}
@@ -1091,19 +1172,19 @@
                     <th>
                         Host
                     </th>
-                    <th class="text-center">
+                    <th>
                         Free
                     </th>
-                    <th class="text-center">
+                    <th>
                         Merges
                     </th>
-                    <th title="merged inserts" class="text-center">
+                    <th title="merged inserts">
                         M_Inserts
                     </th>
-                    <th title="merged deletes" class="text-center">
+                    <th title="merged deletes">
                         M_Deletes
                     </th>
-                    <th title="merge delete marks" class="text-center">
+                    <th title="merge delete marks">
                         M_D_Marks
                     </th>
                 </tr>
