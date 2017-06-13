@@ -1123,7 +1123,7 @@
                         {{ status.innodb_mutex_spin_rounds }}
                     </td>
                     <td>
-                        {{ status.innodb_mutex_spin_rounds }}
+                        {{ status.innodb_mutex_spin_waits }}
                     </td>
                     <td {% if(status.innodb_mutex_ratio > 5) %} class="text-danger" {% endif %}>
                         {{ status.innodb_mutex_ratio }}

@@ -247,20 +247,21 @@ class MonitorServer(threading.Thread):
             innodb_info.innodb_x_lock_os_waits = int(mysql_status_new["Innodb_x_lock_os_waits"]) - int(mysql_status_old["Innodb_x_lock_os_waits"])
             innodb_info.innodb_x_lock_spin_rounds = int(mysql_status_new["Innodb_x_lock_spin_rounds"]) - int(mysql_status_old["Innodb_x_lock_spin_rounds"])
             innodb_info.innodb_x_lock_spin_waits = int(mysql_status_new["Innodb_x_lock_spin_waits"]) - int(mysql_status_old["Innodb_x_lock_spin_waits"])
-            if(innodb_info.innodb_mutex_os_waits == 0):
-                innodb_info.innodb_mutex_ratio = 0
-            else:
-                innodb_info.innodb_mutex_ratio = round(float(innodb_info.innodb_mutex_os_waits) / float(innodb_info.innodb_mutex_spin_rounds) * 100, 2)
 
-            if(innodb_info.innodb_s_lock_os_waits == 0):
-                innodb_info.innodb_s_ratio = 0
-            else:
-                innodb_info.innodb_s_ratio = round(float(innodb_info.innodb_s_lock_os_waits) / float(innodb_info.innodb_s_lock_spin_rounds) * 100, 2)
+        if(innodb_info.innodb_mutex_os_waits == 0):
+            innodb_info.innodb_mutex_ratio = 0
+        else:
+            innodb_info.innodb_mutex_ratio = round(float(innodb_info.innodb_mutex_os_waits) / float(innodb_info.innodb_mutex_spin_rounds) * 100, 2)
 
-            if(innodb_info.innodb_x_lock_os_waits == 0):
-                innodb_info.innodb_x_ratio = 0
-            else:
-                innodb_info.innodb_x_ratio = round(float(innodb_info.innodb_x_lock_os_waits) / float(innodb_info.innodb_x_lock_spin_rounds) * 100, 2)
+        if(innodb_info.innodb_s_lock_os_waits == 0):
+            innodb_info.innodb_s_ratio = 0
+        else:
+            innodb_info.innodb_s_ratio = round(float(innodb_info.innodb_s_lock_os_waits) / float(innodb_info.innodb_s_lock_spin_rounds) * 100, 2)
+
+        if(innodb_info.innodb_x_lock_os_waits == 0):
+            innodb_info.innodb_x_ratio = 0
+        else:
+            innodb_info.innodb_x_ratio = round(float(innodb_info.innodb_x_lock_os_waits) / float(innodb_info.innodb_x_lock_spin_rounds) * 100, 2)
 
         #3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         repl_info = self.__cache.get_repl_info(host_info.key)
@@ -583,6 +584,8 @@ class MonitorServer(threading.Thread):
             self.get_transactions_info(host_info, innodb_status["TRANSACTIONS"])
         if(innodb_status.has_key("INSERT BUFFER AND ADAPTIVE HASH INDEX")):
             self.get_change_buffer_infos(host_info, innodb_status["INSERT BUFFER AND ADAPTIVE HASH INDEX"])
+        if(innodb_status.has_key("SEMAPHORES")):
+            self.get_innodb_lock_infos(host_info, innodb_status["SEMAPHORES"])
 
     def get_lsn_info(self, host_info, values):
         info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
@@ -753,6 +756,57 @@ class MonitorServer(threading.Thread):
                     innodb_info.innodb_ibuf_merged_delete_marks = innodb_info.innodb_ibuf_merged_delete_marks_new - innodb_info.innodb_ibuf_merged_delete_marks_old
 
                 row_number += 1
+
+    def get_innodb_lock_infos(self, host_info, values):
+        if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
+            row_number = 1
+            innodb_info = self.__cache.get_innodb_infos(host_info.key)
+            for line in values:
+                lst = line.split(",")
+                if(row_number == 4):
+                    #Mutex spin waits 4028500577, rounds 3985916509, OS waits 52752390
+                    innodb_info.innodb_mutex_spin_waits_old = innodb_info.innodb_mutex_spin_waits_new
+                    innodb_info.innodb_mutex_spin_waits_new = self.get_last_value_for_array(lst, 0)
+                    innodb_info.innodb_mutex_spin_waits = innodb_info.innodb_mutex_spin_waits_new - innodb_info.innodb_mutex_spin_waits_old
+
+                    innodb_info.innodb_mutex_spin_rounds_old = innodb_info.innodb_mutex_spin_rounds_new
+                    innodb_info.innodb_mutex_spin_rounds_new = self.get_last_value_for_array(lst, 1)
+                    innodb_info.innodb_mutex_spin_rounds = innodb_info.innodb_mutex_spin_rounds_new - innodb_info.innodb_mutex_spin_rounds_old
+
+                    innodb_info.innodb_mutex_os_waits_old = innodb_info.innodb_mutex_os_waits_new
+                    innodb_info.innodb_mutex_os_waits_new = self.get_last_value_for_array(lst, 2)
+                    innodb_info.innodb_mutex_os_waits = innodb_info.innodb_mutex_os_waits_new - innodb_info.innodb_mutex_os_waits_old
+                if(row_number == 5):
+                    #RW-shared spins 6397297650, rounds 57823195252, OS waits 1223146785
+                    innodb_info.innodb_s_lock_spin_waits_old = innodb_info.innodb_s_lock_spin_waits_new
+                    innodb_info.innodb_s_lock_spin_waits_new = self.get_last_value_for_array(lst, 0)
+                    innodb_info.innodb_s_lock_spin_waits = innodb_info.innodb_s_lock_spin_waits_new - innodb_info.innodb_s_lock_spin_waits_old
+
+                    innodb_info.innodb_s_lock_spin_rounds_old = innodb_info.innodb_s_lock_spin_rounds_new
+                    innodb_info.innodb_s_lock_spin_rounds_new = self.get_last_value_for_array(lst, 1)
+                    innodb_info.innodb_s_lock_spin_rounds = innodb_info.innodb_s_lock_spin_rounds_new - innodb_info.innodb_s_lock_spin_rounds_old
+
+                    innodb_info.innodb_s_lock_os_waits_old = innodb_info.innodb_s_lock_os_waits_new
+                    innodb_info.innodb_s_lock_os_waits_new = self.get_last_value_for_array(lst, 2)
+                    innodb_info.innodb_s_lock_os_waits = innodb_info.innodb_s_lock_os_waits_new - innodb_info.innodb_s_lock_os_waits_old
+                if(row_number == 6):
+                    #RW-excl spins 912418176, rounds 42146038659, OS waits 552132933
+                    innodb_info.innodb_x_lock_spin_waits_old = innodb_info.innodb_x_lock_spin_waits_new
+                    innodb_info.innodb_x_lock_spin_waits_new = self.get_last_value_for_array(lst, 0)
+                    innodb_info.innodb_x_lock_spin_waits = innodb_info.innodb_x_lock_spin_waits_new - innodb_info.innodb_x_lock_spin_waits_old
+
+                    innodb_info.innodb_x_lock_spin_rounds_old = innodb_info.innodb_x_lock_spin_rounds_new
+                    innodb_info.innodb_x_lock_spin_rounds_new = self.get_last_value_for_array(lst, 1)
+                    innodb_info.innodb_x_lock_spin_rounds = innodb_info.innodb_x_lock_spin_rounds_new - innodb_info.innodb_x_lock_spin_rounds_old
+
+                    innodb_info.innodb_x_lock_os_waits_old = innodb_info.innodb_x_lock_os_waits_new
+                    innodb_info.innodb_x_lock_os_waits_new = self.get_last_value_for_array(lst, 2)
+                    innodb_info.innodb_x_lock_os_waits = innodb_info.innodb_x_lock_os_waits_new - innodb_info.innodb_x_lock_os_waits_old
+
+                row_number += 1
+
+    def get_last_value_for_array(self, array, index):
+        return int(array[index].split(" ")[-1])
 
 #region show global status sql
 
