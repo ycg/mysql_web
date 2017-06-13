@@ -1031,8 +1031,8 @@
                     <th>
 
                     </th>
-                    <th colspan="4" rowspan="1" class="text-center">
-                        Innodb Page
+                    <th colspan="2" rowspan="1" class="text-center">
+                        Spin Var
                     </th>
                     <th colspan="4" rowspan="1" class="text-center">
                         Mutex Lock
@@ -1048,17 +1048,11 @@
                     <th>
                         Host
                     </th>
-                    <th>
-                        Size(K)
+                    <th title="innodb_sync_spin_loops">
+                        Loops
                     </th>
-                    <th>
-                        Create
-                    </th>
-                    <th>
-                        Read
-                    </th>
-                    <th>
-                        Write
+                    <th title="innodb_spin_wait_delay">
+                        W_Delay(ms)
                     </th>
                     <th>
                         OS_Waits
@@ -1105,16 +1099,10 @@
                         {{ status.host_info.remark }}
                     </td>
                     <td>
-                        {{ status.innodb_page_size }}
+                        {{ status.innodb_sync_spin_loops }}
                     </td>
                     <td>
-                        {{ status.innodb_pages_created }}
-                    </td>
-                    <td>
-                        {{ status.innodb_pages_read }}
-                    </td>
-                    <td>
-                        {{ status.innodb_pages_written }}
+                        {{ status.innodb_spin_wait_delay }}
                     </td>
                     <td {% if(status.innodb_mutex_os_waits > 0) %} class="text-danger" {% endif %}>
                         {{ status.innodb_mutex_os_waits }}
@@ -1157,12 +1145,17 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-5">
+</div>
+<div class="row">
+    <div class="col-md-9">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>
 
+                    </th>
+                    <th colspan="4" rowspan="1" class="text-center">
+                        Innodb Page
                     </th>
                     <th colspan="5" rowspan="1" class="text-center">
                         Change(Insert) Buffer
@@ -1171,6 +1164,18 @@
                 <tr>
                     <th>
                         Host
+                    </th>
+                    <th>
+                        Size(K)
+                    </th>
+                    <th>
+                        Create
+                    </th>
+                    <th>
+                        Read
+                    </th>
+                    <th>
+                        Write
                     </th>
                     <th>
                         Free
@@ -1194,6 +1199,18 @@
                 <tr>
                     <td class="text-left">
                         {{ status.host_info.remark }}
+                    </td>
+                    <td>
+                        {{ status.innodb_page_size }}
+                    </td>
+                    <td>
+                        {{ status.innodb_pages_created }}
+                    </td>
+                    <td>
+                        {{ status.innodb_pages_read }}
+                    </td>
+                    <td>
+                        {{ status.innodb_pages_written }}
                     </td>
                     <td>
                         {{ status.innodb_ibuf_free_list }}

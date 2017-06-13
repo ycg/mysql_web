@@ -63,7 +63,7 @@ class MonitorServer(threading.Thread):
         mysql_status_new = self.get_dic_data(cursor, show_global_status_sql)
         mysql_variables = self.get_dic_data(cursor, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
                                                     "'max_connections', 'table_open_cache', 'table_open_cache_instances', 'innodb_buffer_pool_size', "
-                                                    "'read_only', 'log_bin');")
+                                                    "'read_only', 'log_bin', 'innodb_spin_wait_delay', 'innodb_sync_spin_loops');")
         host_info.uptime = int(mysql_status_new["Uptime"]) / 60 / 60 / 24
 
         #1.---------------------------------------------------------获取mysql global status--------------------------------------------------------
@@ -237,6 +237,8 @@ class MonitorServer(threading.Thread):
             innodb_info.innodb_ibuf_merged_delete_marks = int(mysql_status_new["Innodb_ibuf_merged_delete_marks"]) - int(mysql_status_old["Innodb_ibuf_merged_delete_marks"])
 
         #innodb mutex share excl lock
+        innodb_info.innodb_spin_wait_delay = mysql_variables["innodb_spin_wait_delay"]
+        innodb_info.innodb_sync_spin_loops = mysql_variables["innodb_sync_spin_loops"]
         if(mysql_status_old.has_key("Innodb_mutex_os_waits")):
             innodb_info.innodb_mutex_os_waits = int(mysql_status_new["Innodb_mutex_os_waits"]) - int(mysql_status_old["Innodb_mutex_os_waits"])
             innodb_info.innodb_mutex_spin_rounds = int(mysql_status_new["Innodb_mutex_spin_rounds"]) - int(mysql_status_old["Innodb_mutex_spin_rounds"])
@@ -248,17 +250,17 @@ class MonitorServer(threading.Thread):
             innodb_info.innodb_x_lock_spin_rounds = int(mysql_status_new["Innodb_x_lock_spin_rounds"]) - int(mysql_status_old["Innodb_x_lock_spin_rounds"])
             innodb_info.innodb_x_lock_spin_waits = int(mysql_status_new["Innodb_x_lock_spin_waits"]) - int(mysql_status_old["Innodb_x_lock_spin_waits"])
 
-        if(innodb_info.innodb_mutex_os_waits == 0):
+        if(innodb_info.innodb_mutex_spin_rounds == 0):
             innodb_info.innodb_mutex_ratio = 0
         else:
             innodb_info.innodb_mutex_ratio = round(float(innodb_info.innodb_mutex_os_waits) / float(innodb_info.innodb_mutex_spin_rounds) * 100, 2)
 
-        if(innodb_info.innodb_s_lock_os_waits == 0):
+        if(innodb_info.innodb_s_lock_spin_rounds == 0):
             innodb_info.innodb_s_ratio = 0
         else:
             innodb_info.innodb_s_ratio = round(float(innodb_info.innodb_s_lock_os_waits) / float(innodb_info.innodb_s_lock_spin_rounds) * 100, 2)
 
-        if(innodb_info.innodb_x_lock_os_waits == 0):
+        if(innodb_info.innodb_x_lock_spin_rounds == 0):
             innodb_info.innodb_x_ratio = 0
         else:
             innodb_info.innodb_x_ratio = round(float(innodb_info.innodb_x_lock_os_waits) / float(innodb_info.innodb_x_lock_spin_rounds) * 100, 2)
