@@ -1147,7 +1147,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-9">
+    <div class="col-md-10">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
@@ -1159,6 +1159,9 @@
                     </th>
                     <th colspan="5" rowspan="1" class="text-center">
                         Change(Insert) Buffer
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        Adaptive Hash Index
                     </th>
                 </tr>
                 <tr>
@@ -1192,9 +1195,18 @@
                     <th title="merge delete marks">
                         M_D_Marks
                     </th>
+                    <th>
+                        Searches/S
+                    </th>
+                    <th>
+                        No_Searches/S
+                    </th>
+                    <th>
+                        Aatio(%)
+                    </th>
                 </tr>
             </thead>
-            <tbody class="text-center">
+            <tbody>
                 {% for status in data_innodb %}
                 <tr>
                     <td class="text-left">
@@ -1226,6 +1238,15 @@
                     </td>
                     <td>
                         {{ status.innodb_ibuf_merged_delete_marks }}
+                    </td>
+                    <td>
+                        {{ status.hash_searches }}
+                    </td>
+                    <td>
+                        {{ status.non_hash_searches }}
+                    </td>
+                    <td>
+                        {{ status.hash_search_ratio }}
                     </td>
                 </tr>
                 {% endfor %}

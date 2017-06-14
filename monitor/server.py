@@ -715,6 +715,26 @@ class MonitorServer(threading.Thread):
         return innodb_status_infos
 
     def get_change_buffer_infos(self, host_info, values):
+        row_number = 1
+        innodb_info = self.__cache.get_innodb_infos(host_info.key)
+        for line in values:
+            if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
+                if(row_number == 8):
+                    lst = line.split(",")
+                    innodb_info.hash_searches = float(lst[0].split(" ")[0])
+                    innodb_info.non_hash_searches = float(lst[1].split(" ")[1])
+            elif(row_number == 7):
+                #第七行格式
+                #373422000.00 hash searches/s, 43560000.00 non-hash searches/s
+                lst = line.split(",")
+                innodb_info.hash_searches = float(lst[0].split(" ")[0])
+                innodb_info.non_hash_searches = float(lst[1].split(" ")[1])
+            row_number += 1
+        if(innodb_info.hash_searches <= 0 and innodb_info.non_hash_searches <= 0):
+            innodb_info.hash_search_ratio = 0
+        else:
+            innodb_info.hash_search_ratio = round(innodb_info.hash_searches / (innodb_info.non_hash_searches + innodb_info.hash_searches) * 100, 2)
+
         if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
             row_number = 1
             innodb_info = self.__cache.get_innodb_infos(host_info.key)
