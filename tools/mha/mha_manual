@@ -1,10 +1,25 @@
 
-MHA使用手册
+MHA瀹夎鎵嬪唽
 
-#1.安装MHA
-    #本地安装
+#1.瀹夎MHA
+    #鏈湴瀹夎
     python mha_auto_install.py --package=/opt/mha*
-    #远程安装
+    #杩滅▼瀹夎
     python mha_auto_install.py --host=192.168.1.100 --package=/opt/mha*
 
-#2.编写配置文件
+#2.閰嶇疆鏂囦欢
+    閰嶇疆鏂囦欢瑕佹敞鎰忔満鍣ㄧ殑椤哄簭锛屼互鍙婁竴浜涜剼鏈殑璺緞绛夌瓑
+
+#3.娴嬭瘯SSH鍜孯epl鏄惁姝ｅ父
+    masterha_check_ssh --conf=/app.conf
+    masterha_check_repl --conf=/app.conf
+
+#4.鍚姩MHA
+    nohup masterha_manager --conf=/app.conf --ignore_last_failover &
+
+#5.杩涜鏁呴殰娴嬭瘯锛屽苟娉ㄦ剰VIP鏄惁杞Щ
+
+#6.鍦ㄥ仛涓轰富鐨勫搴撲笂澧炲姞purge_relay_log.sh鑴氭湰锛屽畾鏃舵竻闄elay log
+
+#7.濡傛灉MHA杩涜浜嗘晠闅滆浆绉讳簡锛岄渶瑕佸湪鍒囨崲鍥炴潵锛屽彲浠ヤ娇鐢╩asterha_master_switch
+    masterha_master_switch --master_state=alive --conf=/app1.cnf --new_master_host=192.168.1.100  --orig_master_is_new_slave --running_updates_limit=3

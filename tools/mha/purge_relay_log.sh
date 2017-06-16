@@ -17,3 +17,5 @@ fi
 ${purge_shell}  --host=${host} --user=${user} --password=${passwd} --disable_relay_log_purge --port=${port} --workdir=${work_dir} >> ${log_dir}/purge_relay_logs.log 2>&1
 
 
+#把脚本添加到crontab中去
+#* */1 * * * ./purge_relay_log.sh
