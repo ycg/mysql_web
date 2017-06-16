@@ -1,0 +1,10 @@
+
+MHA使用手册
+
+#1.安装MHA
+    #本地安装
+    python mha_auto_install.py --package=/opt/mha*
+    #远程安装
+    python mha_auto_install.py --host=192.168.1.100 --package=/opt/mha*
+
+#2.编写配置文件
