@@ -1,5 +1,5 @@
 {% if(mysql_infos != None) %}
-<table class="table table-condensed table-hover table-bordered">
+<table class="table table-hover table-bordered">
     <thead>
         <tr>
             <th colspan="4" class="text-center">
@@ -27,52 +27,52 @@
             <th>
                 Host
             </th>
-            <th class="text-center">
+            <th>
                 Port
             </th>
-            <th class="text-center">
+            <th>
                 Role
             </th>
-            <th class="text-center">
+            <th>
                 Master_Name
             </th>
-            <th class="text-center">
+            <th>
                 IO
             </th>
-            <th class="text-center">
+            <th>
                 SQL
             </th>
-            <th class="text-center">
+            <th>
                 Running
             </th>
-            <th class="text-center">
+            <th>
                 QPS
             </th>
-            <th class="text-center">
+            <th>
                 TPS
             </th>
-            <th class="text-center">
+            <th>
                 Trxs
             </th>
-            <th title="buffer pool size" class="text-center">
+            <th title="buffer pool size">
                 B_P_Z
             </th>
-            <th class="text-center">
+            <th>
                 Threads
             </th>
-            <th class="text-center">
+            <th>
                 Threads_R
             </th>
-            <th class="text-center">
+            <th>
                 Send_B
             </th>
-            <th class="text-center">
+            <th>
                 Rece_B
             </th>
-            <th class="text-center">
-                Uptime(Day)
+            <th>
+                Uptime
             </th>
-            <th class="text-center">
+            <th>
                 Version
             </th>
             <th class="text-center">
@@ -83,14 +83,14 @@
             </th>
         </tr>
     </thead>
-    <tbody class="text-center">
+    <tbody>
     {% for data in mysql_infos %}
         <tr>
-            <td class="text-left">
+            <td>
                 {{ data.remark }}
             </td>
             <td>
-                {{ data.port }}
+                {{ data.host }}:{{ data.port }}
             </td>
             <td>
                 {% if(data.is_slave and data.is_master) %}

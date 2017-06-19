@@ -1245,7 +1245,7 @@
                     <td>
                         {{ status.non_hash_searches }}
                     </td>
-                    <td>
+                    <td {% if(status.hash_search_ratio < 50) %} class="text-danger" {% endif %}>
                         {{ status.hash_search_ratio }}
                     </td>
                 </tr>

@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../mysql_audit/.idea/mysql_audit.iml" filepath="$PROJECT_DIR$/../mysql_audit/.idea/mysql_audit.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/mysql_web.iml" filepath="$PROJECT_DIR$/.idea/mysql_web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../untitled6/.idea/untitled6.iml" filepath="$PROJECT_DIR$/../untitled6/.idea/untitled6.iml" />
     </modules>
   </component>
 </project>

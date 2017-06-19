@@ -65,6 +65,8 @@ class MonitorServer(threading.Thread):
                                                     "'max_connections', 'table_open_cache', 'table_open_cache_instances', 'innodb_buffer_pool_size', "
                                                     "'read_only', 'log_bin', 'innodb_spin_wait_delay', 'innodb_sync_spin_loops');")
         host_info.uptime = int(mysql_status_new["Uptime"]) / 60 / 60 / 24
+        if(host_info.uptime == 0):
+            host_info.uptime = 1
 
         #1.---------------------------------------------------------获取mysql global status--------------------------------------------------------
         status_info = self.__cache.get_status_infos(host_info.key)
@@ -715,21 +717,13 @@ class MonitorServer(threading.Thread):
         return innodb_status_infos
 
     def get_change_buffer_infos(self, host_info, values):
-        row_number = 1
+        #为数组的倒数第二行
+        #373422000.00 hash searches/s, 43560000.00 non-hash searches/s
+        line_value = values[-2]
+        lst = line_value.split(",")
         innodb_info = self.__cache.get_innodb_infos(host_info.key)
-        for line in values:
-            if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
-                if(row_number == 8):
-                    lst = line.split(",")
-                    innodb_info.hash_searches = float(lst[0].split(" ")[0])
-                    innodb_info.non_hash_searches = float(lst[1].split(" ")[1])
-            elif(row_number == 7):
-                #第七行格式
-                #373422000.00 hash searches/s, 43560000.00 non-hash searches/s
-                lst = line.split(",")
-                innodb_info.hash_searches = float(lst[0].split(" ")[0])
-                innodb_info.non_hash_searches = float(lst[1].split(" ")[1])
-            row_number += 1
+        innodb_info.hash_searches = float(lst[0].split(" ")[0])
+        innodb_info.non_hash_searches = float(lst[1].split(" ")[1])
         if(innodb_info.hash_searches <= 0 and innodb_info.non_hash_searches <= 0):
             innodb_info.hash_search_ratio = 0
         else:
