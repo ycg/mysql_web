@@ -374,7 +374,7 @@ class MonitorServer(threading.Thread):
         try:
             host_client = paramiko.SSHClient()
             host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            host_client.connect(host_info.host, port=22, username="root")
+            host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
 
             #监测CPU负载
             self.monitor_host_for_cpu_load(host_client, linux_info)
@@ -396,7 +396,7 @@ class MonitorServer(threading.Thread):
         try:
             host_client = paramiko.SSHClient()
             host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            host_client.connect(host_info.host, port=22, username="root")
+            host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
 
             #获取cpu和io数据的标记位
             stdin, stdout, stderr = host_client.exec_command("iostat -xk 1 2")

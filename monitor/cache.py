@@ -28,7 +28,7 @@ class Cache(object):
     def load_all_host_infos(self):
         if (self.__thread_pool == None):
             self.__thread_pool = threadpool.ThreadPool(settings.THREAD_POOL_SIZE)
-        sql = "select host_id, host, port, user, password, remark, is_master, is_slave, master_id, is_deleted from mysql_web.host_infos;"
+        sql = "select host_id, host, port, user, password, remark, is_master, is_slave, master_id, is_deleted, ssh_port from mysql_web.host_infos;"
         for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
             host_id = row["host_id"]
             if (self.__host_infos.has_key(host_id) == True):
@@ -46,6 +46,7 @@ class Cache(object):
             host_info_temp.is_master = bool(row["is_master"])
             host_info_temp.is_slave = bool(row["is_slave"])
             host_info_temp.master_id = row["master_id"]
+            host_info_temp.ssh_port = row["ssh_port"]
             host_info_temp.key = host_info_temp.host_id
             if (row["is_deleted"] == 1):
                 self.remove_key(self.__tablespace, host_id)

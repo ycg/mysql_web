@@ -15,6 +15,7 @@ create table host_infos
     is_master tinyint not null default 0 comment '是否是主库',
     is_slave tinyint not null default 0 comment '是否是从库',
     master_id mediumint unsigned not null default 0 comment '如果是从库-关联他主库的id',
+    ssh_port SMALLINT UNSIGNED NOT NULL DEFAULT 22 COMMENT '用于ssh远程执行的端口',
     is_deleted tinyint not null default 0 comment '删除的将不再监控',
     created_time timestamp not null default current_timestamp,
     modified_time timestamp not null default current_timestamp on update current_timestamp
