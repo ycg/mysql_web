@@ -4,6 +4,8 @@
     <file url="file://$PROJECT_DIR$/../mysql_audit/log" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/mysql_audit.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/settings.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mysql_audit/table.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mysql_audit/templates/list.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/test.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/backup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/mydumper.py" charset="UTF-8" />

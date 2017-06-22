@@ -657,7 +657,8 @@ class MonitorServer(threading.Thread):
 
     def get_latest_deadlock(self, host_info, values):
         info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
-        if(len(values) > 0):
+        if(len(values) > 5):
+            #因为返回的数组有个[----]的表示，所以永远都是大于0的，所以要判断下
             info_tmp.latest_deadlock = values
         else:
             info_tmp.latest_deadlock = None
