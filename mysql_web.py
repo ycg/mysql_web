@@ -9,7 +9,7 @@ from flask import Flask, render_template, request, app, redirect, url_for
 from flask_login import login_user, login_required, logout_user, LoginManager, current_user
 
 import settings, backup
-from monitor import user_login, base_class, new_slow_log, report, alarm_thread
+from monitor import user_login, base_class, new_slow_log, report, alarm_thread, new_alarm
 from monitor import cache, server, slow_log, mysql_status, tablespace, general_log, execute_sql, user, thread, chart
 
 #region load data on run
@@ -32,6 +32,7 @@ monitor_server.start()
 slow_log.load_slow_log_table_config()
 monitor_server.invoke_check_tablespace_method()
 #alarm_thread.AlarmLog().start()
+#new_alarm.AlarmServer().start()
 
 #endregion
 

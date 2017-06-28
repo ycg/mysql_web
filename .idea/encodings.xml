@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/../mysql_audit/control/host.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/log" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/mysql_audit.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/settings.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mysql_audit/src/host_manager.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mysql_audit/src/user_manager.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/table.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mysql_audit/templates/home.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mysql_audit/templates/host.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/list.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mysql_audit/templates/user.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/test.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/backup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/mydumper.py" charset="UTF-8" />
@@ -14,6 +20,7 @@
     <file url="file://$PROJECT_DIR$/install.sh" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/general_log_new.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/mysql_status.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/monitor/new_alarm.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/new_slow_log.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/tablespace.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sql/table.sql" charset="GBK" />

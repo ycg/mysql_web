@@ -70,7 +70,7 @@ def get_tablespace_infos(host_info):
     table_infos = get_table_infos(host_info)
     host_client = paramiko.SSHClient()
     host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    host_client.connect(host_info.host, port=22, username="root")
+    host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
 
     shell = "du -ab {0} | grep ibd".format(host_info.mysql_data_dir)
     stdin, stdout, stderr = host_client.exec_command(shell)

@@ -230,7 +230,7 @@ class MonitorServer(threading.Thread):
         innodb_info.innodb_pages_written = int(mysql_status_new["Innodb_pages_written"]) - int(mysql_status_old["Innodb_pages_written"])
 
         #change(insert) buffer
-        if(mysql_status_old.has_key("Innodb_ibuf_free_list")):
+        if(mysql_status_old.has_key("Innodb_ibuf_size")):
             innodb_info.innodb_ibuf_size = int(mysql_status_new["Innodb_ibuf_size"])
             innodb_info.innodb_ibuf_free_list = int(mysql_status_new["Innodb_ibuf_free_list"])
             innodb_info.innodb_ibuf_merges = int(mysql_status_new["Innodb_ibuf_merges"]) - int(mysql_status_old["Innodb_ibuf_merges"])
@@ -286,6 +286,11 @@ class MonitorServer(threading.Thread):
             repl_info.delay_pos_count = repl_info.master_log_pos - repl_info.slave_log_pos
             host_info.io_status = repl_info.io_status
             host_info.sql_status = repl_info.sql_status
+            #获取对应主库的show master status信息
+            master_status = self.__db_util.fetchone(self.__cache.get_host_info(repl_info.master_host_id), "show master status;")
+            if(master_status != None):
+                repl_info.new_master_log_file = master_status["File"]
+                repl_info.new_master_log_pos = master_status["Position"]
 
         #4.-----------------------------------------------------获取replcation semi_sync-------------------------------------------------------------------
         if(mysql_status_new.has_key("Rpl_semi_sync_master_status")):

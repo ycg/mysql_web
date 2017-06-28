@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 def send_text(subject, to_list, content):
     send_mail(subject, to_list, content, "plain")
 
-def send_html( subject, to_list, content):
+def send_html(subject, to_list, content):
     send_mail(subject, to_list, content, "html")
 
 def send_mail(subject, to_list, content, mail_type):
