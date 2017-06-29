@@ -19,7 +19,7 @@ create table host_infos
     is_deleted tinyint not null default 0 comment '删除的将不再监控',
     created_time timestamp not null default current_timestamp,
     modified_time timestamp not null default current_timestamp on update current_timestamp
-) comment = 'mysql账户信息' ;
+) comment = 'mysql账户信息' CHARSET utf8 ENGINE innodb;
 
 #insert into host_infos (host, port, user, password, remark) values ("192.168.11.128", 3306, "yangcg", "yangcaogui", "Monitor");
 
@@ -38,10 +38,32 @@ CREATE TABLE mysql_status_log
     tmp_tables MEDIUMINT UNSIGNED NOT NULL,
     tmp_disk_tables MEDIUMINT UNSIGNED NOT NULL,
     delay_pos INT UNSIGNED NOT NULL DEFAULT 0,
-    send_bytes VARCHAR(7) NOT NULL DEFAULT '',
-    receive_bytes VARCHAR(7) NOT NULL DEFAULT '',
+    send_bytes INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '最小单位字节',
+    receive_bytes INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '最小单位字节',
     created_time TIMESTAMP NOT NULL DEFAULT NOW()
-) COMMENT = 'mysql monitor log';
+) COMMENT = 'mysql监控日志' CHARSET utf8 ENGINE innodb;
+
+DROP TABLE os_monitor_data;
+CREATE TABLE os_monitor_data
+(
+    id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    host_id MEDIUMINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    cpu1 FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    cpu5 FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    cpu15 FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    cpu_user FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    cpu_sys FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    cpu_iowait FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    mysql_cpu FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    mysql_memory FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    mysql_size SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'mysql数据大小，单位为G',
+    io_qps SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    io_tps SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '',
+    io_read FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'io每秒读取数据，单位KB',
+    io_write FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'io每秒写入数据，单位KB',
+    io_util FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'io使用率，越大说明io越繁忙',
+    created_time TIMESTAMP NOT NULL DEFAULT NOW()
+) COMMENT = 'linux服务器监控日志' CHARSET utf8 ENGINE innodb;
 
 DROP TABLE mysql_enviroment_data;
 CREATE TABLE mysql_enviroment_data

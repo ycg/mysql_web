@@ -36,7 +36,7 @@ class MonitorServer(threading.Thread):
         while (True):
             if(self.__times % settings.UPDATE_INTERVAL == 0):
                 self.__cache.join_thread_pool(self.get_mysql_status)
-            if(self.__times % settings.LINUX_UPDATE_INTERVAL == 0):
+            if(self.__times % settings.UPDATE_INTERVAL == 0):
                 if(settings.LINUX_OS):
                     self.__cache.join_thread_pool(self.monitor_host_status)
                     self.__cache.join_thread_pool(self.monitor_host_for_cpu_and_io)
@@ -72,6 +72,8 @@ class MonitorServer(threading.Thread):
         status_info = self.__cache.get_status_infos(host_info.key)
         status_info.open_files = int(mysql_status_new["Open_files"])
         status_info.opened_files = int(mysql_status_new["Opened_files"])
+        status_info.send_bytes_bigint = int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"])
+        status_info.receive_bytes_bigint = int(mysql_status_new["Bytes_received"]) - int(mysql_status_old["Bytes_received"])
         status_info.send_bytes = self.get_data_length(int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"]))
         status_info.receive_bytes = self.get_data_length(int(mysql_status_new["Bytes_received"]) - int(mysql_status_old["Bytes_received"]))
 
@@ -287,10 +289,14 @@ class MonitorServer(threading.Thread):
             host_info.io_status = repl_info.io_status
             host_info.sql_status = repl_info.sql_status
             #获取对应主库的show master status信息
-            master_status = self.__db_util.fetchone(self.__cache.get_host_info(repl_info.master_host_id), "show master status;")
-            if(master_status != None):
-                repl_info.new_master_log_file = master_status["File"]
-                repl_info.new_master_log_pos = master_status["Position"]
+            if(hasattr(repl_info, "master_host_id")):
+                master_status = self.__db_util.fetchone(self.__cache.get_host_info(repl_info.master_host_id), "show master status;")
+                if(master_status != None):
+                    repl_info.new_master_log_file = master_status["File"]
+                    repl_info.new_master_log_pos = master_status["Position"]
+            else:
+                repl_info.new_master_log_pos = ""
+                repl_info.new_master_log_file = ""
 
         #4.-----------------------------------------------------获取replcation semi_sync-------------------------------------------------------------------
         if(mysql_status_new.has_key("Rpl_semi_sync_master_status")):
@@ -316,7 +322,7 @@ class MonitorServer(threading.Thread):
         else:
             repl_info.rpl_semi_sync = 0
 
-        #self.insert_status_log(status_info)
+        self.insert_status_log(status_info)
         self.__db_util.close(connection, cursor)
         self.read_innodb_status(host_info)
 
@@ -370,7 +376,17 @@ class MonitorServer(threading.Thread):
               "({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, \'{10}\', \'{11}\')"\
               .format(status_info.host_info.host_id, status_info.qps, status_info.tps, status_info.commit, status_info.rollback, status_info.connections_per,
                       status_info.threads_count, status_info.threads_run_count, status_info.create_tmp_table_count, status_info.create_tmp_disk_table_count,
-                      status_info.send_bytes, status_info.receive_bytes)
+                      status_info.send_bytes_bigint, status_info.receive_bytes_bigint)
+        self.__db_util.execute(settings.MySQL_Host, sql)
+
+    def insert_os_monitor_log(self, linux_info):
+        sql = """INSERT INTO `mysql_web`.`os_monitor_data`
+                 (`host_id`,`cpu1`,`cpu5`,`cpu15`,`cpu_user`,`cpu_sys`,`cpu_iowait`,`mysql_cpu`,`mysql_memory`,`mysql_size`,`io_qps`,`io_tps`,`io_read`,`io_write`,`io_util`)
+                 VALUES
+                 ({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14});"""\
+                 .format(linux_info.host_info.host_id, linux_info.cpu_1, linux_info.cpu_5, linux_info.cpu_15, linux_info.cpu_user, linux_info.cpu_system, linux_info.cpu_iowait,
+                         linux_info.mysql_cpu, linux_info.mysql_memory, linux_info.mysql_data_size,
+                         linux_info.io_qps, linux_info.io_tps, linux_info.io_read, linux_info.io_write, linux_info.util)
         self.__db_util.execute(settings.MySQL_Host, sql)
 
     def monitor_host_status(self, host_info):
@@ -468,6 +484,9 @@ class MonitorServer(threading.Thread):
             linux_info.cpu_iowait = float(cpu_tmp[3])
             linux_info.cpu_steal = float(cpu_tmp[4])
             linux_info.cpu_idle = float(cpu_tmp[5])
+
+            #插入os系统监控数据
+            self.insert_os_monitor_log(linux_info)
         finally:
             if (host_client != None):
                 host_client.close()
@@ -688,7 +707,7 @@ class MonitorServer(threading.Thread):
                 if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
                     status_info.old_trx_count = status_info.new_trx_count
                     status_info.new_trx_count = int(split_value)
-                    status_info.trx_count = (status_info.new_trx_count - status_info.old_trx_count) / settings.INNODB_UPDATE_INTERVAL
+                    status_info.trx_count = (status_info.new_trx_count - status_info.old_trx_count) / settings.UPDATE_INTERVAL
                     innodb_info.trx_count = status_info.trx_count
                     info_tmp.trx_count = status_info.trx_count
 

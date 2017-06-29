@@ -191,7 +191,7 @@
                     <button class="btn btn-xs btn-primary" onclick=show_review_dialog_modal("{{ status.checksum }}")>Review</button>
                 </td>
             </tr>
-            <tr style="display: none" id="{{ status.checksum }}">
+            <tr style="display: none;white-space: pre-wrap;" id="{{ status.checksum }}">
                 <td colspan="14">
                     {{ status.fingerprint }}
                 </td>
