@@ -322,9 +322,9 @@ class MonitorServer(threading.Thread):
         else:
             repl_info.rpl_semi_sync = 0
 
-        self.insert_status_log(status_info)
         self.__db_util.close(connection, cursor)
         self.read_innodb_status(host_info)
+        self.insert_status_log(status_info, innodb_info)
 
         host_info.tps = status_info.tps
         host_info.qps = status_info.qps
@@ -370,13 +370,13 @@ class MonitorServer(threading.Thread):
         elif(monitor_type == MonitorEnum.Replication):
             return self.__cache.get_all_repl_infos()
 
-    def insert_status_log(self, status_info):
+    def insert_status_log(self, status_info, innodb_info):
         sql = "insert into mysql_web.mysql_status_log(host_id, qps, tps, commit, rollback, connections, " \
-              "thread_count, thread_running_count, tmp_tables, tmp_disk_tables, send_bytes, receive_bytes) VALUES " \
-              "({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, \'{10}\', \'{11}\')"\
+              "thread_count, thread_running_count, tmp_tables, tmp_disk_tables, send_bytes, receive_bytes, `trxs`) VALUES " \
+              "({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, \'{10}\', \'{11}\', {12})"\
               .format(status_info.host_info.host_id, status_info.qps, status_info.tps, status_info.commit, status_info.rollback, status_info.connections_per,
                       status_info.threads_count, status_info.threads_run_count, status_info.create_tmp_table_count, status_info.create_tmp_disk_table_count,
-                      status_info.send_bytes_bigint, status_info.receive_bytes_bigint)
+                      status_info.send_bytes_bigint, status_info.receive_bytes_bigint, innodb_info.trx_count)
         self.__db_util.execute(settings.MySQL_Host, sql)
 
     def insert_os_monitor_log(self, linux_info):
