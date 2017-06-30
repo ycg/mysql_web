@@ -78,14 +78,6 @@ CREATE TABLE mysql_enviroment_data
     created_time TIMESTAMP NOT NULL DEFAULT NOW()
 ) COMMENT = 'mysql envirment data';
 
-CREATE TABLE mysql_host_status_log
-(
-    id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    host_id MEDIUMINT UNSIGNED NOT NULL,
-    cpu SMALLINT UNSIGNED NOT NULL,
-    memory SMALLINT UNSIGNED NOT NULL
-) COMMENT = 'mysql monitor log';
-
 CREATE TABLE mysql_data_size_for_day
 (
     id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,

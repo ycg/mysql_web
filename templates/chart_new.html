@@ -1,0 +1,94 @@
+<div class="row">
+    <div class="col-md-2">
+        <select id="select_host" class="selectpicker show-tick form-control bs-select-hidden" onchange="init_chart()">
+            {% for info in host_infos %}
+                <option value="{{ info.host_id }}">{{ info.remark }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="chart_type" class="selectpicker show-tick form-control bs-select-hidden" onchange="init_chart()">
+            <option value="qps:1">QPS</option>
+            <option value="tps:1">TPS</option>
+            <option value="trxs:1">Transaction Count</option>
+            <option value="threads_count:1">Threads</option>
+            <option value="select_count:insert_count:update_count:delete_count:1">DML</option>
+            <option value="cpu_1:cpu_5:cpu_15:2">CPU Load</option>
+            <option value="cpu_user:cpu_system:cpu_idle:2">CPU User And Sys And Idle</option>
+            <option value="io_qps:io_tps:2">IO QPS And TPS</option>
+            <option value="io_read:io_write:2">IO Read And Write</option>
+            <option value="util:2">IO Util</option>
+            <option value="delay_pos_count:3">Repl Delay Pos</option>
+            <option value="seconds_behind_master:3">Repl Delay Seconds</option>
+            <option value="mysql_cpu:2">MySQL CPU</option>
+            <option value="mysql_memory:2">MySQL Memory</option>
+        </select>
+    </div>
+</div>
+</br></br>
+<div class="row">
+    <div class="col-md-12">
+        <div id="chart_div" style="height:300px;"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var timer = 0;
+    var data_y = [];
+    var data_time_x = [];
+    $(".selectpicker").selectpicker({liveSearch: true});
+    var chart_div = echarts.init(document.getElementById("chart_div"));
+
+    function init_chart() {
+        data_y = [];
+        data_time_x = [];
+        var chart_type = $("#chart_type").val();
+        var chart_option = {
+            grid: {
+                x:40,
+                x2:0,
+                y:20
+            },
+            xAxis: {
+                data: data_time_x
+            },
+            yAxis: {},
+            series: [{
+                type: 'line',
+                data: data_y,
+                showSymbol: false,
+                hoverAnimation: false,
+            }]
+        };
+        chart_div.setOption(chart_option)
+
+        clearInterval(timer);
+        timer = setInterval(get_chart_data, 3000);
+    }
+
+    function get_chart_data() {
+        var json_data = "host_id=" + $("#select_host").val() + "&attribute_names=" + $("#chart_type").val();
+        $.post("/chart_new/get_data/", json_data, function (data) {
+            var obj = JSON.parse(data);
+            //赋值x和y轴数据
+            if (data_time_x.length >= 300) {
+                data_y.shift();
+                data_time_x.shift();
+            }
+            data_y.push(obj.data1);
+            data_time_x.push(obj.time);
+
+            //刷新图表
+            chart_div.setOption({
+                xAxis: {
+                    data: data_time_x
+                },
+                series: [{
+                    data: data_y
+                }]
+            });
+        });
+    }
+
+    init_chart();
+</script>

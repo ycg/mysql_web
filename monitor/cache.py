@@ -194,10 +194,10 @@ class Cache(object):
     def get_linux_info(self, key):
         return self.get_value_for_key(self.__linux_infos, key)
 
-    def get_status_infos(self, key):
+    def get_status_info(self, key):
         return self.get_value_for_key(self.__status_infos, key)
 
-    def get_innodb_infos(self, key):
+    def get_innodb_info(self, key):
         return self.get_value_for_key(self.__innodb_infos, key)
 
     def get_tablespace_info(self, key):

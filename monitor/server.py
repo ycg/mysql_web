@@ -69,7 +69,7 @@ class MonitorServer(threading.Thread):
             host_info.uptime = 1
 
         #1.---------------------------------------------------------获取mysql global status--------------------------------------------------------
-        status_info = self.__cache.get_status_infos(host_info.key)
+        status_info = self.__cache.get_status_info(host_info.key)
         status_info.open_files = int(mysql_status_new["Open_files"])
         status_info.opened_files = int(mysql_status_new["Opened_files"])
         status_info.send_bytes_bigint = int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"])
@@ -159,7 +159,7 @@ class MonitorServer(threading.Thread):
         status_info.sort_scan = int(mysql_status_new["Sort_scan"]) - int(mysql_status_old["Sort_scan"])
 
         #2.---------------------------------------------------------获取innodb的相关数据-------------------------------------------------------------------
-        innodb_info = self.__cache.get_innodb_infos(host_info.key)
+        innodb_info = self.__cache.get_innodb_info(host_info.key)
         innodb_info.commit = status_info.commit
         innodb_info.rollback = status_info.rollback
         innodb_info.trx_count = status_info.trx_count
@@ -688,8 +688,8 @@ class MonitorServer(threading.Thread):
             info_tmp.latest_deadlock = None
 
     def get_transactions_info(self, host_info, values):
-        status_info = self.__cache.get_status_infos(host_info.key)
-        innodb_info = self.__cache.get_innodb_infos(host_info.key)
+        status_info = self.__cache.get_status_info(host_info.key)
+        innodb_info = self.__cache.get_innodb_info(host_info.key)
         info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
         for line in values:
             line_split = line.split(" ")
@@ -746,7 +746,7 @@ class MonitorServer(threading.Thread):
         #373422000.00 hash searches/s, 43560000.00 non-hash searches/s
         line_value = values[-2]
         lst = line_value.split(",")
-        innodb_info = self.__cache.get_innodb_infos(host_info.key)
+        innodb_info = self.__cache.get_innodb_info(host_info.key)
         innodb_info.hash_searches = float(lst[0].split(" ")[0])
         innodb_info.non_hash_searches = float(lst[1].split(" ")[1])
         if(innodb_info.hash_searches <= 0 and innodb_info.non_hash_searches <= 0):
@@ -756,7 +756,7 @@ class MonitorServer(threading.Thread):
 
         if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
             row_number = 1
-            innodb_info = self.__cache.get_innodb_infos(host_info.key)
+            innodb_info = self.__cache.get_innodb_info(host_info.key)
             for line in values:
                 if("Ibuf" in line):
                     #第一行格式
@@ -801,7 +801,7 @@ class MonitorServer(threading.Thread):
     def get_innodb_lock_infos(self, host_info, values):
         if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
             row_number = 1
-            innodb_info = self.__cache.get_innodb_infos(host_info.key)
+            innodb_info = self.__cache.get_innodb_info(host_info.key)
             for line in values:
                 lst = line.split(",")
                 if(row_number == 4):

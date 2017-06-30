@@ -402,6 +402,16 @@ def chart_home():
 def get_chart_data_by_host_id(host_id):
     return chart.get_chart_data_by_host_id(host_id)
 
+@app.route("/chart_new")
+@login_required
+def chart_home_new():
+    return render_template("chart_new.html", host_infos=mysql_cache.get_all_host_infos())
+
+@app.route("/chart_new/get_data/", methods=["POST"])
+@login_required
+def get_chart_data_by_attribute_names():
+    return chart.get_chart_data(get_object_from_json(request.form))
+
 #endregion
 
 #region config
