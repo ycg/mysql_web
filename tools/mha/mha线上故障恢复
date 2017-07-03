@@ -1,0 +1,25 @@
+#前提
+#1.确保故障的master启动成功
+#2.确保故障的master成为了新的master的slave
+
+#步骤
+#1.设置新的master为read only
+    set global read_only = 1;
+#2.确保VIP或者DNS已经转移到故障的master上去
+#3.停止MHA进程并检查状态
+    masterha_stop --conf=/etc/masterha/app1.cnf
+	masterha_check_status --conf=/etc/masterha/app1.cnf
+#4.检查配置，确保故障的master信息在脚本有配置
+    [server1]
+    candidate_master=1
+    check_repl_delay=0
+    hostname=192.168.1.100
+#5.杀掉新的master上原来的连接
+    select concat('KILL ',id,';') from information_schema.processlist where user not in ('root','system user','repnew','repl') into outfile '/tmp/a.txt';
+	source /tmp/a.txt;
+#6.执行MHA脚本
+    masterha_master_switch --master_state=alive --conf=/etc/masterha/app1.cnf --new_master_host=192.168.1.100 --orig_master_is_new_slave --running_updates_limit=3
+#7.启动MHA
+    nohup masterha_manager --conf=/etc/masterha/app1.cnf  --ignore_last_failover > /etc/masterha/mha_manager2.log 2>&1 &
+#8.监测主从复制
+
