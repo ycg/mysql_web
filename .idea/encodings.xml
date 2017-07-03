@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/../mysql_audit/control/host.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/log" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/mysql_audit.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/settings.py" charset="UTF-8" />
@@ -40,7 +39,5 @@
     <file url="file://$PROJECT_DIR$/tools/mha/mha_auto_install.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools/mha/mha_manual" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools/mha/purge_relay_log.sh" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/tools/replace_into.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/tools/test.py" charset="UTF-8" />
   </component>
 </project>

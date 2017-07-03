@@ -3,7 +3,6 @@
 import os, threadpool
 import base_class, host_info, collections, db_util, settings, mysql_branch, tablespace
 
-
 class Cache(object):
     __number = False
     __instance = None

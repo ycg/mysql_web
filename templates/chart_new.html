@@ -8,24 +8,13 @@
     </div>
     <div class="col-md-2">
         <select id="chart_type" class="selectpicker show-tick form-control bs-select-hidden" onchange="init_chart()">
-            <option value="qps:1">QPS</option>
-            <option value="tps:1">TPS</option>
-            <option value="trxs:1">Transaction Count</option>
-            <option value="threads_count:1">Threads</option>
-            <option value="select_count:insert_count:update_count:delete_count:1">DML</option>
-            <option value="cpu_1:cpu_5:cpu_15:2">CPU Load</option>
-            <option value="cpu_user:cpu_system:cpu_idle:2">CPU User And Sys And Idle</option>
-            <option value="io_qps:io_tps:2">IO QPS And TPS</option>
-            <option value="io_read:io_write:2">IO Read And Write</option>
-            <option value="util:2">IO Util</option>
-            <option value="delay_pos_count:3">Repl Delay Pos</option>
-            <option value="seconds_behind_master:3">Repl Delay Seconds</option>
-            <option value="mysql_cpu:2">MySQL CPU</option>
-            <option value="mysql_memory:2">MySQL Memory</option>
+            {% for key, chart_info in chart_options.items() %}
+                <option value="{{ key }}">{{ chart_info.title }}</option>
+            {% endfor %}
         </select>
     </div>
 </div>
-</br></br>
+</br>
 <div class="row">
     <div class="col-md-12">
         <div id="chart_div" style="height:300px;"></div>
@@ -34,59 +23,93 @@
 
 <script type="text/javascript">
     var timer = 0;
-    var data_y = [];
+    var series = [];
+    var data_y_1 = [];
+    var data_y_2 = [];
+    var data_y_3 = [];
+    var data_y_4 = [];
     var data_time_x = [];
     $(".selectpicker").selectpicker({liveSearch: true});
     var chart_div = echarts.init(document.getElementById("chart_div"));
 
     function init_chart() {
-        data_y = [];
-        data_time_x = [];
-        var chart_type = $("#chart_type").val();
-        var chart_option = {
-            grid: {
-                x:40,
-                x2:0,
-                y:20
-            },
-            xAxis: {
-                data: data_time_x
-            },
-            yAxis: {},
-            series: [{
-                type: 'line',
-                data: data_y,
-                showSymbol: false,
-                hoverAnimation: false,
-            }]
-        };
-        chart_div.setOption(chart_option)
-
         clearInterval(timer);
-        timer = setInterval(get_chart_data, 3000);
+        series = [];
+        data_y_1 = [];
+        data_y_2 = [];
+        data_y_3 = [];
+        data_y_4 = [];
+        data_time_x = [];
+
+        $.get("/chart_new/option/" + $("#chart_type").val(), "", function (data) {
+            chart_div = echarts.init(document.getElementById("chart_div"));
+            var json_obj = JSON.parse(data);
+            var chart_option = {grid: {x: 60, x2: 0}, xAxis: {data: data_time_x}, yAxis: {}};
+            chart_option.title = {text: json_obj.title};
+            if (json_obj.legend == null) {
+                var item = {
+                    name: json_obj.title,
+                    type: "line",
+                    data: data_y_1,
+                    showSymbol: false,
+                    hoverAnimation: false,
+                }
+                series.push(item)
+            }
+            else {
+                var number = 1;
+                chart_option.legend = {data: json_obj.legend};
+                chart_option.tooltip = {trigger: 'axis', axisPointer: {type: 'cross', label: {backgroundColor: '#6a7985'}}};
+                for (var i = 0, list_len = json_obj.legend.length; i < list_len; i++) {
+                    var item = {
+                        name: json_obj.legend[i],
+                        type: "line",
+                        showSymbol: false,
+                        hoverAnimation: false,
+                    }
+                    if (number == 1) {
+                        item.data = data_y_1;
+                    }
+                    else if (number == 2) {
+                        item.data = data_y_2;
+                    }
+                    else if (number == 3) {
+                        item.data = data_y_3;
+                    }
+                    else if (number == 4) {
+                        item.data = data_y_4;
+                    }
+                    series.push(item)
+                    number = number + 1;
+                }
+            }
+            chart_option.series = series;
+            chart_div.setOption(chart_option)
+            timer = setInterval(get_chart_data, 3000);
+        });
     }
 
     function get_chart_data() {
-        var json_data = "host_id=" + $("#select_host").val() + "&attribute_names=" + $("#chart_type").val();
+        var json_data = "host_id=" + $("#select_host").val() + "&key=" + $("#chart_type").val();
         $.post("/chart_new/get_data/", json_data, function (data) {
             var obj = JSON.parse(data);
+
             //赋值x和y轴数据
             if (data_time_x.length >= 300) {
-                data_y.shift();
+                data_y_1.shift();
+                data_y_2.shift();
+                data_y_3.shift();
+                data_y_4.shift();
                 data_time_x.shift();
             }
-            data_y.push(obj.data1);
+            data_y_1.push(obj.data1);
+            data_y_2.push(obj.data2);
+            data_y_3.push(obj.data3);
+            data_y_4.push(obj.data4)
             data_time_x.push(obj.time);
 
             //刷新图表
-            chart_div.setOption({
-                xAxis: {
-                    data: data_time_x
-                },
-                series: [{
-                    data: data_y
-                }]
-            });
+            chart_div.setOption({xAxis: {data: data_time_x}, series: series});
         });
     }
 
