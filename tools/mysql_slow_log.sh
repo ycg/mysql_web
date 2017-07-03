@@ -55,7 +55,7 @@ function check_slow_log()
 
     echo "$slow_log_file"
     #设置新的slow log文件路径
-    slow_log_file_path=${slow_log_dir}`date "+%Y-%m-%d_%H-%M-%S.slow"`
+    slow_log_file_path=${slow_log_dir}${mysql_host_id}_`date "+%Y-%m-%d_%H-%M-%S.slow"`
     `${mysql_client} -h${mysql_host} -P${mysql_port} -u${mysql_user} -p${mysql_password} \
     -e "set global slow_query_log = 1;set global long_query_time=$slow_query_long_time;set global log_output='FILE';set global slow_query_log_file='$slow_log_file_path'"`
 
