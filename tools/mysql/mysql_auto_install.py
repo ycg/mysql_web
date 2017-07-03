@@ -211,9 +211,6 @@ def execute_remote_shell(host_client, shell):
 #region mysql config
 
 mysql_config = ("""
-#[client]
-#default_character_set = utf8mb4
-
 [mysql]
 prompt = "\\u@\\h(\\d) \\\\r:\\\\m:\\\\s>"
 default_character_set = utf8mb4
@@ -269,7 +266,7 @@ log_bin = {6}/bin_log
 log_bin_index = {6}/bin_log_index
 binlog_format = ROW
 binlog_cache_size = 2M
-max_binlog_cache_size = 50M
+max_binlog_cache_size = 4G
 max_binlog_size = 1G
 expire_logs_days = 7
 sync_binlog = 0
@@ -344,6 +341,7 @@ rpl_semi_sync_master_wait_no_slave = ON
 rpl_semi_sync_master_wait_for_slave_count = 1
 rpl_semi_sync_slave_enabled = 0
 rpl_semi_sync_slave_trace_level = 32
+rpl_semi_sync_master_wait_point = AFTER_SYNC
 slave_parallel_workers = 8
 slave_parallel_type = LOGICAL_CLOCK
 """
