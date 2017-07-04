@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MySQL Monitor Web</title>
     <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
     <script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>
@@ -29,9 +31,9 @@
                     <a href="javascript:void(0)" id="os" class="list-group-item" onclick=start("/os","os")><span class="glyphicon glyphicon-user"> OS</span></a>
                     <a href="javascript:void(0)" id="slowlog" class="list-group-item" onclick=stop("/slowlog","slowlog")><span class="glyphicon glyphicon-log-in"> SlowLog</span></a>
                     <a href="javascript:void(0)" id="tablespace" class="list-group-item" onclick=stop("/tablespace","tablespace")><span class="glyphicon glyphicon-barcode"> Tablespace</span></a>
-                    <a href="javascript:void(0)" id="sql" class="list-group-item" onclick=stop("/sql","sql")><span class="glyphicon glyphicon-apple"> SQLExecute</span></a>
+                    <!--<a href="javascript:void(0)" id="sql" class="list-group-item" onclick=stop("/sql","sql")><span class="glyphicon glyphicon-apple"> SQLExecute</span></a>-->
                     <a href="javascript:void(0)" id="chart" class="list-group-item" onclick=stop("/chart","chart")><span class="glyphicon glyphicon-cloud"> Chart</span></a>
-                    <a href="javascript:void(0)" id="chart_new" class="list-group-item" onclick=stop("/chart_new","chart_new")><span class="glyphicon glyphicon-console"> Chart_New</span></a>
+                    <!--<a href="javascript:void(0)" id="chart_new" class="list-group-item" onclick=stop("/chart_new","chart_new")><span class="glyphicon glyphicon-console"> Chart_New</span></a>-->
                     <!--<a href="javascript:void(0)" id="general" class="list-group-item" onclick=stop("/general/1","general")><span class="glyphicon glyphicon-check"> GeneralLog</span></a>
                     <a href="javascript:void(0)" id="user" class="list-group-item" onclick=stop("/user","user")><span class="glyphicon glyphicon-user"> User</span></a>
                     <a href="javascript:void(0)" id="thread" class="list-group-item" onclick=stop("/thread","thread")><span class="glyphicon glyphicon-download"> Thread</span></a>

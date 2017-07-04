@@ -31,10 +31,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
         info = base_class.BaseClass(None)
         info.checksum = row["checksum"]
         info.fingerprint = row["fingerprint"]
-        if(len(info.fingerprint) > 40):
-            info.fingerprint_tmp = row["fingerprint"][0:40] + "..."
-        else:
-            info.fingerprint_tmp = row["fingerprint"]
+        info.fingerprint_tmp = row["fingerprint"].decode("utf-8")[0:30]
         info.first_seen = row["first_seen"]
         info.last_seen = row["last_seen"]
         info.serverid_max = row["serverid_max"]

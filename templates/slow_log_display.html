@@ -86,9 +86,9 @@
             <th colspan="3" rowspan="1" class="text-center">
                 Lock Time
             </th>
-            <th>
+            <!--<th>
 
-            </th>
+            </th>-->
             <th>
 
             </th>
@@ -130,9 +130,9 @@
             <th>
                 Max
             </th>
-            <th class="text-center">
+            <!--<th class="text-center">
                 Status
-            </th>
+            </th>-->
             <th>
 
             </th>
@@ -179,20 +179,20 @@
                 <td>
                     {{ status.Lock_time_max }}
                 </td>
-                <td class="text-center">
+                <!--<td class="text-center">
                     {% if(status.is_reviewed == 0) %}
                         Not Reviewed
                     {% else %}
                         Reviewed
                     {% endif %}
-                </td>
+                </td>-->
                 <td class="text-center">
                     <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>Detail</button>
-                    <button class="btn btn-xs btn-primary" onclick=show_review_dialog_modal("{{ status.checksum }}")>Review</button>
+                    <!--<button class="btn btn-xs btn-primary" onclick=show_review_dialog_modal("{{ status.checksum }}")>Review</button>-->
                 </td>
             </tr>
-            <tr style="display: none;white-space: pre-wrap;" id="{{ status.checksum }}">
-                <td colspan="14">
+            <tr id="{{ status.checksum }}" hidden>
+                <td colspan="13">
                     {{ status.fingerprint }}
                 </td>
             </tr>
