@@ -12,6 +12,8 @@ def get_chart_data_by_host_id(host_id):
     result.insert = status_info.insert_count
     result.update = status_info.update_count
     result.delete = status_info.delete_count
+    result.mysql_cpu = os_info.mysql_cpu
+    result.mysql_mem = os_info.mysql_memory
     result.time = time.strftime('%H:%M:%S', time.localtime(time.time()))
     if(hasattr(os_info, "cpu_1")):
         result.cpu_1 = os_info.cpu_1
