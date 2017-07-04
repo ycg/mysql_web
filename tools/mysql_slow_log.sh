@@ -44,7 +44,7 @@ slow_query_long_time=2
 pt_query_digest="/usr/bin/pt-query-digest"
 
 #4.mysql_host_id对应着mysql_web.host_infos中id字段值
-#第四处修改的地址
+#第四处修改的地址,这个字段很重要
 mysql_host_id=14
 
 function check_slow_log()
