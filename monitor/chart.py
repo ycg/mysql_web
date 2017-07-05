@@ -14,6 +14,10 @@ def get_chart_data_by_host_id(host_id):
     result.delete = status_info.delete_count
     result.mysql_cpu = os_info.mysql_cpu
     result.mysql_mem = os_info.mysql_memory
+    result.io_qps = os_info.io_qps
+    result.io_tps = os_info.io_tps
+    result.io_read = os_info.io_read
+    result.io_write = os_info.io_write
     result.time = time.strftime('%H:%M:%S', time.localtime(time.time()))
     if(hasattr(os_info, "cpu_1")):
         result.cpu_1 = os_info.cpu_1
@@ -25,6 +29,9 @@ def get_chart_data_by_host_id(host_id):
     else:
         result.cpu_1 = result.cpu_5 = result.cpu_15 = result.cpu_user = result.cpu_system = result.cpu_idle = 0
     return json.dumps(result, default=lambda o: o.__dict__)
+
+def get_chart_history_data(host_id):
+    pass
 
 def get_chart_data(obj):
     chart_data = ChartData()

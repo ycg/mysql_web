@@ -45,7 +45,14 @@
         <div id="mysql_mem" style="height:300px;"></div>
     </div>
 </div>
-
+<div class="row">
+    <div class="col-md-6">
+        <div id="io_qps_tps" style="height:300px;"></div>
+    </div>
+    <div class="col-md-6">
+        <div id="io_read_write" style="height:300px;"></div>
+    </div>
+</div>
 <script type="text/javascript">
     $('.selectpicker').selectpicker({liveSearch: true});
     $("#host_ids").find("option:first").attr("selected", true);
@@ -60,10 +67,14 @@
     var thread_chart = echarts.init(document.getElementById('thread_chart'));
     var mysql_cpu_chart = echarts.init(document.getElementById('mysql_cpu'));
     var mysql_mem_chart = echarts.init(document.getElementById('mysql_mem'));
+    var io_qps_tps_chart = echarts.init(document.getElementById('io_qps_tps'));
+    var io_read_write_chart = echarts.init(document.getElementById('io_read_write'));
 
     var cpu_list = [];
     var cpu_load_list = [];
     var dml_data_list = [];
+    var io_qps_tps_data_list = [];
+    var io_read_write_data_list = [];
     var qps_data_y = [];
     var tps_data_y = [];
     var date_time_x = [];
@@ -80,6 +91,10 @@
     var cpu_idle_data_y = [];
     var mysql_cpu_data_y = [];
     var mysql_mem_data_y = [];
+    var io_qps_data_y = [];
+    var io_tps_data_y = [];
+    var io_read_data_y = [];
+    var io_write_data_y = [];
 
     function init_chart() {
         set_chart_options(qps_chart, "QPS", qps_data_y);
@@ -88,10 +103,14 @@
         set_chart_options(mysql_cpu_chart, "MySQL CPU", mysql_cpu_data_y);
         set_chart_options(mysql_mem_chart, "MySQL Mem", mysql_mem_data_y);
 
+        io_qps_tps_data_list = [io_qps_data_y, io_tps_data_y];
+        io_read_write_data_list = [io_read_data_y, io_write_data_y];
         cpu_list = [cpu_user_data_y, cpu_sys_data_y, cpu_idle_data_y];
         cpu_load_list = [cpu1_data_y, cpu5_data_y, cpu15_data_y];
         dml_data_list = [select_date_y, insert_date_y, update_date_y, delete_date_y];
 
+        set_multi_line_chart_options(io_qps_tps_chart, "IO Q/T", ["qps", "tps"], io_qps_tps_data_list);
+        set_multi_line_chart_options(io_read_write_chart, "IO R/W(KB)", ["read", "write"], io_read_write_data_list);
         set_multi_line_chart_options(cpu_chart, "CPU", ["user", "sys", "idle"], cpu_list);
         set_multi_line_chart_options(cpu_load_chart, "CPU Load", ["CPU1", "CPU5", "CPU15"], cpu_load_list);
         set_multi_line_chart_options(dml_chart, "DML", ["select", "insert", "update", "delete"], dml_data_list);
@@ -115,6 +134,10 @@
         cpu_idle_data_y = [];
         mysql_cpu_data_y = [];
         mysql_mem_data_y = [];
+        io_qps_data_y = [];
+        io_tps_data_y = [];
+        io_read_data_y = [];
+        io_write_data_y = [];
 
         init_chart();
     }
@@ -128,6 +151,8 @@
             refresh_chart(thread_chart, thread_data_y);
             refresh_chart(mysql_cpu_chart, mysql_cpu_data_y);
             refresh_chart(mysql_mem_chart, mysql_mem_data_y);
+            refresh_multi_line_chart(io_qps_tps_chart, io_qps_tps_data_list);
+            refresh_multi_line_chart(io_read_write_chart, io_read_write_data_list);
             refresh_multi_line_chart(cpu_chart, cpu_list);
             refresh_multi_line_chart(dml_chart, dml_data_list);
             refresh_multi_line_chart(cpu_load_chart, cpu_load_list);
@@ -135,7 +160,7 @@
     }
 
     function set_chart_data(obj_data) {
-        if (qps_data_y.length >= 150) {
+        if (qps_data_y.length >= 200) {
             qps_data_y.shift();
             tps_data_y.shift();
             date_time_x.shift();
@@ -152,6 +177,10 @@
             cpu_sys_data_y.shift();
             mysql_cpu_data_y.shift();
             mysql_mem_data_y.shift();
+            io_qps_data_y.shift();
+            io_tps_data_y.shift();
+            io_read_data_y.shift();
+            io_write_data_y.shift();
         }
         qps_data_y.push(obj_data.qps);
         tps_data_y.push(obj_data.tps);
@@ -169,6 +198,10 @@
         cpu_sys_data_y.push(obj_data.cpu_system);
         mysql_cpu_data_y.push(obj_data.mysql_cpu);
         mysql_mem_data_y.push(obj_data.mysql_mem);
+        io_qps_data_y.push(obj_data.io_qps);
+        io_tps_data_y.push(obj_data.io_tps);
+        io_read_data_y.push(obj_data.io_read);
+        io_write_data_y.push(obj_data.io_write);
     }
 
     function refresh_chart(chart_dom, data_y) {
@@ -181,6 +214,7 @@
     function set_chart_options(chart_dom, title, data_y) {
         var chart_option = {
             title: {text: title,},
+            grid: {x2: 0},
             tooltip: {},
             xAxis: {data: date_time_x},
             yAxis: {},
@@ -203,10 +237,11 @@
     function set_multi_line_chart_options(chart_dom, title, line_titles, data_list) {
         var chart_option = {
             title: {text: title},
+            grid: {x2: 0},
             tooltip: {trigger: 'axis', axisPointer: {type: 'cross', label: {backgroundColor: '#6a7985'}}},
             legend: {data: line_titles},
             xAxis: {data: date_time_x},
-            yAxis: {},
+            yAxis: {}
         };
         var series = [];
         for (var i = 0, list_len = line_titles.length; i < list_len; i++) {
@@ -216,7 +251,7 @@
                 data: data_list[i],
                 showSymbol: false,
                 hoverAnimation: false,
-            }
+            };
             series.push(item)
         }
         chart_option.series = series;
