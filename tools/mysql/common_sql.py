@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 #查看没有主键的表
 no_primary_key_sql = """
