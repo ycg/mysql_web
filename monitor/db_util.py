@@ -75,7 +75,8 @@ class DBUtil(object):
         if(self.__connection_pools.get(host_info.key) == None):
             pool = PooledDB(creator=pymysql, mincached=5, maxcached=20,
                             host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password,
-                            use_unicode=False, charset="utf8", cursorclass=pymysql.cursors.DictCursor,reset=False, autocommit=True)
+                            use_unicode=False, charset="utf8", cursorclass=pymysql.cursors.DictCursor, reset=False, autocommit=True,
+                            connect_timeout=1, read_timeout=1, write_timeout=1)
             self.__connection_pools[host_info.key] = pool
         return self.__connection_pools[host_info.key].connection()
 
@@ -90,5 +91,4 @@ class DBUtil(object):
 
     def escape(self, string):
         return pymysql.escape_string(string)
-
 
