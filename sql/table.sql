@@ -41,7 +41,8 @@ CREATE TABLE mysql_status_log
     delay_pos INT UNSIGNED NOT NULL DEFAULT 0,
     send_bytes INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '最小单位字节',
     receive_bytes INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '最小单位字节',
-    created_time TIMESTAMP NOT NULL DEFAULT NOW()
+    created_time TIMESTAMP NOT NULL DEFAULT NOW(),
+    key idx_hostId_createdTime (`host_id`, `created_time`)
 ) COMMENT = 'mysql监控日志' CHARSET utf8 ENGINE innodb;
 
 DROP TABLE os_monitor_data;
@@ -63,7 +64,8 @@ CREATE TABLE os_monitor_data
     io_read FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'io每秒读取数据，单位KB',
     io_write FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'io每秒写入数据，单位KB',
     io_util FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'io使用率，越大说明io越繁忙',
-    created_time TIMESTAMP NOT NULL DEFAULT NOW()
+    created_time TIMESTAMP NOT NULL DEFAULT NOW(),
+    key idx_hostId_createdTime (`host_id`, `created_time`)
 ) COMMENT = 'linux服务器监控日志' CHARSET utf8 ENGINE innodb;
 
 DROP TABLE mysql_enviroment_data;
