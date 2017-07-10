@@ -332,6 +332,34 @@ CREATE TABLE `mysql_slow_query_review_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- -------------------------------------------------------------------
 
+/*
+#统计慢查询频率日志表
+drop table mysql_slow_query_log;
+CREATE TABLE mysql_slow_query_log
+(
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  checksum BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '慢查询sql的checksum值',
+  created_time TIMESTAMP NOT NULL DEFAULT NOW() COMMENT '慢查询出现的时间'
+) ENGINE=Innodb DEFAULT  CHARSET=utf8 COMMENT '慢查询日志表';
+
+#insert触发器
+DROP TRIGGER IF EXISTS insert_trigger;
+delimiter $$
+CREATE TRIGGER insert_trigger AFTER INSERT ON mysql_web.mysql_slow_query_review FOR EACH ROW
+BEGIN
+     insert into mysql_web.mysql_slow_query_log(checksum, created_time) values(new.checksum, new.first_seen);
+END $$
+delimiter ;
+
+#update触发器
+DROP TRIGGER IF EXISTS update_trigger;
+delimiter $$
+CREATE TRIGGER update_trigger AFTER UPDATE ON mysql_web.mysql_slow_query_review FOR EACH ROW
+BEGIN
+     insert into mysql_web.mysql_slow_query_log(checksum, created_time) values(new.checksum, new.last_seen);
+END $$
+delimiter ;
+*/
 -- ---------------------------------------------------------
 -- 备份任务计划表
 -- ---------------------------------------------------------
