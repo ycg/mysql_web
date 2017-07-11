@@ -14,6 +14,7 @@ class Cache(object):
     __linux_infos = collections.OrderedDict()
     __status_infos = collections.OrderedDict()
     __innodb_infos = collections.OrderedDict()
+    __analyze_infos = collections.OrderedDict()
     __innodb_status_infos = collections.OrderedDict()
 
     def __init__(self):
@@ -56,6 +57,7 @@ class Cache(object):
                 self.remove_key(self.__innodb_infos, host_id)
                 self.remove_key(self.__linux_infos, host_id)
                 self.remove_key(self.__innodb_status_infos, host_id)
+                self.remove_key(self.__analyze_infos, host_id)
             else:
                 if (self.__tablespace.has_key(host_id) == False):
                     self.__tablespace[host_id] = base_class.BaseClass(host_info_temp)
@@ -67,6 +69,8 @@ class Cache(object):
                     self.__status_infos[host_id] = base_class.BaseClass(host_info_temp)
                 if (self.__innodb_infos.has_key(host_id) == False):
                     self.__innodb_infos[host_id] = self.init_innodb_info(base_class.BaseClass(host_info_temp))
+                if (self.__analyze_infos.has_key(host_id) == False):
+                    self.__analyze_infos[host_id] = self.init_analyze_info(base_class.BaseClass(None))
                 if (self.__innodb_status_infos.has_key(host_id) == False):
                     self.__innodb_status_infos[host_id] = base_class.BaseClass(host_info_temp)
                     self.__innodb_status_infos[host_id].buffer_pool_infos = collections.OrderedDict()
@@ -94,6 +98,23 @@ class Cache(object):
             user_info.user_password = row["user_password"]
             user_info.is_deleted = row["is_deleted"]
             self.add_user_info(user_info)
+
+    def init_analyze_info(self, analyze_info):
+        for key in Analyze_OS_Key:
+            setattr(analyze_info, key + Value_Min, 0)
+            setattr(analyze_info, key + Value_Max, 0)
+            setattr(analyze_info, key + Value_Avg, 0)
+            setattr(analyze_info, key + Value_Sum, 0)
+            setattr(analyze_info, key + Value_Count, 0)
+
+        for key in Analyze_MySQL_Key:
+            setattr(analyze_info, key + Value_Min, 0)
+            setattr(analyze_info, key + Value_Max, 0)
+            setattr(analyze_info, key + Value_Avg, 0)
+            setattr(analyze_info, key + Value_Sum, 0)
+            setattr(analyze_info, key + Value_Count, 0)
+
+        return analyze_info
 
     def init_innodb_info(self, innodb_info):
         innodb_info.innodb_ibuf_size = 0
@@ -199,6 +220,9 @@ class Cache(object):
     def get_innodb_info(self, key):
         return self.get_value_for_key(self.__innodb_infos, key)
 
+    def get_analyze_info(self, key):
+        return self.get_value_for_key(self.__analyze_infos, key)
+
     def get_tablespace_info(self, key):
         return self.get_value_for_key(self.__tablespace, key)
 
@@ -290,3 +314,20 @@ class Cache(object):
             host_info.mysql_pid_file = data["pid_file"]
             if (os.path.exists(host_info.mysql_pid_file) == False):
                 host_info.mysql_pid_file = os.path.join(host_info.mysql_data_dir, host_info.mysql_pid_file)
+
+Value_Min = "_min"
+Value_Max = "_max"
+Value_Avg = "_avg"
+Value_Sum = "_sum"
+Value_Count = "_count"
+
+Analyze_OS_Key = [
+]
+
+Analyze_MySQL_Key = [
+    "qps",
+    "tps",
+    "threads_count",
+    "create_tmp_table_count",
+    "create_tmp_disk_table_count",
+]
