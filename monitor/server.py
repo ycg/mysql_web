@@ -93,6 +93,7 @@ class MonitorServer(threading.Thread):
         if (mysql_status_new.get("Innodb_max_trx_id") != None):
             # percona
             status_info.trx_count = int(mysql_status_new["Innodb_max_trx_id"]) - int(mysql_status_old["Innodb_max_trx_id"])
+        status_info.slow_queries = int(mysql_status_new["Slow_queries"]) - int(mysql_status_old["Slow_queries"])
 
         # thread and connection
         status_info.connections = int(mysql_status_new["Connections"])
@@ -168,33 +169,26 @@ class MonitorServer(threading.Thread):
         innodb_info.rollback = status_info.rollback
         innodb_info.trx_count = status_info.trx_count
 
-        # unod list length mysql 没有这个状态值
-        if (mysql_status_new.get("Innodb_history_list_length") != None):
-            # percona
-            innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
-
         # row locks
-        if (mysql_status_new.get("Innodb_current_row_locks") != None):
-            # percona
-            innodb_info.current_row_locks = mysql_status_new["Innodb_current_row_locks"]
-        elif (mysql_status_new.get("Innodb_row_lock_current_waits") != None):
-            # mysql
+        if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
+            # 没有Innodb_current_row_locks状态值，只有Innodb_row_lock_current_waits
             innodb_info.current_row_locks = mysql_status_new["Innodb_row_lock_current_waits"]
+        elif(host_info.branch == mysql_branch.MySQLBranch.Percona):
+            innodb_info.current_row_locks = mysql_status_new["Innodb_current_row_locks"]
+            innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
+        innodb_info.innodb_row_lock_waits = int(mysql_status_new["Innodb_row_lock_waits"]) - int(mysql_status_old["Innodb_row_lock_waits"])
+        innodb_info.innodb_row_lock_time = int(mysql_status_new["Innodb_row_lock_time"]) - int(mysql_status_old["Innodb_row_lock_time"])
+        innodb_info.innodb_row_lock_time_avg = int(mysql_status_new["Innodb_row_lock_time_avg"])
+        innodb_info.innodb_row_lock_time_max = int(mysql_status_new["Innodb_row_lock_time_max"])
+        innodb_info.innodb_deadlocks = int(mysql_status_new["Innodb_deadlocks"]) - int(mysql_status_old["Innodb_deadlocks"])
 
         # innodb redo log info
+        innodb_info.innodb_log_waits = int(mysql_status_new["Innodb_log_waits"])
         innodb_info.innodb_log_writes = int(mysql_status_new["Innodb_log_writes"]) - int(mysql_status_old["Innodb_log_writes"])
         innodb_info.innodb_log_write_requests = int(mysql_status_new["Innodb_log_write_requests"]) - int(mysql_status_old["Innodb_log_write_requests"])
         innodb_info.innodb_os_log_pending_fsyncs = int(mysql_status_new["Innodb_os_log_pending_fsyncs"])
         innodb_info.innodb_os_log_pending_writes = int(mysql_status_new["Innodb_os_log_pending_writes"])
         innodb_info.innodb_os_log_written = int(mysql_status_new["Innodb_os_log_written"]) - int(mysql_status_old["Innodb_os_log_written"])
-
-        # innodb log row page waits
-        innodb_info.innodb_log_waits = int(mysql_status_new["Innodb_log_waits"])
-        innodb_info.innodb_buffer_pool_wait_free = int(mysql_status_new["Innodb_buffer_pool_wait_free"])
-        innodb_info.innodb_row_lock_waits = int(mysql_status_new["Innodb_row_lock_waits"]) - int(mysql_status_old["Innodb_row_lock_waits"])
-        innodb_info.innodb_row_lock_time = int(mysql_status_new["Innodb_row_lock_time"]) - int(mysql_status_old["Innodb_row_lock_time"])
-        innodb_info.innodb_row_lock_time_avg = int(mysql_status_new["Innodb_row_lock_time_avg"])
-        innodb_info.innodb_row_lock_time_max = int(mysql_status_new["Innodb_row_lock_time_max"])
 
         # buffer pool page
         innodb_info.page_data_count = int(mysql_status_new["Innodb_buffer_pool_pages_data"])
@@ -206,6 +200,7 @@ class MonitorServer(threading.Thread):
         innodb_info.page_usage = round((1 - float(innodb_info.page_free_count) / float(innodb_info.page_total_count)) * 100, 2)
         innodb_info.data_page_usage = round(float(innodb_info.page_data_count) / float(innodb_info.page_total_count) * 100, 2)
         innodb_info.dirty_page_usage = round(float(innodb_info.page_dirty_count) / float(innodb_info.page_total_count) * 100, 2)
+        innodb_info.innodb_buffer_pool_wait_free = int(mysql_status_new["Innodb_buffer_pool_wait_free"])
 
         # buffer pool rows
         innodb_info.rows_read = int(mysql_status_new["Innodb_rows_read"]) - int(mysql_status_old["Innodb_rows_read"])
@@ -944,6 +939,7 @@ show global status where variable_name in
 'Sort_merge_passes',
 'Sort_range',
 'Sort_scan',
+'Innodb_deadlocks',
 'Innodb_history_list_length',
 'Innodb_current_row_locks',
 'Innodb_row_lock_current_waits',
@@ -1012,7 +1008,8 @@ show global status where variable_name in
 'Innodb_s_lock_spin_waits',
 'Innodb_x_lock_os_waits',
 'Innodb_x_lock_spin_rounds',
-'Innodb_x_lock_spin_waits'
+'Innodb_x_lock_spin_waits',
+'Slow_queries'
 );
 """
 # endregion

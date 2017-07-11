@@ -731,7 +731,7 @@
                     <th colspan="9" rowspan="1" class="text-center">
                         Buffer Pool Pages
                     </th>
-                    <th colspan="5" rowspan="1" class="text-center">
+                    <th colspan="6" rowspan="1" class="text-center">
                         Row Lock
                     </th>
                     <th></th>
@@ -779,13 +779,13 @@
                     <th>
                         Flushs
                     </th>
-                    <th>
+                    <th title="current_row_locks">
                         Locks
                     </th>
-                    <th>
+                    <th title="innodb_row_lock_waits">
                         Waits
                     </th>
-                    <th>
+                    <th title="innodb_row_lock_time">
                         Times
                     </th>
                     <th>
@@ -793,6 +793,9 @@
                     </th>
                     <th>
                         Max
+                    </th>
+                    <th>
+                        Dead
                     </th>
                     <th>
 
@@ -859,7 +862,10 @@
                     <td>
                         {{ status.innodb_row_lock_time_max }}
                     </td>
-                     <td class="text-center">
+                    <td {% if(status.innodb_deadlocks > 0) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_deadlocks }}
+                    </td>
+                    <td class="text-center">
                         <a href="javascript:void(0)" onclick=start("/innodb/{{ status.host_info.key }}","") href="/innodb/{{ status.host_info.key }}">Innodb Status</a>
                     </td>
                 </tr>
@@ -932,10 +938,10 @@
                         Writes
                     </th>
                     <th>
-                        Read
+                        Read(KB)
                     </th>
                     <th>
-                        Written
+                        Written(KB)
                     </th>
                     <th>
                         Fsyncs
