@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import base_class
 import pymysql
 from DBUtils.PooledDB import PooledDB
@@ -73,6 +75,7 @@ class DBUtil(object):
 
     def get_mysql_connection(self, host_info):
         if(self.__connection_pools.get(host_info.key) == None):
+            #这边添加超时设置是为了防止多线程操作导致数据库线程堆积
             pool = PooledDB(creator=pymysql, mincached=5, maxcached=20,
                             host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password,
                             use_unicode=False, charset="utf8", cursorclass=pymysql.cursors.DictCursor, reset=False, autocommit=True,
