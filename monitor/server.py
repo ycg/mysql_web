@@ -60,6 +60,7 @@ class MonitorServer(threading.Thread):
         try:
             mysql_status_old = self.get_dic_data(cursor, show_global_status_sql)
         except pymysql.err.OperationalError:
+            traceback.print_exc()
             host_info.is_running = 0
             return
 
@@ -170,17 +171,23 @@ class MonitorServer(threading.Thread):
         innodb_info.trx_count = status_info.trx_count
 
         # row locks
-        if(host_info.branch == mysql_branch.MySQLBranch.MySQL):
-            # 没有Innodb_current_row_locks状态值，只有Innodb_row_lock_current_waits
-            innodb_info.current_row_locks = mysql_status_new["Innodb_row_lock_current_waits"]
-        elif(host_info.branch == mysql_branch.MySQLBranch.Percona):
-            innodb_info.current_row_locks = mysql_status_new["Innodb_current_row_locks"]
+        if(mysql_status_new.get("Innodb_history_list_length") != None):
+            #percona
             innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
+        if(mysql_status_new.get("Innodb_current_row_locks") != None):
+            #percona
+            innodb_info.current_row_locks = mysql_status_new["Innodb_current_row_locks"]
+        elif(mysql_status_new.get("Innodb_row_lock_current_waits") != None):
+            #mysql
+            innodb_info.current_row_locks = mysql_status_new["Innodb_row_lock_current_waits"]
         innodb_info.innodb_row_lock_waits = int(mysql_status_new["Innodb_row_lock_waits"]) - int(mysql_status_old["Innodb_row_lock_waits"])
         innodb_info.innodb_row_lock_time = int(mysql_status_new["Innodb_row_lock_time"]) - int(mysql_status_old["Innodb_row_lock_time"])
         innodb_info.innodb_row_lock_time_avg = int(mysql_status_new["Innodb_row_lock_time_avg"])
         innodb_info.innodb_row_lock_time_max = int(mysql_status_new["Innodb_row_lock_time_max"])
-        innodb_info.innodb_deadlocks = int(mysql_status_new["Innodb_deadlocks"]) - int(mysql_status_old["Innodb_deadlocks"])
+        if (mysql_status_new.get("Innodb_deadlocks") == None):
+            innodb_info.innodb_deadlocks = 0
+        else:
+            innodb_info.innodb_deadlocks = int(mysql_status_new["Innodb_deadlocks"]) - int(mysql_status_old["Innodb_deadlocks"])
 
         # innodb redo log info
         innodb_info.innodb_log_waits = int(mysql_status_new["Innodb_log_waits"])
@@ -395,7 +402,7 @@ class MonitorServer(threading.Thread):
         try:
             host_client = paramiko.SSHClient()
             host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
+            host_client.connect(host_info.host, port=host_info.ssh_port, username="root", timeout=1)
 
             # 监测CPU负载
             self.monitor_host_for_cpu_load(host_client, linux_info)
@@ -407,6 +414,8 @@ class MonitorServer(threading.Thread):
             self.monitor_host_for_memory(host_client, linux_info)
             # 监控mysql的cpu和memory以及data大小
             self.monitor_host_for_mysql_cpu_and_memory(host_client, host_info, linux_info)
+        except Exception as e:
+            traceback.print_exc()
         finally:
             if (host_client != None):
                 host_client.close()
@@ -417,7 +426,7 @@ class MonitorServer(threading.Thread):
         try:
             host_client = paramiko.SSHClient()
             host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
+            host_client.connect(host_info.host, port=host_info.ssh_port, username="root", timeout=1)
 
             # 获取cpu和io数据的标记位
             stdin, stdout, stderr = host_client.exec_command("iostat -xk 1 2")
@@ -488,6 +497,8 @@ class MonitorServer(threading.Thread):
             # self.analyze_os_status(linux_info)
             # 插入os系统监控数据
             self.insert_os_monitor_log(linux_info)
+        except Exception as e:
+            traceback.print_exc()
         finally:
             if (host_client != None):
                 host_client.close()
