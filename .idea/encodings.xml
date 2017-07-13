@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/../mysql_audit/log" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/mysql_audit.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/settings.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/src/host_manager.py" charset="UTF-8" />
@@ -17,11 +16,13 @@
     <file url="file://$PROJECT_DIR$/backup/mysqldump.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/xtrabackup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/install.sh" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/monitor/db_util.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/general_log_new.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/mysql_status.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/new_alarm.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/new_slow_log.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/tablespace.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/python_upgrade.sh" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sql/table.sql" charset="GBK" />
     <file url="file://$PROJECT_DIR$/startup.sh" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/static/js/my.js" charset="UTF-8" />

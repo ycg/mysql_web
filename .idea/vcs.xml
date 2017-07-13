@@ -3,6 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/../mysql_audit" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../proxysql" vcs="Git" />
     <mapping directory="C:\Users\Administrator\PycharmProjects\mysql_web\DBManagerService" vcs="Git" />
   </component>
 </project>

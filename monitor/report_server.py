@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import cache, base_class, mail_util, table_check
+import cache, base_class, mail_util, tablespace
 from flask import render_template, app
 
 class Report():
@@ -29,7 +29,7 @@ class Report():
             if(db_tablespace.has_key(key) == False):
                 tmp_info = base_class.BaseClass(None)
                 tmp_info.name = host_info.remark
-                tablespace_list = table_check.check_table_space(host_info)
+                tablespace_list = tablespace.check_table_space(host_info)
                 tmp_info.data = tablespace_list
                 db_tablespace[key] = tmp_info
         str_html = render_template("report.html", tablespace_data=db_tablespace, report_name="Tablespace Report")

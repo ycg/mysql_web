@@ -6,6 +6,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="mysql_audit" />
     <orderEntry type="module" module-name="untitled6" />
+    <orderEntry type="module" module-name="proxysql" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
