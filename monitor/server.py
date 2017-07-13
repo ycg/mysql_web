@@ -17,6 +17,7 @@ class MonitorServer(threading.Thread):
     __db_util = None
     __instance = None
     __thread_pool = None
+    __ssh_client_dict = {}
 
     def __init__(self):
         pass
@@ -171,14 +172,14 @@ class MonitorServer(threading.Thread):
         innodb_info.trx_count = status_info.trx_count
 
         # row locks
-        if(mysql_status_new.get("Innodb_history_list_length") != None):
-            #percona
+        if (mysql_status_new.get("Innodb_history_list_length") != None):
+            # percona
             innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
-        if(mysql_status_new.get("Innodb_current_row_locks") != None):
-            #percona
+        if (mysql_status_new.get("Innodb_current_row_locks") != None):
+            # percona
             innodb_info.current_row_locks = mysql_status_new["Innodb_current_row_locks"]
-        elif(mysql_status_new.get("Innodb_row_lock_current_waits") != None):
-            #mysql
+        elif (mysql_status_new.get("Innodb_row_lock_current_waits") != None):
+            # mysql
             innodb_info.current_row_locks = mysql_status_new["Innodb_row_lock_current_waits"]
         innodb_info.innodb_row_lock_waits = int(mysql_status_new["Innodb_row_lock_waits"]) - int(mysql_status_old["Innodb_row_lock_waits"])
         innodb_info.innodb_row_lock_time = int(mysql_status_new["Innodb_row_lock_time"]) - int(mysql_status_old["Innodb_row_lock_time"])
@@ -397,111 +398,88 @@ class MonitorServer(threading.Thread):
         self.__db_util.execute(settings.MySQL_Host, sql)
 
     def monitor_host_status(self, host_info):
-        host_client = None
         linux_info = self.__cache.get_linux_info(host_info.key)
-        try:
-            host_client = paramiko.SSHClient()
-            host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            host_client.connect(host_info.host, port=host_info.ssh_port, username="root", timeout=1)
-
-            # 监测CPU负载
-            self.monitor_host_for_cpu_load(host_client, linux_info)
-            # 监测网卡流量
-            self.monitor_host_for_net(host_client, linux_info)
-            # 监测硬盘空间
-            self.monitor_host_for_disk(host_client, linux_info)
-            # 监测linux内存使用情况
-            self.monitor_host_for_memory(host_client, linux_info)
-            # 监控mysql的cpu和memory以及data大小
-            self.monitor_host_for_mysql_cpu_and_memory(host_client, host_info, linux_info)
-        except Exception as e:
-            traceback.print_exc()
-        finally:
-            if (host_client != None):
-                host_client.close()
+        # 监测CPU负载
+        self.monitor_host_for_cpu_load(linux_info)
+        # 监测网卡流量
+        self.monitor_host_for_net(linux_info)
+        # 监测硬盘空间
+        self.monitor_host_for_disk(linux_info)
+        # 监测linux内存使用情况
+        self.monitor_host_for_memory(linux_info)
+        # 监控mysql的cpu和memory以及data大小
+        self.monitor_host_for_mysql_cpu_and_memory(host_info, linux_info)
 
     def monitor_host_for_cpu_and_io(self, host_info):
-        host_client = None
         linux_info = self.__cache.get_linux_info(host_info.key)
-        try:
-            host_client = paramiko.SSHClient()
-            host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            host_client.connect(host_info.host, port=host_info.ssh_port, username="root", timeout=1)
+        result_list = self.get_remote_command_result(host_info, "iostat -xk 1 2")
 
-            # 获取cpu和io数据的标记位
-            stdin, stdout, stderr = host_client.exec_command("iostat -xk 1 2")
-            result_list = stdout.readlines()
-            io_flag = "Device"
-            cpu_flag = "avg-cpu"
-            number = 1
-            io_flag_index = 0
-            cpu_flag_index = 0
-            for line in result_list:
-                if (line.find(io_flag) >= 0):
-                    io_flag_index = number
-                elif (line.find(cpu_flag) >= 0):
-                    cpu_flag_index = number
-                number += 1
+        io_flag = "Device"
+        cpu_flag = "avg-cpu"
+        number = 1
+        io_flag_index = 0
+        cpu_flag_index = 0
+        for line in result_list:
+            if (line.find(io_flag) >= 0):
+                io_flag_index = number
+            elif (line.find(cpu_flag) >= 0):
+                cpu_flag_index = number
+            number += 1
 
-            io_list = result_list[io_flag_index:]
-            cpu_list = result_list[cpu_flag_index:]
-            io_column_names = self.remove_empty_string(result_list[io_flag_index - 1])
+        io_list = result_list[io_flag_index:]
+        cpu_list = result_list[cpu_flag_index:]
+        io_column_names = self.remove_empty_string(result_list[io_flag_index - 1])
 
-            # 解析io数据
-            util = 0
-            await = 0
-            svctm = 0
-            io_qps = 0
-            io_tps = 0
-            io_read = 0
-            io_write = 0
-            for str in io_list:
-                number_tmp = 0
-                io_tmp = self.remove_empty_string(str)
+        # 解析io数据
+        util = 0
+        await = 0
+        svctm = 0
+        io_qps = 0
+        io_tps = 0
+        io_read = 0
+        io_write = 0
+        for str in io_list:
+            number_tmp = 0
+            io_tmp = self.remove_empty_string(str)
 
-                if (len(io_tmp) <= 0):
-                    continue
-                for column_name in io_column_names:
-                    if (column_name == "%util"):
-                        util += float(io_tmp[number_tmp])
-                    if (column_name == "await"):
-                        await += float(io_tmp[number_tmp])
-                    if (column_name == "svctm"):
-                        svctm += float(io_tmp[number_tmp])
-                    if (column_name == "r/s"):
-                        io_qps += float(io_tmp[number_tmp])
-                    if (column_name == "w/s"):
-                        io_tps += float(io_tmp[number_tmp])
-                    if (column_name == "rkB/s"):
-                        io_read += float(io_tmp[number_tmp])
-                    if (column_name == "wkB/s"):
-                        io_write += float(io_tmp[number_tmp])
-                    number_tmp += 1
-            linux_info.util = util
-            linux_info.await = await
-            linux_info.svctm = svctm
-            linux_info.io_qps = int(io_qps)
-            linux_info.io_tps = int(io_tps)
-            linux_info.io_read = int(io_read)
-            linux_info.io_write = int(io_write)
+            if (len(io_tmp) <= 0):
+                continue
+            for column_name in io_column_names:
+                if (column_name == "%util"):
+                    util += float(io_tmp[number_tmp])
+                if (column_name == "await"):
+                    await += float(io_tmp[number_tmp])
+                if (column_name == "svctm"):
+                    svctm += float(io_tmp[number_tmp])
+                if (column_name == "r/s"):
+                    io_qps += float(io_tmp[number_tmp])
+                if (column_name == "w/s"):
+                    io_tps += float(io_tmp[number_tmp])
+                if (column_name == "rkB/s"):
+                    io_read += float(io_tmp[number_tmp])
+                if (column_name == "wkB/s"):
+                    io_write += float(io_tmp[number_tmp])
+                number_tmp += 1
+        linux_info.util = util
+        linux_info.await = await
+        linux_info.svctm = svctm
+        linux_info.io_qps = int(io_qps)
+        linux_info.io_tps = int(io_tps)
+        linux_info.io_read = int(io_read)
+        linux_info.io_write = int(io_write)
 
-            # 解析cpu数据，因为cpu只有一行数据
-            cpu_tmp = self.remove_empty_string(cpu_list[0])
-            linux_info.cpu_user = float(cpu_tmp[0])
-            linux_info.cpu_nice = float(cpu_tmp[1])
-            linux_info.cpu_system = float(cpu_tmp[2])
-            linux_info.cpu_iowait = float(cpu_tmp[3])
-            linux_info.cpu_steal = float(cpu_tmp[4])
-            linux_info.cpu_idle = float(cpu_tmp[5])
+        # 解析cpu数据，因为cpu只有一行数据
+        cpu_tmp = self.remove_empty_string(cpu_list[0])
+        linux_info.cpu_user = float(cpu_tmp[0])
+        linux_info.cpu_nice = float(cpu_tmp[1])
+        linux_info.cpu_system = float(cpu_tmp[2])
+        linux_info.cpu_iowait = float(cpu_tmp[3])
+        linux_info.cpu_steal = float(cpu_tmp[4])
+        linux_info.cpu_idle = float(cpu_tmp[5])
 
-            # self.analyze_os_status(linux_info)
-            # 插入os系统监控数据
-            self.insert_os_monitor_log(linux_info)
-        except Exception as e:
-            traceback.print_exc()
-        finally:
-            if (host_client != None):
-                host_client.close()
+        # self.analyze_os_status(linux_info)
+        # 插入os系统监控数据
+        self.insert_os_monitor_log(linux_info)
 
     def remove_empty_string(self, str):
         result = []
@@ -511,29 +489,21 @@ class MonitorServer(threading.Thread):
                 result.append(value)
         return result
 
-    def monitor_host_for_cpu_load(self, host_client, linux_info):
-        stdin, stdout, stderr = host_client.exec_command("cat /proc/loadavg")
-        cpu_value = stdout.readlines()[0].split()
+    def monitor_host_for_cpu_load(self, linux_info):
+        cpu_value = self.get_remote_command_result(linux_info.host_info, "cat /proc/loadavg")[0].split()
         linux_info.cpu_1 = cpu_value[0]
         linux_info.cpu_5 = cpu_value[1]
         linux_info.cpu_15 = cpu_value[2]
 
-    def monitor_host_for_net(self, host_client, linux_info):
+    def monitor_host_for_net(self, linux_info):
         net_send_byte, net_receive_byte, number = 0, 0, 0
-        stdin, stdout, stderr = host_client.exec_command("cat /proc/net/dev")
-        for line in stdout.readlines():
+        result = self.get_remote_command_result(linux_info.host_info, "cat /proc/net/dev")
+        for line in result:
             number += 1
             if (number >= 3):
                 new_list = [x for x in line.split(" ") if x != ""]
                 net_send_byte += long(new_list[9])
                 net_receive_byte += long(new_list[1])
-            '''if(line.find("eth") >= 0):
-                value_list = []
-                for value in line.split(" "):
-                    if(len(value) > 0):
-                        value_list.append(value)
-                net_send_byte = net_send_byte + long(value_list[9])
-                net_receive_byte = net_receive_byte + long(value_list[1])'''
 
         linux_info.net_send_old = linux_info.net_send_new
         linux_info.net_receive_old = linux_info.net_receive_new
@@ -543,13 +513,13 @@ class MonitorServer(threading.Thread):
         linux_info.net_send_byte = self.get_data_length(linux_info.net_send_new - linux_info.net_send_old)
         linux_info.net_receive_byte = self.get_data_length(linux_info.net_receive_new - linux_info.net_receive_old)
 
-    def monitor_host_for_disk(self, host_client, linux_info):
+    def monitor_host_for_disk(self, linux_info):
         id_tmp = 0
         max_disk_value = 0
         total_disk_value = 0
-        stdin, stdout, stderr = host_client.exec_command("df | grep -v 'tmpfs'")
-        for line in stdout.readlines():
-            id_tmp = id_tmp + 1
+        result = self.get_remote_command_result(linux_info.host_info, "df | grep -v 'tmpfs'")
+        for line in result:
+            id_tmp += 1
             if (id_tmp == 1):
                 continue
             values = line.split()
@@ -565,16 +535,16 @@ class MonitorServer(threading.Thread):
             list_len = len(values)
             if (list_len >= 3):
                 if (list_len == 6):
-                    total_disk_value = total_disk_value + int(values[1])
+                    total_disk_value += int(values[1])
                 elif (list_len == 5):
-                    total_disk_value = total_disk_value + int(values[0])
+                    total_disk_value += int(values[0])
         linux_info.disk_value = int(max_disk_value)
         linux_info.total_disk_value = int(total_disk_value / 1024 / 1024)
 
-    def monitor_host_for_memory(self, host_client, linux_info):
+    def monitor_host_for_memory(self, linux_info):
         memory_free_total = 0
-        stdin, stdout, stderr = host_client.exec_command("cat /proc/meminfo")
-        for line in stdout.readlines():
+        result = self.get_remote_command_result(linux_info.host_info, "cat /proc/meminfo")
+        for line in result:
             values = line.split(":")
             if (len(values) >= 2):
                 value_tmp = int(values[1].replace("kB", "")) * 1024
@@ -595,13 +565,12 @@ class MonitorServer(threading.Thread):
                     linux_info.swap_free = tablespace.get_data_length(value_tmp)
         linux_info.memory_free_total = tablespace.get_data_length(memory_free_total)
 
-    def monitor_host_for_mysql_cpu_and_memory(self, host_client, host_info, linux_info):
-        stdin, stdout, stderr = host_client.exec_command("cat %s" % host_info.mysql_pid_file)
-        result = stdout.readlines()
+    def monitor_host_for_mysql_cpu_and_memory(self, host_info, linux_info):
+        result = self.get_remote_command_result(host_info, "cat %s" % host_info.mysql_pid_file)
         linux_info.mysql_pid = int(result[0])
 
-        stdin, stdout, stderr = host_client.exec_command("top -b -n1 | grep mysql")
-        for line in stdout.readlines():
+        result = self.get_remote_command_result(host_info, "top -b -n1 | grep mysql")
+        for line in result:
             values = line.split()
             if (int(values[0]) == linux_info.mysql_pid):
                 linux_info.mysql_cpu = float(values[8])
@@ -609,8 +578,21 @@ class MonitorServer(threading.Thread):
                 break
 
         # 监测MySQL数据目录大小
-        stdin, stdout, stderr = host_client.exec_command("du -h %s | tail -n1 | awk '{print $1'}" % host_info.mysql_data_dir)
-        linux_info.mysql_data_size = stdout.readlines()[0].replace("\n", "").replace("G", "")
+        result = self.get_remote_command_result(host_info, "du -h %s | tail -n1 | awk '{print $1'}" % host_info.mysql_data_dir)
+        linux_info.mysql_data_size = result[0].replace("\n", "").replace("G", "")
+
+    def get_remote_command_result(self, host_info, command):
+        key = host_info.host + str(host_info.port)
+        if (key in self.__ssh_client_dict.keys()):
+            host_client = self.__ssh_client_dict[key]
+        else:
+            host_client = paramiko.SSHClient()
+            host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
+            host_client.get_transport().set_keepalive(1)
+            self.__ssh_client_dict[key] = host_client
+        stdin, stdout, stderr = host_client.exec_command(command)
+        return stdout.readlines()
 
     def read_innodb_status(self, host_info):
         innodb_status = self.get_innodb_status_infos(host_info)
@@ -890,6 +872,7 @@ class MonitorServer(threading.Thread):
             setattr(analyze_info, key + cache.Value_Avg, value_avg)
             setattr(analyze_info, key + cache.Value_Sum, value_sum)
             setattr(analyze_info, key + cache.Value_Count, value_count)
+
 
 # region show global status sql
 
