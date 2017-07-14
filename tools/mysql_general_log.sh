@@ -23,10 +23,10 @@ pt_query_digest="/usr/bin/pt-query-digest"
 
 function start_general_log()
 {
-    general_log_file_old=`$mysql_client -h$mysql_host -P$mysql_port -u$mysql_user -p$mysql_password -e "show global variables like 'general_log_file';" | grep log | awk '{print $2}'`
+    general_log_file_old=`${mysql_client} -h${mysql_host} -P${mysql_port} -u${mysql_user} -p${mysql_password} -e "show global variables like 'general_log_file';" | grep log | awk '{print $2}'`
     echo "---------------------------------start general log-------------------------------------------------"
-	general_log_file_new=$general_log_dir`date "+%Y-%m-%d_%H-%M-%S.general"`
-	`$mysql_client -h$mysql_host -P$mysql_port -u$mysql_user -p$mysql_password \
+	general_log_file_new=${general_log_dir}`date "+%Y-%m-%d_%H-%M-%S.general"`
+	`${mysql_client} -h${mysql_host} -P${mysql_port} -u${mysql_user} -p${mysql_password} \
 	-e "set global general_log = 1;set global log_output = 'FILE';set global general_log_file = '$general_log_file_new';"`
 
     sleep 1
@@ -39,21 +39,25 @@ function start_general_log()
 function stop_general_log()
 {
     echo "===================================stop general ok==================================================="
-	`$mysql_client -h$mysql_host -P$mysql_port -u$mysql_user -p$mysql_password -e "set global general_log = 0;"`
+	`${mysql_client} -h${mysql_host} -P${mysql_port} -u${mysql_user} -p${mysql_password} -e "set global general_log = 0;"`
 }
 
 function check_general_log()
 {
 	echo "----------------------------------check general log------------------------------------------------"
-	general_log_file=`$mysql_client -h$mysql_host -P$mysql_port -u$mysql_user -p$mysql_password -e "show global variables like 'general_log_file';" | grep log | awk '{print $2}'`
-	$pt_query_digest --type=genlog \
-	--user=$db_user --password=$db_password --port=$db_port --charset=utf8 \
-	--review h=$db_host,D=$db_database,t=general_log_review  \
-	--history h=$db_host,D=$db_database,t=general_log_review_history  \
+	general_log_file=`${mysql_client} -h${mysql_host} -P${mysql_port} -u${mysql_user} -p${mysql_password} -e "show global variables like 'general_log_file';" | grep log | awk '{print $2}'`
+	${pt_query_digest} --type=genlog \
+	--user=${db_user} --password=${db_password} --port=${db_port} --charset=utf8 \
+	--review h=${db_host},D=${db_database},t=general_log_review  \
 	--no-report --limit=100% \
-	--filter='$event->{fingerprint} =~ m/^select/i' $general_log_file > /tmp/general_log.log
+	--filter='$event->{fingerprint} =~ m/^select/i' ${general_log_file} > /tmp/general_log.log
 	echo "---------------------------------------check ok----------------------------------------------------"
 	echo ""
+}
+
+function stop_slow_log()
+{
+    `${mysql_client} -h${mysql_host} -P${mysql_port} -u${mysql_user} -p${mysql_password} -e "set global slow_query_log = 0;"`
 }
 
 if [ ! -d "$general_log_dir" ]; then
@@ -63,10 +67,11 @@ fi
 while true
 do
     start_general_log
-    sleep 1m
+    sleep 5m
     stop_general_log
+    sleep 3
     check_general_log
-    sleep 10
+    sleep 1m
 done
 
 
