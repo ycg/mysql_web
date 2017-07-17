@@ -4,12 +4,14 @@ import traceback
 import cache, db_util, settings, base_class, mysql_branch, tablespace
 import time, threadpool, threading, enum, paramiko, collections, pymysql
 
+
 class MonitorEnum(enum.Enum):
     mysql = 4
     host = 3
     status = 0
     innodb = 1
     replication = 2
+
 
 class MonitorServer(threading.Thread):
     __times = 1
@@ -584,15 +586,21 @@ class MonitorServer(threading.Thread):
     def get_remote_command_result(self, host_info, command):
         key = host_info.host + str(host_info.port)
         if (key in self.__ssh_client_dict.keys()):
-            host_client = self.__ssh_client_dict[key]
+            if (self.__ssh_client_dict[key].get_transport().is_active == False):
+                self.__ssh_client_dict[key].close()
+                self.__ssh_client_dict[key] = self.create_remote_ssh_client(host_info)
+                print("ssh not active, create new ssh client ok.")
         else:
-            host_client = paramiko.SSHClient()
-            host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
-            host_client.get_transport().set_keepalive(1)
-            self.__ssh_client_dict[key] = host_client
-        stdin, stdout, stderr = host_client.exec_command(command)
+            self.__ssh_client_dict[key] = self.create_remote_ssh_client(host_info)
+        stdin, stdout, stderr = self.__ssh_client_dict[key].exec_command(command)
         return stdout.readlines()
+
+    def create_remote_ssh_client(self, host_info):
+        host_client = paramiko.SSHClient()
+        host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
+        host_client.get_transport().set_keepalive(1)
+        return host_client
 
     def read_innodb_status(self, host_info):
         innodb_status = self.get_innodb_status_infos(host_info)
