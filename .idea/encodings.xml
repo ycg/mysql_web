@@ -5,6 +5,7 @@
     <file url="file://$PROJECT_DIR$/../mysql_audit/settings.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/src/host_manager.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/src/user_manager.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mysql_audit/static/js/common.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/table.sql" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/home.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/host.html" charset="UTF-8" />

@@ -1,78 +1,3 @@
-{% if(slow_log_infos != None) %}
-    <table class="table table-hover table-bordered">
-        <thead>
-        <tr>
-            <th>
-                ID
-            </th>
-            <th>
-                Fingerprint
-            </th>
-            <th>
-                Count
-            </th>
-            <th title="Query_time_sum">
-                Query_S
-            </th>
-            <th title="Lock_time_sum">
-                Lock_S
-            </th>
-            <th title="Rows_sent_sum">
-                Rows_S
-            </th>
-            <th title="Rows_examined_sum">
-                Rows_E_C
-            </th>
-            <th>
-                First
-            </th>
-            <th>
-                Last
-            </th>
-            <th>
-
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for status in slow_log_infos %}
-            <tr>
-                <td>
-                    {{ status.id }}
-                </td>
-                <td title="{{ status.fingerprint }}">
-                    {{ status.display_sql }}
-                </td>
-                <td>
-                    {{ status.sql_count }}
-                </td>
-                <td>
-                    {{ status.query_sum }}
-                </td>
-                <td>
-                    {{ status.lock_sum }}
-                </td>
-                <td>
-                    {{ status.rows_sent_count }}
-                </td>
-                <td>
-                    {{ status.rows_exam_sum }}
-                </td>
-                <td>
-                    {{ status.first_seen }}
-                </td>
-                <td>
-                    {{ status.last_seen }}
-                </td>
-                <td class="text-center">
-                    <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>Detail</button>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-{% endif %}
-
 {% if(slow_logs != None) %}
     <table class="table table-hover table-bordered">
         <thead>
@@ -86,9 +11,6 @@
             <th colspan="3" rowspan="1" class="text-center">
                 Lock Time
             </th>
-            <!--<th>
-
-            </th>-->
             <th>
 
             </th>
@@ -130,9 +52,6 @@
             <th>
                 Max
             </th>
-            <!--<th class="text-center">
-                Status
-            </th>-->
             <th>
 
             </th>
@@ -142,7 +61,7 @@
         {% for status in slow_logs %}
             <tr>
                 <td>
-                    <a role="button" onclick=visible_or_hidden("{{ status.checksum }}") >
+                    <a role="button" onclick=visible_or_hidden("{{ status.checksum }}")>
                         {{ status.fingerprint_tmp }}
                     </a>
                 </td>
@@ -179,16 +98,13 @@
                 <td>
                     {{ status.Lock_time_max }}
                 </td>
-                <!--<td class="text-center">
-                    {% if(status.is_reviewed == 0) %}
-                        Not Reviewed
-                    {% else %}
-                        Reviewed
-                    {% endif %}
-                </td>-->
                 <td class="text-center">
-                    <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>Detail</button>
-                    <!--<button class="btn btn-xs btn-primary" onclick=show_review_dialog_modal("{{ status.checksum }}")>Review</button>-->
+                    <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>详情</button>
+                    {% if(status.is_reviewed == 0) %}
+                        <button class="btn btn-xs btn-danger" onclick=show_review_dialog_modal("{{ status.checksum }}")>审核</button>
+                    {% else %}
+                        <button class="btn btn-xs btn-danger" disabled>已审核</button>
+                    {% endif %}
                 </td>
             </tr>
             <tr id="{{ status.checksum }}" hidden>

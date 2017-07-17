@@ -162,7 +162,7 @@
     }
 
     function show_modal_dialog() {
-        $("#detail").modal({backdrop: "static", keyboard: false});
+        $("#detail").modal({backdrop: "static"});
         $("#detail").modal("show")
     }
 
@@ -212,7 +212,7 @@
             set_option_selected("#review_status", obj.is_reviewed)
         })
 
-        $("#review").modal({backdrop: "static", keyboard: false});
+        $("#review").modal({backdrop: "static"});
         $("#review").modal("show")
     }
 
@@ -234,6 +234,7 @@
         json_data["checksum"] = slow_log_checksum
         $.post("/newslowlog/review/update", json_data, function (data) {
             alert(data)
+            $("#review").modal("hide")
         });
     }
 </script>

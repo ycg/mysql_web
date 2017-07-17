@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../flask-admin/.idea/flask-admin.iml" filepath="$PROJECT_DIR$/../flask-admin/.idea/flask-admin.iml" />
       <module fileurl="file://$PROJECT_DIR$/../mysql_audit/.idea/mysql_audit.iml" filepath="$PROJECT_DIR$/../mysql_audit/.idea/mysql_audit.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/mysql_web.iml" filepath="$PROJECT_DIR$/.idea/mysql_web.iml" />
       <module fileurl="file://$PROJECT_DIR$/../proxysql/.idea/proxysql.iml" filepath="$PROJECT_DIR$/../proxysql/.idea/proxysql.iml" />

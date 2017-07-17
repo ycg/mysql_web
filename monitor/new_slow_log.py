@@ -13,7 +13,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
         where_sql += " and a.is_reviewed = {0}".format(status)
 
     sql = """select a.checksum, a.fingerprint, a.first_seen, a.last_seen, a.is_reviewed,
-                    b.serverid_max, b.db_max, b.user_max, b.ts_min, b.ts_max, sum(b.ts_cnt) ts_cnt,
+                    b.serverid_max, b.db_max, b.user_max, b.ts_min, b.ts_max, sum(ifnull(b.ts_cnt, 1)) ts_cnt,
                     sum(b.Query_time_sum)/sum(b.ts_cnt) Query_time_avg,
                     max(b.Query_time_max) Query_time_max, min(b.Query_time_min) Query_time_min, sum(b.Query_time_sum) Query_time_sum,
                     max(b.Lock_time_max) Lock_time_max, min(b.Lock_time_min) Lock_time_min, sum(b.Lock_time_sum) Lock_time_sum
@@ -23,6 +23,20 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
              group by a.checksum
              order by {2} desc
              limit {3}, 15;"""
+
+    """sql = select t1.*, t2.checksum, t2.fingerprint, t2.first_seen, t2.last_seen, t2.is_reviewed
+             from
+             (
+                 select b.serverid_max, b.db_max, b.user_max, b.ts_min, b.ts_max, sum(b.ts_cnt) ts_cnt,
+                        sum(b.Query_time_sum)/sum(b.ts_cnt) Query_time_avg,
+                        max(b.Query_time_max) Query_time_max, min(b.Query_time_min) Query_time_min, sum(b.Query_time_sum) Query_time_sum,
+                        max(b.Lock_time_max) Lock_time_max, min(b.Lock_time_min) Lock_time_min, sum(b.Lock_time_sum) Lock_time_sum
+                 from mysql_web.mysql_slow_query_review_history b
+                 where b.serverid_max={0} {1}
+                 group by b.checksum
+                 order by {2} desc
+                 limit {3}, 15
+             ) t1 left join mysql_web.mysql_slow_query_review t2 on t1.checksum=t2.checksum"""
 
     result = []
     sql = sql.format(server_id, where_sql, order_by_options[order_by_type], (page_number - 1) * 15)
@@ -38,7 +52,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
         info.db_max = row["db_max"]
         info.user_max = row["user_max"]
         info.ts_max = row["ts_max"]
-        info.ts_cnt = int(row["ts_cnt"])
+        info.ts_cnt = get_sql_count_value(row["ts_cnt"])
         info.is_reviewed = row["is_reviewed"]
         info.Query_time_avg = get_float(row["Query_time_avg"])
         info.Query_time_max = get_float(row["Query_time_max"])
@@ -51,7 +65,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
     return result
 
 def get_slow_log_detail(checksum, server_id):
-    sql = """select t1.checksum, t2.ts_cnt,  t1.first_seen, t1.last_seen, t1.fingerprint, t2.sample,
+    sql = """select t1.checksum, ifnull(t2.ts_cnt, 1) as ts_cnt,  t1.first_seen, t1.last_seen, t1.fingerprint, t2.sample,
              t2.serverid_max, t2.db_max, t2.user_max,
              t2.Query_time_min, t2.Query_time_max, t2.Query_time_sum, t2.Query_time_pct_95,
              Lock_time_sum,Lock_time_min,Lock_time_max,Lock_time_pct_95,
@@ -67,7 +81,7 @@ def get_slow_log_detail(checksum, server_id):
         slow_log_detail.db_max = row["db_max"]
         slow_log_detail.user_max = row["user_max"]
         slow_log_detail.checksum = row["checksum"]
-        slow_log_detail.count = int(row["ts_cnt"])
+        slow_log_detail.count = get_sql_count_value(row["ts_cnt"])
         slow_log_detail.query_time_sum = row["Query_time_sum"]
         slow_log_detail.query_time_max = row["Query_time_max"]
         slow_log_detail.query_time_min = row["Query_time_min"]
@@ -137,4 +151,15 @@ def get_review_detail_by_checksum(checksum):
     return json.dumps(info, default=lambda o: o.__dict__, skipkeys=True, ensure_ascii=False)
 
 def get_float(value):
+    if(value == None):
+        return str(0)
     return str("%.5f" % value)
+
+def get_sql_count_value(value):
+    value = int(value)
+    if(value <= 1000):
+        return value
+    if(value <= 10000):
+        return str(round(float(value) / float(1000), 1)) + "k"
+    return str(value / 1000) + "k"
+

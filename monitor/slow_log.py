@@ -1,11 +1,6 @@
 import db_util, base_class, settings
 
-query_type = {}
-query_type[1] = "sql_count"
-query_type[2] = "query_sum"
-query_type[3] = "lock_sum"
-query_type[4] = "rows_sent_count"
-query_type[5] = "rows_exam_sum"
+query_type = {1: "sql_count", 2: "query_sum", 3: "lock_sum", 4: "rows_sent_count", 5: "rows_exam_sum"}
 
 table_config = {}
 

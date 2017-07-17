@@ -207,23 +207,25 @@ insert into mysql_web_user_info (user_name, user_password) values("yangcg", md5(
 
 -- -----------------------------------------------------------
 -- 慢查询配置表
+-- 遇到生成的checksum比bigint还要大
+-- 字段修改成 checksum varchar(25) not null
 -- -----------------------------------------------------------
 DROP TABLE IF EXISTS `mysql_slow_query_review`;
 CREATE TABLE `mysql_slow_query_review` (
-  `checksum` bigint(20) NOT NULL,
-  `fingerprint` text NOT NULL,
-  `sample` mediumtext NOT NULL,
+  `id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `checksum` BIGINT NOT NULL,
+  `fingerprint` text,
+  `sample` mediumtext,
   `first_seen` datetime DEFAULT NULL,
   `last_seen` datetime DEFAULT NULL,
-  `reviewed_by` varchar(20) DEFAULT NULL,
-  `reviewed_on` datetime DEFAULT NULL,
+  `reviewed_by` varchar(20) DEFAULT '',
+  `reviewed_on` varchar(20) DEFAULT '',
   `reviewed_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   `is_reviewed` TINYINT NOT NULL DEFAULT 0,
   `created_time` TIMESTAMP NOT NULL DEFAULT NOW(),
   `modified_time` TIMESTAMP NOT NULL DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP,
-  `comments` text,
-  PRIMARY KEY (`checksum`)
-  #KEY `idx_last_seen` (`last_seen`) USING BTREE
+  `comments` varchar(200) DEFAULT '' COMMENT '备注',
+  UNIQUE KEY (`checksum`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `mysql_slow_query_review_history`;
@@ -325,10 +327,7 @@ CREATE TABLE `mysql_slow_query_review_history` (
   `Filesort_on_disk_sum` float DEFAULT NULL,
   `created_time` TIMESTAMP NOT NULL DEFAULT NOW(),
   `modified_time` TIMESTAMP NOT NULL DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP,
-  KEY `idx_checksum` (`checksum`)
-  #PRIMARY KEY (`checksum`,`ts_min`,`ts_max`)
-  #KEY `idx_serverid_max` (`serverid_max`) USING BTREE,
-  #KEY `idx_query_time_max` (`Query_time_max`) USING BTREE
+  KEY `idx_checksum` (`checksum`, serverid_max)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 -- -------------------------------------------------------------------
 

@@ -12,6 +12,9 @@ T = G * 1024
 Table_Page_Size = 20
 
 class TableInfo():
+    def __init__(self):
+        pass
+
     diff = 0
     value = 0
     file_size = 0
