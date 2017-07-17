@@ -210,7 +210,7 @@ insert into mysql_web_user_info (user_name, user_password) values("yangcg", md5(
 -- -----------------------------------------------------------
 DROP TABLE IF EXISTS `mysql_slow_query_review`;
 CREATE TABLE `mysql_slow_query_review` (
-  `checksum` bigint(20) unsigned NOT NULL,
+  `checksum` bigint(20) NOT NULL,
   `fingerprint` text NOT NULL,
   `sample` mediumtext NOT NULL,
   `first_seen` datetime DEFAULT NULL,
@@ -229,10 +229,10 @@ CREATE TABLE `mysql_slow_query_review` (
 DROP TABLE IF EXISTS `mysql_slow_query_review_history`;
 CREATE TABLE `mysql_slow_query_review_history` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `serverid_max` smallint(4) NOT NULL DEFAULT '0',
+  `serverid_max` smallint(4) NOT NULL DEFAULT 0,
   `db_max` varchar(30) DEFAULT NULL,
   `user_max` varchar(30) DEFAULT NULL,
-  `checksum` bigint(20) unsigned NOT NULL,
+  `checksum` bigint(20) NOT NULL,
   `sample` mediumtext NOT NULL,
   `ts_min` datetime NOT NULL,
   `ts_max` datetime NOT NULL,
