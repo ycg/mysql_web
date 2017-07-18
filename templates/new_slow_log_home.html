@@ -63,7 +63,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="review" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+<!--<div class="modal fade" id="review" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -76,6 +76,7 @@
                 <form class="form-horizontal" id="slow_log_review_detail" role="form" target="nm_iframe" action="/newslowlog/review/update" method="post">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Review_By:</label>
+
                         <div class="col-sm-10">
                             <select id="users" name="users" class="form-control">
                                 <option value="0" selected>None</option>
@@ -87,12 +88,14 @@
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Review_On:</label>
+
                         <div class="col-sm-10">
                             <input type="text" id="review_on" name="review_on" value="" class="form-control" readonly>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Status:</label>
+
                         <div class="col-sm-10">
                             <select id="review_status" name="review_status" class="form-control">
                                 <option value="1">Reviewed</option>
@@ -102,6 +105,7 @@
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Comments:</label>
+
                         <div class="col-sm-10">
                             <textarea id="comments" name="comments" class="form-control" style="resize: none" placeholder="please input review slow log comment" rows=8></textarea>
                         </div>
@@ -111,6 +115,32 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" onclick="update_review_detail()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>-->
+
+<div class="modal fade" id="review" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="exampleModalLabel">请填写审核备注</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="slow_log_review_detail" role="form" target="nm_iframe" action="/newslowlog/review/update" method="post">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <textarea id="comments" name="comments" class="form-control" style="resize: none" placeholder="please input review slow log comment" rows=8></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="update_review_detail()">保存</button>
             </div>
         </div>
     </div>

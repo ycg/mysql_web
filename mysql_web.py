@@ -17,7 +17,7 @@ from monitor import cache, server, slow_log, mysql_status, tablespace, general_l
 reload(sys)
 sys.setdefaultencoding("UTF-8")
 
-app = Flask(__name__)
+app = Flask("mysql_web")
 app.secret_key = os.urandom(24)
 login_manager = LoginManager()
 login_manager.session_protection = "strong"
@@ -256,10 +256,9 @@ def get_review_detail(checksum):
 
 @app.route("/newslowlog/review/update", methods=['POST'])
 def update_review_detail():
-    return new_slow_log.update_review_detail(int(request.form["users"]),
-                                             int(request.form["review_status"]),
-                                             request.form["comments"],
-                                             int(request.form["checksum"]))
+    obj = get_object_from_json(request.form)
+    obj.user_id = current_user.id
+    return new_slow_log.update_review_detail(obj)
 
 def get_page_number_list(page_number):
     if(page_number <= 5):
@@ -500,4 +499,4 @@ if __name__ == '__main__':
         server.serve_forever()
     if(settings.WINDOWS_OS):
         print("windows start ok.")
-        app.run(debug=True, host="0.0.0.0", port=int("5000"), use_reloader=False)
+        app.run(debug=True, host="0.0.0.0", port=5000, use_reloader=False)
