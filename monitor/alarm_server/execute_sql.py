@@ -1,12 +1,12 @@
-import db_util, cache, settings, base_class, json, traceback, pymysql
+import monitor.db_util, monitor.cache, settings, monitor.base_class, json, traceback, pymysql
 
 def execute_sql_test(host_id, sql, comment, is_backup):
-    result = base_class.BaseClass(None)
+    result = monitor.base_class.BaseClass(None)
     result.error = ""
     result.success = ""
     conn, cur = None, None
     try:
-        host_info = cache.Cache().get_host_info(int(host_id))
+        host_info = monitor.cache.Cache().get_host_info(int(host_id))
         conn = pymysql.connect(host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password, db="mysql", charset="utf8", autocommit=True)
         cur = conn.cursor()
         sql = "start transaction;" + sql + "commit;"
@@ -34,5 +34,5 @@ def insert_execute_sql_log(host_id, sql, comment, is_backup=0, backup_name=""):
           "(host_id, is_backup, backup_name, `sql`, `comment`) " \
           "VALUES " \
           "(%s, %s, '%s', '%s', '%s')" % (host_id, is_backup, backup_name, pymysql.escape_string(sql), pymysql.escape_string(comment))
-    db_util.DBUtil().execute(settings.MySQL_Host, sql);
+    monitor.db_util.DBUtil().execute(settings.MySQL_Host, sql);
 

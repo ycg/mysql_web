@@ -3,14 +3,23 @@
 #yum install openssl-devel python-devel libffi-devel -y
 #pip install flask flask-login gevent threadpool pymysql DBUtils paramiko
 
+import json
+import os
+import gzip
+import StringIO
+import base64
+import sys
+
 from gevent import pywsgi
-import json, os, gzip, StringIO, base64, sys
 from flask import Flask, render_template, request, app, redirect, url_for
 from flask_login import login_user, login_required, logout_user, LoginManager, current_user
 
-import settings, backup
-from monitor import user_login, base_class, new_slow_log, report, alarm_thread, new_alarm
+import settings
+import backup
+from monitor import user_login, base_class, new_slow_log, report
+from monitor.alarm_server import alarm_thread, execute_sql, general_log, thread, user
 from monitor import cache, server, slow_log, mysql_status, tablespace, general_log, execute_sql, user, thread, chart
+
 
 #region load data on run
 

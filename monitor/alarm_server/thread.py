@@ -1,4 +1,4 @@
-import cache, db_util, base_class
+import monitor.cache, monitor.db_util, monitor.base_class
 
 def get_all_thread(host_id, query_type):
     sql = """select * from
@@ -14,8 +14,8 @@ def get_all_thread(host_id, query_type):
     elif(query_type == 3):
         where_sql = "and command != 'Sleep'"
     result = []
-    for row in db_util.DBUtil().fetchall(cache.Cache().get_host_info(host_id), sql.format(where_sql)):
-        info = base_class.BaseClass(None)
+    for row in monitor.db_util.DBUtil().fetchall(monitor.cache.Cache().get_host_info(host_id), sql.format(where_sql)):
+        info = monitor.base_class.BaseClass(None)
         info.user = row["user"]
         info.host = row["host"]
         info.command = row["command"]

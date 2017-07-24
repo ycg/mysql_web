@@ -40,11 +40,8 @@ from monitor import base_class, cache
 #查看备份任务历史数据-需要建个表
 
 backup_infos = {}
+backup_tools = {1: "mydumper", 2: "mysqldump", 3: "xtrabackup"}
 
-backup_tools = {}
-backup_tools[1] = "mydumper"
-backup_tools[2] = "mysqldump"
-backup_tools[3] = "xtrabackup"
 
 def add_backup(info):
     result_info = check_backup_parameters(info)

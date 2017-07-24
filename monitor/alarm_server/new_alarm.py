@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import cache, mail_util, settings
+import monitor.cache, monitor.mail_util, settings
 import enum, threading, time, traceback
 
 #通过配置属性名称来获取数据
@@ -52,7 +52,7 @@ class AlarmServer(threading.Thread):
         while(True):
             try:
                 if(self.__times % 5 == 0):
-                    for repl_info in cache.Cache().get_all_repl_infos():
+                    for repl_info in monitor.cache.Cache().get_all_repl_infos():
                         if(repl_info.host_info.is_slave):
                             self.check_alarm_setting(repl_info, Replication_Alarm_Setting_List)
             except Exception:

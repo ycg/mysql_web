@@ -8,6 +8,7 @@
     <orderEntry type="module" module-name="untitled6" />
     <orderEntry type="module" module-name="proxysql" />
     <orderEntry type="module" module-name="flask-admin" />
+    <orderEntry type="module" module-name="panda" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />

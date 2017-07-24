@@ -4,7 +4,7 @@
 #告警，包括CPU，内存，线程数，qps和tps等等
 
 import pymysql, threading, time
-import cache, mail_util, enum, db_util, settings, mysql_status, base_class
+import monitor.cache, monitor.mail_util, enum, monitor.db_util, settings, monitor.mysql_status, monitor.base_class
 
 class AlarmEnum(enum.Enum):
     ReplStatus = 0
@@ -24,7 +24,7 @@ class AlarmThread(threading.Thread):
             self.alarm_for_replication()
 
     def alarm_for_replication(self):
-        for repl_info in cache.Cache().get_all_repl_infos():
+        for repl_info in monitor.cache.Cache().get_all_repl_infos():
             if(hasattr(repl_info, "io_status") == True):
                 error_flag = False
                 subject = "MySQL-" + repl_info.host_info.remark
@@ -35,7 +35,7 @@ class AlarmThread(threading.Thread):
                     error_flag = True
                     subject = subject + "复制延迟"
                 if(error_flag == True):
-                    mail_util.send_text(subject, "yangcaogui.sh@superjia.com", self.get_alarm_for_repl_status_format(repl_info))
+                    monitor.mail_util.send_text(subject, "yangcaogui.sh@superjia.com", self.get_alarm_for_repl_status_format(repl_info))
 
     def alarm_for_mysql_status(self):
         pass
@@ -51,10 +51,10 @@ class AlarmThread(threading.Thread):
         #3.show slave status
         #4.获取error的数据信息
 
-        for host_info in cache.Cache.get_all_host_infos():
+        for host_info in monitor.cache.Cache.get_all_host_infos():
             sql = "SELECT concat(ID, '\t', user, '\t', host, '\t', db, '\t', time, '\t', state, '\t', info, '\n') as process_data " \
                   "FROM information_schema.processlist where length(info) > 0"
-            db_util.DBUtil.fetchall(sql)
+            monitor.db_util.DBUtil.fetchall(sql)
 
 @enum.unique
 class LogType(enum.Enum):
@@ -85,7 +85,7 @@ class AlarmLog(threading.Thread):
     def run(self):
         while(True):
             time.sleep(settings.LINUX_UPDATE_INTERVAL)
-            cache.Cache().join_thread_pool(self.check_status)
+            monitor.cache.Cache().join_thread_pool(self.check_status)
 
     def check_status(self, host_info):
         self.check_os_status(host_info)
@@ -94,23 +94,23 @@ class AlarmLog(threading.Thread):
         self.check_replication_status(host_info)
 
     def check_os_status(self, host_info):
-        os_info = cache.Cache().get_linux_info(host_info.key)
+        os_info = monitor.cache.Cache().get_linux_info(host_info.key)
         if(os_info.cpu_system > 20 or os_info.cpu_user > 80 or os_info.cpu_idle < 50):
             self.insert_alarm_log(host_info.key, ExceptionType.CPU_High, ExceptionLevel.Serious, LogType.Processlist)
             self.insert_alarm_log(host_info.key, ExceptionType.CPU_High, ExceptionLevel.Serious, LogType.Lock_Status)
             self.insert_alarm_log(host_info.key, ExceptionType.CPU_High, ExceptionLevel.Serious, LogType.Innodb_Status)
 
     def check_mysql_status(self, host_info):
-        mysql_status = cache.Cache().get_status_infos(host_info.key)
-        if(mysql_status.threads_run_count > 10):
+        mysql_status = monitor.cache.Cache().get_status_infos(host_info.key)
+        if(monitor.mysql_status.threads_run_count > 10):
             self.insert_alarm_log(host_info.key, ExceptionType.Thread, ExceptionLevel.Serious, LogType.Processlist)
             self.insert_alarm_log(host_info.key, ExceptionType.Thread, ExceptionLevel.Serious, LogType.Lock_Status)
 
     def check_innodb_status(self, host_info):
-        innodb_info = cache.Cache().get_innodb_infos(host_info.key)
+        innodb_info = monitor.cache.Cache().get_innodb_infos(host_info.key)
 
     def check_replication_status(self, host_info):
-        repl_info = cache.Cache().get_repl_info(host_info.key)
+        repl_info = monitor.cache.Cache().get_repl_info(host_info.key)
         if(host_info.is_master):
             return
         if(hasattr(repl_info, "master_log_pos") == False):
@@ -123,19 +123,19 @@ class AlarmLog(threading.Thread):
     def insert_alarm_log(self, host_id, type, level, log_type):
         log_text = ""
         if(log_type == LogType.Lock_Status):
-            log_text = mysql_status.get_log_text(mysql_status.get_innodb_lock_status(host_id))
+            log_text = monitor.mysql_status.get_log_text(monitor.mysql_status.get_innodb_lock_status(host_id))
         elif(log_type == LogType.Processlist):
-            log_text = mysql_status.get_log_text(mysql_status.get_show_processlist(host_id))
+            log_text = monitor.mysql_status.get_log_text(monitor.mysql_status.get_show_processlist(host_id))
         elif(log_type == LogType.Slave_Status):
-            log_text = mysql_status.get_log_text(mysql_status.get_show_slave_status(host_id))
+            log_text = monitor.mysql_status.get_log_text(monitor.mysql_status.get_show_slave_status(host_id))
         elif(log_type == LogType.Innodb_Status):
-            log_text = mysql_status.get_log_text(mysql_status.get_show_engine_innodb_status(host_id))
+            log_text = monitor.mysql_status.get_log_text(monitor.mysql_status.get_show_engine_innodb_status(host_id))
         if(len(log_text) <= 0):
             return
-        conn, cur = db_util.DBUtil().get_conn_and_cur(settings.MySQL_Host)
+        conn, cur = monitor.db_util.DBUtil().get_conn_and_cur(settings.MySQL_Host)
         cur.execute("insert into mysql_web.mysql_exception(host_id, exception_type, level, log_type) VALUES ({0}, {1}, {2}, {3});".format(host_id, type.value, level.value, log_type.value))
         cur.execute("insert into mysql_web.mysql_exception_log(id, log_text) VALUES ({0}, '{1}');".format(cur.lastrowid, pymysql.escape_string(log_text)))
-        db_util.DBUtil().close(conn, cur)
+        monitor.db_util.DBUtil().close(conn, cur)
 
 def get_execption_logs(query_parameters):
     sql = """select t1.id, t1.host_id, t3.remark, exception_type, log_type, level, t1.created_time
@@ -145,8 +145,8 @@ def get_execption_logs(query_parameters):
              order by t1.id desc limit 20;"""
 
     result_list = []
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
-        info = base_class.BaseClass(None)
+    for row in monitor.db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
+        info = monitor.base_class.BaseClass(None)
         info.id = row["id"]
         info.host_id = row["host_id"]
         info.remark = row["remark"]

@@ -8,3 +8,4 @@ def send_report_everyday():
     subject = "MySQL Report - {0}".format(time.strftime("%Y-%m-%d", time.localtime(time.time())))
     mail_util.send_html(subject, settings.EMAIL_SEND_USERS, html_str)
     print("send report ok")
+

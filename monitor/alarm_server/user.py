@@ -1,4 +1,4 @@
-import enum, db_util, cache, base_class, json
+import enum, monitor.db_util, monitor.cache, monitor.base_class, json
 
 class PrivEnum(enum.Enum):
     SELECT = 1
@@ -10,7 +10,7 @@ class MySQLUser():
     __host_info = None
 
     def __init__(self, host_id):
-        self.__host_info = cache.Cache().get_host_info(host_id)
+        self.__host_info = monitor.cache.Cache().get_host_info(host_id)
 
     def query_user(self, name, ip):
         if(self.__host_info == None):
@@ -21,24 +21,24 @@ class MySQLUser():
         if(len(ip) > 0):
             sql += "and host like '%{0}%'".format(ip)
         print(sql)
-        return self.get_user_infos(db_util.DBUtil().fetchall(self.__host_info, sql))
+        return self.get_user_infos(monitor.db_util.DBUtil().fetchall(self.__host_info, sql))
 
     def get_all_users(self):
         sql = "select host, user, Select_priv, Insert_priv, Update_priv, Delete_priv from mysql.user"
-        return self.get_user_infos(db_util.DBUtil().fetchall(self.__host_info, sql))
+        return self.get_user_infos(monitor.db_util.DBUtil().fetchall(self.__host_info, sql))
 
     def get_user_by_ip(self, ip):
         sql = "select host, user, Select_priv, Insert_priv, Update_priv, Delete_priv from mysql.user where host='{0}'".format(ip)
-        return self.get_user_infos(db_util.DBUtil().fetchall(self.__host_info, sql))
+        return self.get_user_infos(monitor.db_util.DBUtil().fetchall(self.__host_info, sql))
 
     def get_user_by_name(self, name):
         sql = "select host, user, Select_priv, Insert_priv, Update_priv, Delete_priv from mysql.user where user='{0}'".format(name)
-        return self.get_user_infos(db_util.DBUtil().fetchall(self.__host_info, sql))
+        return self.get_user_infos(monitor.db_util.DBUtil().fetchall(self.__host_info, sql))
 
     def get_user_infos(self, rows):
         result = []
         for row in rows:
-            user_info = base_class.BaseClass(None)
+            user_info = monitor.base_class.BaseClass(None)
             user_info.host = row["host"]
             user_info.user = row["user"]
             user_info.select = row["Select_priv"]
@@ -51,7 +51,7 @@ class MySQLUser():
     def get_privs_by_user(self, name, ip):
         result = []
         sql = "show grants for '{0}'@'{1}'".format(name, ip)
-        for row in db_util.DBUtil().fetchall(self.__host_info, sql):
+        for row in monitor.db_util.DBUtil().fetchall(self.__host_info, sql):
             result.append(row.values()[0])
         return "</br>".join(result)
         #return json.dumps(result, default=lambda o: o.__dict__)
@@ -64,22 +64,22 @@ class MySQLUser():
         print(sql)
 
     def drop_user(self, name, ip):
-        db_util.DBUtil().execute(self.__host_info, "drop user '{0}'@'{1}';".format(name, ip))
+        monitor.db_util.DBUtil().execute(self.__host_info, "drop user '{0}'@'{1}';".format(name, ip))
 
     def exists_user(self, name, ip):
         sql = "select host, user, Select_priv, Insert_priv, Update_priv, Delete_priv from mysql.user where user='{0}' and host='{1}'".format(name, ip)
-        result = self.get_user_infos(db_util.DBUtil().fetchall(self.__host_info, sql))
+        result = self.get_user_infos(monitor.db_util.DBUtil().fetchall(self.__host_info, sql))
         if(len(result) > 0):
             return True
         return False
 
     def drop_user(self, ip, name):
-        db_util.DBUtil().execute(self.__host_info, "drop user '{0}'@'{1}';".format(name, ip))
+        monitor.db_util.DBUtil().execute(self.__host_info, "drop user '{0}'@'{1}';".format(name, ip))
 
     def get_all_database_name(self):
         result = []
-        for row in db_util.DBUtil().fetchall(self.__host_info, "show databases;"):
-            info = base_class.BaseClass(None)
+        for row in monitor.db_util.DBUtil().fetchall(self.__host_info, "show databases;"):
+            info = monitor.base_class.BaseClass(None)
             info.text = row.values()[0]
             result.append(info)
         return json.dumps(result, default=lambda o: o.__dict__)

@@ -1,6 +1,6 @@
 import threading, time, traceback
 
-import base_class, cache, mail_util
+import monitor.base_class, monitor.cache, monitor.mail_util
 
 class AlarmType():
     def __init__(self):
@@ -33,7 +33,7 @@ class AlarmServer(threading.Thread):
     __times = 0
     __alarm_details = {}
     __alarm_content = {}
-    __cache = cache.Cache()
+    __cache = monitor.cache.Cache()
     __host_alarm_parameter = {}
     __global_alarm_parameter = {}
 
@@ -57,7 +57,7 @@ class AlarmServer(threading.Thread):
         self.__global_alarm_parameter[AlarmType.MySQL_Thread_Execute_Long_Time] = 5
         self.__global_alarm_parameter[AlarmType.Mail_To] = "yangcaogui.sh@superjia.com"
 
-        for host_info in cache.Cache().get_all_host_infos():
+        for host_info in monitor.cache.Cache().get_all_host_infos():
             self.__alarm_details[host_info.host_id] = {}
 
     def update_host_alarm_parameter(self, host_id, values):
@@ -68,7 +68,7 @@ class AlarmServer(threading.Thread):
         pass
 
     def slave_for_alarm(self):
-        for info in cache.Cache().get_all_repl_infos():
+        for info in monitor.cache.Cache().get_all_repl_infos():
             if(info.is_slave == 1):
                 alarm_parameter = self.get_host_alarm_parameter(info.host_info.host_id)
 
@@ -123,7 +123,7 @@ class AlarmServer(threading.Thread):
 
     def send_alarm_mail(self, host_info, alarm_type):
         print("send ok")
-        mail_util.send_text("thread count is too much", self.__global_alarm_parameter[AlarmType.Mail_To], "test")
+        monitor.mail_util.send_text("thread count is too much", self.__global_alarm_parameter[AlarmType.Mail_To], "test")
 
     #endregion
 
