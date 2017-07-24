@@ -64,3 +64,5 @@
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/119.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/120.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/121.png)
+![image](https://github.com/ycg/mysql_web/blob/master/static/img/123.png)
+![image](https://github.com/ycg/mysql_web/blob/master/static/img/124.png)
