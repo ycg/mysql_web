@@ -586,7 +586,7 @@ class MonitorServer(threading.Thread):
     def get_remote_command_result(self, host_info, command):
         key = host_info.host + str(host_info.port)
         if (key in self.__ssh_client_dict.keys()):
-            if (self.__ssh_client_dict[key].get_transport().is_active == False):
+            if (self.__ssh_client_dict[key].get_transport().is_active() == False):
                 self.__ssh_client_dict[key].close()
                 self.__ssh_client_dict[key] = self.create_remote_ssh_client(host_info)
                 print("ssh not active, create new ssh client ok.")
