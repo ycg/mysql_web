@@ -503,7 +503,7 @@
                     <th>
 
                     </th>
-                    <th colspan="5" class="text-center">
+                    <th colspan="7" class="text-center">
                         Table Open Cache
                     </th>
                     <th colspan="2" class="text-center">
@@ -514,11 +514,17 @@
                     <th>
                         Host
                     </th>
-                    <th>
-                        Open_T
+                    <th title="table_open_cache">
+                        Cache
+                    </th>
+                    <th title="table_open_cache_instances">
+                        Ins
                     </th>
                     <th>
-                        Opened_T
+                        Open
+                    </th>
+                    <th>
+                        Opened
                     </th>
                     <th>
                         Hits
@@ -530,10 +536,10 @@
                         Overflows
                     </th>
                     <th>
-                        Open_F
+                        Open
                     </th>
                     <th>
-                        Opened_F
+                        Opened
                     </th>
                 </tr>
             </thead>
@@ -544,6 +550,12 @@
                         {{ status.host_info.remark }}
                     </td>
                     <td>
+                        {{ status.table_open_cache }}
+                    </td>
+                    <td>
+                        {{ status.table_open_cache_instances }}
+                    </td>
+                    <td {% if(status.open_tables >= status.table_open_cache) %} class="text-danger" {% endif %}>
                         {{ status.open_tables }}
                     </td>
                     <td {% if(status.openend_tables > 0) %} class="text-danger" {% endif %}>
