@@ -82,10 +82,10 @@ def get_slow_log_detail(checksum, server_id):
         slow_log_detail.user_max = row["user_max"]
         slow_log_detail.checksum = row["checksum"]
         slow_log_detail.count = get_sql_count_value(row["ts_cnt"])
-        slow_log_detail.query_time_sum = row["Query_time_sum"]
-        slow_log_detail.query_time_max = row["Query_time_max"]
-        slow_log_detail.query_time_min = row["Query_time_min"]
-        slow_log_detail.query_time_pct_95 = row["Query_time_pct_95"]
+        slow_log_detail.query_time_sum = get_float(row["Query_time_sum"])
+        slow_log_detail.query_time_max = get_float(row["Query_time_max"])
+        slow_log_detail.query_time_min = get_float(row["Query_time_min"])
+        slow_log_detail.query_time_pct_95 = get_float(row["Query_time_pct_95"])
         slow_log_detail.lock_time_sum = get_float(row["Lock_time_sum"])
         slow_log_detail.lock_time_max = get_float(row["Lock_time_max"])
         slow_log_detail.lock_time_min = get_float(row["Lock_time_min"])
