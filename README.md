@@ -1,4 +1,4 @@
-# mysql monitor web:
+# mysql monitor web
 比较全面的MySQL实时监控</br>
 
 # 安装环境：</br>
@@ -11,7 +11,7 @@
 MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
 ```
 6.导入sql/table.sql的SQL脚本</br>
-7.在mysql_web.host_infos添加MySQL数据库用户</br>
+7.添加MySQL数据库用户</br>
 ``` mysql
 insert into host_infos (host, port, user, password, remark) values
 ("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"), ("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");
