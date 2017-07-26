@@ -78,8 +78,6 @@ class MonitorServer(threading.Thread):
 
         # 1.---------------------------------------------------------获取mysql global status--------------------------------------------------------
         status_info = self.__cache.get_status_info(host_info.key)
-        status_info.open_files = int(mysql_status_new["Open_files"])
-        status_info.opened_files = int(mysql_status_new["Opened_files"])
         status_info.send_bytes_bigint = int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"])
         status_info.receive_bytes_bigint = int(mysql_status_new["Bytes_received"]) - int(mysql_status_old["Bytes_received"])
         status_info.send_bytes = tablespace.get_data_length(int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"]))
