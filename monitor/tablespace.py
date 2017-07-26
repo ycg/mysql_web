@@ -3,9 +3,9 @@
 import paramiko, time
 import db_util, settings, cache
 
-KB = 1024
-K = KB * 1024
-M = K * 1024
+B = 1024
+KB = B * 1024
+M = KB * 1024
 G = M * 1024
 T = G * 1024
 
@@ -56,12 +56,12 @@ def check_table_has_primary_key(table_schema, table_name):
     return False
 
 def get_data_length(data_length):
-    if(data_length < KB):
-        return str(data_length) + "KB"
-    elif(data_length < K):
-        return str(data_length / KB) + "K"
+    if(data_length < B):
+        return str(data_length) + "B"
+    elif(data_length < KB):
+        return str(int(data_length / B)) + "KB"
     elif(data_length < M):
-        return str(data_length / K) + "M"
+        return str(int(data_length / KB)) + "M"
     elif(data_length < G):
         return str(round(float(data_length) / float(M), 2)) + "G"
     elif(data_length < T):

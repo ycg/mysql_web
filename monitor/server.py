@@ -82,8 +82,8 @@ class MonitorServer(threading.Thread):
         status_info.opened_files = int(mysql_status_new["Opened_files"])
         status_info.send_bytes_bigint = int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"])
         status_info.receive_bytes_bigint = int(mysql_status_new["Bytes_received"]) - int(mysql_status_old["Bytes_received"])
-        status_info.send_bytes = self.get_data_length(int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"]))
-        status_info.receive_bytes = self.get_data_length(int(mysql_status_new["Bytes_received"]) - int(mysql_status_old["Bytes_received"]))
+        status_info.send_bytes = tablespace.get_data_length(int(mysql_status_new["Bytes_sent"]) - int(mysql_status_old["Bytes_sent"]))
+        status_info.receive_bytes = tablespace.get_data_length(int(mysql_status_new["Bytes_received"]) - int(mysql_status_old["Bytes_received"]))
 
         # tps and qps
         status_info.qps = int(mysql_status_new["Questions"]) - int(mysql_status_old["Questions"])
@@ -344,17 +344,6 @@ class MonitorServer(threading.Thread):
         host_info.send_bytes = status_info.send_bytes
         host_info.receive_bytes = status_info.receive_bytes
 
-    def get_data_length(self, data_length):
-        value = float(1024)
-        if (data_length > value):
-            result = round(data_length / value, 0)
-            if (result > value):
-                return str(int(round(result / value, 0))) + "M"
-            else:
-                return str(int(result)) + "K"
-        else:
-            return str(data_length) + "KB"
-
     def get_binlog_size_total(self, log_bin, status_info, cursor):
         if (log_bin == "ON"):
             total_size = 0
@@ -498,22 +487,30 @@ class MonitorServer(threading.Thread):
         linux_info.cpu_15 = cpu_value[2]
 
     def monitor_host_for_net(self, linux_info):
-        net_send_byte, net_receive_byte, number = 0, 0, 0
-        result = self.get_remote_command_result(linux_info.host_info, "cat /proc/net/dev")
+        line_num = 1
+        net_send_byte = 0
+        net_receive_byte = 0
+        net_send_packet = 0
+        net_receive_packet = 0
+        result = self.get_remote_command_result(linux_info.host_info, "sar -n DEV 1 2")
         for line in result:
-            number += 1
-            if (number >= 3):
-                new_list = [x for x in line.split(" ") if x != ""]
-                net_send_byte += long(new_list[9])
-                net_receive_byte += long(new_list[1])
+            if(line.find("Average") >= 0):
+                break
+            line_num += 1
 
-        linux_info.net_send_old = linux_info.net_send_new
-        linux_info.net_receive_old = linux_info.net_receive_new
-        linux_info.net_send_new = net_send_byte
-        linux_info.net_receive_new = net_receive_byte
+        net_data = result[line_num:]
+        for value in net_data:
+            list_tmp = self.remove_empty_string(value)
+            net_send_byte += float(list_tmp[5])
+            net_receive_byte += float(list_tmp[4])
+            net_send_packet += float(list_tmp[3])
+            net_receive_packet += float(list_tmp[2])
 
-        linux_info.net_send_byte = self.get_data_length(linux_info.net_send_new - linux_info.net_send_old)
-        linux_info.net_receive_byte = self.get_data_length(linux_info.net_receive_new - linux_info.net_receive_old)
+        # 因为这边的单位是KB
+        linux_info.net_send_byte = tablespace.get_data_length(net_send_byte * 1024)
+        linux_info.net_receive_byte = tablespace.get_data_length(net_receive_byte * 1024)
+        linux_info.net_send_packet = net_send_packet
+        linux_info.net_receive_packet = net_receive_packet
 
     def monitor_host_for_disk(self, linux_info):
         id_tmp = 0
