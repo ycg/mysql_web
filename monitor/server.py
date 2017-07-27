@@ -1,17 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import traceback
-import cache, db_util, settings, base_class, mysql_branch, tablespace
-import time, threadpool, threading, enum, paramiko, collections, pymysql
-
-
-class MonitorEnum(enum.Enum):
-    mysql = 4
-    host = 3
-    status = 0
-    innodb = 1
-    replication = 2
-
+import cache, db_util, settings, base_class, tablespace
+from mysql_enum import MonitorEnum, MySQLBranch
+import time, threadpool, threading, paramiko, collections, pymysql
 
 class MonitorServer(threading.Thread):
     __times = 1
@@ -693,7 +685,7 @@ class MonitorServer(threading.Thread):
             split_value = line_split[len(line_split) - 1].replace(",", "")
             if (line.find("History list length") >= 0):
                 # 官方status也没有undo list值
-                if (host_info.branch == mysql_branch.MySQLBranch.MySQL):
+                if (host_info.branch == MySQLBranch.MySQL):
                     info_tmp.undo_history_list_len = int(split_value)
                     innodb_info.history_list_length = int(split_value)
                 else:
@@ -701,7 +693,7 @@ class MonitorServer(threading.Thread):
             elif (line.find("Trx id counter") >= 0):
                 # 因为官方mysql版本没有Innodb_max_trx_id状态值
                 # 需要去show engine innodb status去进行计算
-                if (host_info.branch == mysql_branch.MySQLBranch.MySQL):
+                if (host_info.branch == MySQLBranch.MySQL):
                     status_info.old_trx_count = status_info.new_trx_count
                     status_info.new_trx_count = int(split_value)
                     status_info.trx_count = (status_info.new_trx_count - status_info.old_trx_count) / settings.UPDATE_INTERVAL
@@ -751,7 +743,7 @@ class MonitorServer(threading.Thread):
         else:
             innodb_info.hash_search_ratio = round(innodb_info.hash_searches / (innodb_info.non_hash_searches + innodb_info.hash_searches) * 100, 2)
 
-        if (host_info.branch == mysql_branch.MySQLBranch.MySQL):
+        if (host_info.branch == MySQLBranch.MySQL):
             row_number = 1
             innodb_info = self.__cache.get_innodb_info(host_info.key)
             for line in values:
@@ -796,7 +788,7 @@ class MonitorServer(threading.Thread):
                 row_number += 1
 
     def get_innodb_lock_infos(self, host_info, values):
-        if (host_info.branch == mysql_branch.MySQLBranch.MySQL):
+        if (host_info.branch == MySQLBranch.MySQL):
             row_number = 1
             innodb_info = self.__cache.get_innodb_info(host_info.key)
             for line in values:

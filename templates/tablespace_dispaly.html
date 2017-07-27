@@ -1,7 +1,7 @@
 {% if(tablespace_status != None) %}
     <table class="table table-hover table-bordered">
         <thead>
-        <tr>
+            <tr>
             <th class="text-left">
                 Table_Name
             </th>
@@ -60,6 +60,7 @@
                 </td>
                 <td class="text-center">
                     <button class="btn btn-xs btn-primary" onclick=get_table_detail("{{ status.schema }}","{{ status.t_name }}")>Detail</button>
+                    <button class="btn btn-xs btn-danger">优化空间</button>
                 </td>
             </tr>
         {% endfor %}

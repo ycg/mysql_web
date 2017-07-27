@@ -359,38 +359,36 @@ BEGIN
 END $$
 delimiter ;
 */
--- ---------------------------------------------------------
--- 备份任务计划表
--- ---------------------------------------------------------
-CREATE TABLE backup_task
-(
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  host_id MEDIUMINT NOT NULL,
-  backup_name VARCHAR(30) NOT NULL,
-  backup_tool TINYINT NOT NULL,
-  backup_mode TINYINT NOT NULL,
-  backup_cycle VARCHAR(30) NOT NULL,
-  backup_time TIME NOT NULL,
-  backup_save_days MEDIUMINT UNSIGNED NOT NULL,
-  backup_compress TINYINT UNSIGNED NOT NULL,
-  backup_upload_host TINYINT UNSIGNED NOT NULL,
-  created_time TIMESTAMP NOT NULL DEFAULT now(),
-  updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
 
--- ---------------------------------------------------------
--- 备份任务计划日志表
--- ---------------------------------------------------------
 CREATE TABLE backup_task
 (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  backup_id INT NOT NULL,
-  backup_file VARCHAR(100) NOT NULL,
-  backup_size BIGINT UNSIGNED NOT NULL,
-  backup_start TIMESTAMP NOT NULL,
-  backup_stop TIMESTAMP NOT NULL,
-  backup_status TINYINT NOT NULL,
-  backup_result VARCHAR(100) NOT NULL DEFAULT '',
-  backup_compress TINYINT UNSIGNED NOT NULL,
-  created_time TIMESTAMP NOT NULL DEFAULT now()
-);
+  task_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+  host_id MEDIUMINT UNSIGNED NOT NULL COMMENT '要备份的机器id',
+  name VARCHAR(30) NOT NULL DEFAULT '' COMMENT '备份名称',
+  tool TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '备份方式，也就是采用什么工具进行备份',
+  mode TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '备份模式，全量还是增量',
+  cycle VARCHAR(30) NOT NULL DEFAULT '' COMMENT '备份周期，只有增量的时候才有周期',
+  time TIME NOT NULL COMMENT '备份时间，每天什么时候开始备份，不能是白天，起码是凌晨以后',
+  save_days MEDIUMINT UNSIGNED NOT NULL COMMENT '备份文件保存天数',
+  compress TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '时候压缩，默认不压缩',
+  storage_host_id TINYINT UNSIGNED NOT NULL COMMENT '备份文件存储机器',
+  directory VARCHAR(100) NOT NULL DEFAULT '' COMMENT '备份目录，很重要',
+  is_deleted TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除，也可以说是否被禁用',
+  created_time TIMESTAMP NOT NULL DEFAULT now() COMMENT '',
+  updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT ''
+) ENGINE=innodb CHARSET=utf8 COMMENT='备份计划表';
+
+CREATE TABLE backup_log
+(
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+  task_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '备份任务id',
+  file VARCHAR(100) NOT NULL DEFAULT '' COMMENT '备份文件名称或者目录名称',
+  size BIGINT UNSIGNED NOT NULL COMMENT '备份文件或者目录总大小',
+  start_datetime TIMESTAMP NOT NULL COMMENT '备份开始时间',
+  stop_datetime TIMESTAMP NOT NULL COMMENT '备份结束时间',
+  status TINYINT NOT NULL COMMENT '备份状态，备份进行中，备份成功，备份失败',
+  result TEXT COMMENT '存储备份结果，可能要存储xtrabackup的日志',
+  created_time TIMESTAMP NOT NULL DEFAULT now() COMMENT '数据插入时间'
+) ENGINE=innodb CHARSET=utf8 COMMENT='备份日志表';
+
+INSERT  INTO  backup_log (id, task_id, file, size, start_datetime, stop_datetime, status, result, created_time)

@@ -1403,6 +1403,7 @@
                             </td>
                             <td class="text-center">
                                 <a href="javascript:void(0)" onclick=start("/replication/{{ status.host_info.key }}","repl")>Details</a>
+                                <button class="btn-danger btn-xs" onclick=skip_slave_error({{ status.host_info.key }}) {% if(status.sql_status == "Yes") %} disabled {% endif %}>跳过错误</button>
                             </td>
                         </tr>
                     {% endif %}

@@ -33,6 +33,7 @@
                     <a href="javascript:void(0)" id="tablespace" class="list-group-item" onclick=stop("/tablespace","tablespace")><span class="glyphicon glyphicon-barcode"> Tablespace</span></a>
                     <!--<a href="javascript:void(0)" id="sql" class="list-group-item" onclick=stop("/sql","sql")><span class="glyphicon glyphicon-apple"> SQLExecute</span></a>-->
                     <a href="javascript:void(0)" id="chart" class="list-group-item" onclick=stop("/chart","chart")><span class="glyphicon glyphicon-cloud"> Chart</span></a>
+                    <a href="javascript:void(0)" id="backup" class="list-group-item" onclick=stop("/backup","backup")><span class="glyphicon glyphicon-align-justify"> Backup</span></a>
                     <!--<a href="javascript:void(0)" id="chart_new" class="list-group-item" onclick=stop("/chart_new","chart_new")><span class="glyphicon glyphicon-console"> Chart_New</span></a>-->
                     <!--<a href="javascript:void(0)" id="general" class="list-group-item" onclick=stop("/general/1","general")><span class="glyphicon glyphicon-check"> GeneralLog</span></a>
                     <a href="javascript:void(0)" id="user" class="list-group-item" onclick=stop("/user","user")><span class="glyphicon glyphicon-user"> User</span></a>
@@ -41,54 +42,6 @@
                     <a href="javascript:void(0)" id="config" class="list-group-item" onclick=stop("/config","config")><span class="glyphicon glyphicon-console"> Config</span></a>
                     <a href="javascript:void(0)" id="backup" class="list-group-item" onclick=stop("/backup","backup")><span class="glyphicon glyphicon-align-justify"> Backup</span></a>-->
                 </div>
-
-                <!--<div>
-                    <div class="panel-group" id="accordion2">
-                        <div class="panel panel-default">
-                            <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-                                <a class="accordion-toggle" href="#collapseOne">MySQL Monitor</a>
-                            </div>
-                            <div id="collapseOne" class="panel-collapse collapse" style="height: 0px;">
-                                <div class="panel-body">
-                                    <ul class="nav nav-pills nav-stacked">
-                                        <li class="active"><a href="javascript:void(0)" id="mysql" onclick=start("/mysql","mysql")><span class="glyphicon glyphicon-home"> MySQL</span></a></li>
-                                        <li><a href="javascript:void(0)" id="status" onclick=start("/status","status")><span class="glyphicon glyphicon-cog"> Status</span></a></li>
-                                        <li><a href="javascript:void(0)" id="innodb" onclick=start("/innodb","innodb")><span class="glyphicon glyphicon-file"> INNODB</span></a></li>
-                                        <li><a href="javascript:void(0)" id="repl" onclick=start("/replication","repl")><span class="glyphicon glyphicon-filter"> Replication</span></a></li>
-                                        <li><a href="javascript:void(0)" id="os" onclick=start("/os","os")><span class="glyphicon glyphicon-user"> OS</span></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
-                                <a class="accordion-toggle" href="#collapseTwo">Table</a>
-                            </div>
-                            <div id="collapseTwo" class="panel-collapse collapse" style="height: 0px;">
-                                <div class="panel-body">
-                                    <ul class="nav nav-pills nav-stacked">
-                                        <li><a href="javascript:void(0)" id="mysql" onclick=start("/mysql","mysql")><span class="glyphicon glyphicon-home"> MySQL</span></a></li>
-                                        <li><a href="javascript:void(0)" id="status" onclick=start("/status","status")><span class="glyphicon glyphicon-cog"> Status</span></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
-                                <a class="accordion-toggle" href="#collapseThree">技术前沿</a>
-                            </div>
-                            <div id="collapseThree" class="panel-collapse in" style="height: 0px;">
-                                <div class="panel-body">
-                                    <ul class="nav nav-pills nav-stacked">
-                                        <li><a href="#">NoSQL</a></li>
-                                        <li><a href="#">Hadoop</a></li>
-                                        <li><a href="#">WebService</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
             </div>
             <div id="host_search_div" class="col-md-10">
                 <select id="host_search" class="selectpicker" data-live-search="true" multiple>

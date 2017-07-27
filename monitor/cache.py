@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os, threadpool
-import base_class, host_info, collections, db_util, settings, mysql_branch, tablespace
+from mysql_enum import MySQLBranch
+import base_class, host_info, collections, db_util, settings, tablespace
 
 class Cache(object):
     __number = False
@@ -174,24 +175,18 @@ class Cache(object):
             dic.pop(key)
 
     def get_all_host_infos(self, keys=[]):
-        # return self.__host_infos.values()
         return self.get_values_by_keys(self.__host_infos, keys)
 
     def get_all_repl_infos(self, keys=[]):
-        # return self.__repl_infos.values()
-        # keys = list(keys)
         return self.get_values_by_keys(self.__repl_infos, keys)
 
     def get_all_status_infos(self, keys=[]):
-        # return self.__status_infos.values()
         return self.get_values_by_keys(self.__status_infos, keys)
 
     def get_all_innodb_infos(self, keys=[]):
-        # return self.__innodb_infos.values()
         return self.get_values_by_keys(self.__innodb_infos, keys)
 
     def get_all_linux_infos(self, keys=[]):
-        # return self.__linux_infos.values()
         return self.get_values_by_keys(self.__linux_infos, keys)
 
     def get_mysql_web_user_infos(self, key=None):
@@ -305,12 +300,12 @@ class Cache(object):
             host_info.mysql_data_dir = data["datadir"]
             host_info.server_uuid = data["server_uuid"]
             host_info.innodb_buffer_pool_size = tablespace.get_data_length(long(data["innodb_buffer_pool_size"]))
-            if (str_branch.find(mysql_branch.MySQLBranch.Percona.name) >= 0):
-                host_info.branch = mysql_branch.MySQLBranch.Percona
-            elif (str_branch.find(mysql_branch.MySQLBranch.Mariadb.name) >= 0):
-                host_info.branch = mysql_branch.MySQLBranch.Mariadb
+            if (str_branch.find(MySQLBranch.Percona.name) >= 0):
+                host_info.branch = MySQLBranch.Percona
+            elif (str_branch.find(MySQLBranch.Mariadb.name) >= 0):
+                host_info.branch = MySQLBranch.Mariadb
             else:
-                host_info.branch = mysql_branch.MySQLBranch.MySQL
+                host_info.branch = MySQLBranch.MySQL
             host_info.mysql_pid_file = data["pid_file"]
             if (os.path.exists(host_info.mysql_pid_file) == False):
                 host_info.mysql_pid_file = os.path.join(host_info.mysql_data_dir, host_info.mysql_pid_file)

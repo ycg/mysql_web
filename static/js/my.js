@@ -17,11 +17,11 @@ function myrefresh() {
         });
 
         /*$.post(my_url, {"keys": JSON.stringify(host_ids)}).success(function (data, status, xhr) {
-            console.log(xhr);
-            $("#data").html(ungzip_new(data));
-        }).success(function (data, status, xhr) {
-            console.log(xhr);
-        });*/
+         console.log(xhr);
+         $("#data").html(ungzip_new(data));
+         }).success(function (data, status, xhr) {
+         console.log(xhr);
+         });*/
     }
     else {
         $.get(my_url, "", function (data) {
@@ -109,8 +109,8 @@ function search_div(id_name) {
 
 function set_select_ids() {
     host_ids = $("#host_search").val();
-    if(host_ids == null || host_ids == 0){
-       host_ids = new Array();
+    if (host_ids == null || host_ids == 0) {
+        host_ids = new Array();
     }
 }
 
@@ -172,7 +172,7 @@ function get_form_json(frm) {
 }
 
 $(function () {
-    $(document).on('click', '.accordion-toggle', function(event) {
+    $(document).on('click', '.accordion-toggle', function (event) {
         event.stopPropagation();
         var $this = $(this);
         var parent = $this.data('parent');
@@ -189,15 +189,12 @@ $(function () {
     });
 })
 
-function changeFeedback(id)
-{
+function changeFeedback(id) {
     var str = document.getElementById(id).className;
-    var tag = str.substring(25,str.length);
-    if(tag == "right")
-    {
+    var tag = str.substring(25, str.length);
+    if (tag == "right") {
         document.getElementById(id).className = "glyphicon glyphicon-menu-down";
-    }else
-    {
+    } else {
         document.getElementById(id).className = "glyphicon glyphicon-menu-right";
     }
 }
@@ -212,4 +209,8 @@ $("button[type='reset']").click(function () {
         $(this).val(0)
     });
 });
+
+function skip_slave_error(host_id) {
+
+}
 

@@ -1,20 +1,34 @@
+# -*- coding: utf-8 -*-
+
 import db_util, cache
 
+
+# 获取mysql线程信息
 def get_show_processlist(host_id):
     return get_mysql_status_fetchall(host_id, "SELECT * FROM information_schema.processlist where COMMAND != 'Sleep';")
 
+
+# 获取从库复制信息
 def get_show_slave_status(host_id):
     return get_mysql_status_fetchone(host_id, "show slave status;")
 
+
+# 获取主库binlog信息
 def get_show_master_status(host_id):
     return get_mysql_status_fetchone(host_id, "show master status;")
 
+
+# 获取innodb的详细信息
 def get_show_engine_innodb_status(host_id):
     return get_mysql_status_fetchone(host_id, "show engine innodb status;")
 
+
+# 获取innodb事务信息
 def get_innodb_trx(host_id):
     return get_mysql_status_fetchall(host_id, "SELECT * FROM information_schema.INNODB_TRX;")
 
+
+# 获取innodb事务锁信息
 def get_innodb_lock_status(host_id):
     return get_mysql_status_fetchall(host_id,
                                      """select r.trx_isolation_level,
@@ -40,26 +54,48 @@ def get_innodb_lock_status(host_id):
                                         inner join information_schema.innodb_locks lb on lb.lock_trx_id=w.blocking_trx_id
                                         inner join information_schema.innodb_locks lr on lr.lock_trx_id=w.requesting_trx_id;""")
 
+
+# 获取单一mysql global status信息
 def get_mysql_status_fetchone(host_id, sql):
     return db_util.DBUtil().fetchone(cache.Cache().get_host_info(host_id), sql)
 
+
+# 获取多个mysql global status信息
 def get_mysql_status_fetchall(host_id, sql):
     return db_util.DBUtil().fetchone(cache.Cache().get_host_info(host_id), sql)
+
 
 def get_log_text(result):
     number = 0
     log_list = []
-    if(isinstance(result, list)):
+    if (isinstance(result, list)):
         for value_dict in result:
             number += 1
             log_list.append("*************************** {0}. row ***************************\n".format(number))
             append_log_list(value_dict, log_list)
-    elif(isinstance(result, dict)):
+    elif (isinstance(result, dict)):
         append_log_list(result, log_list)
-    if(len(log_list) > 0):
+    if (len(log_list) > 0):
         return "".join(log_list)
     return ""
+
 
 def append_log_list(value_dict, log_list):
     for key, value in value_dict.items():
         log_list.append("{0}: {1}\n".format(key, value))
+
+
+# 跳过从库复制错误
+def skip_slave_error(host_id):
+    slave_info = get_show_slave_status(host_id)
+    if (slave_info["Slave_SQL_Running"] == "No"):
+        sql = "stop slave sql_thread; set global sql_slave_skip_counter=1; start slave sql_thread;"
+        db_util.DBUtil().execute(cache.Cache().get_host_info(host_id), sql)
+        return "复制错误跳过成功"
+    return "复制无异常"
+
+
+# 优化表空间
+def optimized_table_space(host_id, table_name):
+    pass
+

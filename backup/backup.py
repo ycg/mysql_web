@@ -2,7 +2,8 @@
 
 import json
 
-from monitor import base_class, cache
+import settings
+from monitor import base_class, cache, common
 
 #备份
 #备份工具mysqldump dumper xtrabackup
@@ -64,3 +65,16 @@ def check_backup_parameters(info):
         result_info.flag = 0
         result_info.message = "备份时间不能为空"
     return result_info
+
+
+def add_backup_task(obj):
+    # 1.监测数据源是否正常
+
+    # 2.如果是xtrabackup备份需要检测有没有安装
+    if (obj.backup_tool == settings.BACKUP_TOOL_XTRABACKUP):
+        stdin, stdout, stderr = common.execute_remote_command(obj.host_info, "xtrabackup --version")
+        print(stdout.readlines(), stderr)
+
+    # 3.创建备份目录
+    pass
+

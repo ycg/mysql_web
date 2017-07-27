@@ -4,7 +4,7 @@
 #告警，包括CPU，内存，线程数，qps和tps等等
 
 import pymysql, threading, time
-import monitor.cache, monitor.mail_util, enum, monitor.db_util, settings, monitor.mysql_status, monitor.base_class
+import monitor.cache, monitor.mail_util, enum, monitor.db_util, settings, monitor.mysql_manager, monitor.base_class
 
 class AlarmEnum(enum.Enum):
     ReplStatus = 0

@@ -17,7 +17,7 @@ from flask_login import login_user, login_required, logout_user, LoginManager, c
 import settings, backup
 from monitor import user_login, base_class, new_slow_log, report
 from monitor.alarm_server import alarm_thread, execute_sql, general_log, thread, user
-from monitor import cache, server, slow_log, mysql_status, tablespace, chart
+from monitor import cache, server, slow_log, mysql_manager, tablespace, chart
 
 
 # region load data on run
@@ -106,7 +106,7 @@ def get_replication_data():
 @app.route("/replication/<int:id>")
 @login_required
 def get_replication_data_by_id(id):
-    return get_monitor_data(slave_status=mysql_status.get_show_slave_status(id))
+    return get_monitor_data(slave_status=mysql_manager.get_show_slave_status(id))
 
 
 # endregion
