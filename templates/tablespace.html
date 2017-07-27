@@ -8,13 +8,22 @@
         </select>
     </div>
     <div class="col-md-2">
-        <select id="sort_type" name="sort_type" class="selectpicker show-tick form-control bs-select-hidden" required data-live-search="true">
+        <select id="sort_type" name="sort_type" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
             <option value="1" selected="selected">Rows Count</option>
             <option value="2">Data Size</option>
             <option value="3">Index Size</option>
             <option value="4">Total Size</option>
             <option value="5">File Size</option>
             <option value="6">Free Size</option>
+            <option value="7">Auto Increment</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="table_type" name="table_type" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
+            <option value="0" selected="selected">ALL</option>
+            <option value="1">INNODB</option>
+            <option value="2" selected="selected">MyISAM</option>
+            <option value="3" selected="selected">Other</option>
         </select>
     </div>
     <div class="col-md-2">
@@ -26,7 +35,7 @@
 </div>
 <br>
 <div class="row">
-    <div class="col-md-9" id="tablespace_info"></div>
+    <div class="col-md-10" id="tablespace_info"></div>
 </div>
 
 <div class="modal fade" id="table_detail_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>

@@ -2,40 +2,49 @@
     <table class="table table-hover table-bordered">
         <thead>
             <tr>
-            <th class="text-left">
-                Table_Name
-            </th>
-            <th class="text-center">
-                Rows
-            </th>
-            <th class="text-center">
-                Data
-            </th>
-            <th class="text-center">
-                Index
-            </th>
-            <th class="text-center">
-                Total
-            </th>
-            <th class="text-center">
-                File
-            </th>
-            <th class="text-center">
-                Free
-            </th>
-            <th class="text-center">
-                Create_Time
-            </th>
-            <th>
+                <th class="text-left">
+                    Table_Name
+                </th>
+                <th>
+                    Auto_Inc
+                </th>
+                <th>
+                    Rows
+                </th>
+                <th>
+                    Data
+                </th>
+                <th>
+                    Index
+                </th>
+                <th>
+                    Total
+                </th>
+                <th>
+                    File
+                </th>
+                <th>
+                    Free
+                </th>
+                <th>
+                    Engine
+                </th>
+                <th>
+                    Create_Time
+                </th>
+                <th>
 
-            </th>
-        </tr>
+                </th>
+            </tr>
         </thead>
-        <tbody class="text-center">
+        <tbody>
         {% for status in tablespace_status %}
             <tr>
                 <td class="text-left">
                     {{ status.schema }}.{{ status.t_name }}
+                </td>
+                <td>
+                    {{ status.auto_increment }}
                 </td>
                 <td>
                     {{ status.rows }}
@@ -56,10 +65,14 @@
                     {{ status.diff }}
                 </td>
                 <td>
+                    {{ status.engine }}
+                </td>
+                <td>
                     {{ status.create_time }}
                 </td>
                 <td class="text-center">
-                    <button class="btn btn-xs btn-primary" onclick=get_table_detail("{{ status.schema }}","{{ status.t_name }}")>Detail</button>
+                    <button class="btn btn-xs btn-primary" onclick=get_table_detail("{{ status.schema }}","{{ status.t_name }}")>表结构</button>
+                    &nbsp;
                     <button class="btn btn-xs btn-danger">优化空间</button>
                 </td>
             </tr>
