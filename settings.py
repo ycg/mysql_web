@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import platform
-from monitor import host_info
+from monitor.entitys import HoseInfo
 
-MySQL_Host = host_info.HoseInfo(host="192.168.11.101", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
+MySQL_Host = HoseInfo(host="192.168.11.101", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
 
 #一天的秒数
 ONE_DAY = 24 * 60 * 60

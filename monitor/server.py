@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import traceback
-import cache, db_util, settings, base_class, tablespace
+import cache, db_util, settings, entitys, tablespace
 from mysql_enum import MonitorEnum, MySQLBranch
 import time, threadpool, threading, paramiko, collections, pymysql
 
@@ -639,7 +639,7 @@ class MonitorServer(threading.Thread):
 
         for key, value_list in buffer_pool_infos.items():
             num = 0
-            info_tmp = base_class.BaseClass(None)
+            info_tmp = entitys.BaseClass(None)
             buffer_pool_name = key.replace("-", "")
             info_tmp.name = buffer_pool_name
             for line in value_list:

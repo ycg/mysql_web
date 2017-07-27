@@ -2,7 +2,8 @@
 
 import os, threadpool
 from mysql_enum import MySQLBranch
-import base_class, host_info, collections, db_util, settings, tablespace
+from entitys import BaseClass, HoseInfo
+import collections, db_util, settings, tablespace
 
 class Cache(object):
     __number = False
@@ -35,7 +36,7 @@ class Cache(object):
             if (self.__host_infos.has_key(host_id) == True):
                 host_info_temp = self.__host_infos[host_id]
             else:
-                host_info_temp = host_info.HoseInfo()
+                host_info_temp = HoseInfo()
                 host_info_temp.host_id = host_id
                 self.__host_infos[host_info_temp.host_id] = host_info_temp
             host_info_temp.host = row["host"]
@@ -61,19 +62,19 @@ class Cache(object):
                 self.remove_key(self.__analyze_infos, host_id)
             else:
                 if (self.__tablespace.has_key(host_id) == False):
-                    self.__tablespace[host_id] = base_class.BaseClass(host_info_temp)
+                    self.__tablespace[host_id] = BaseClass(host_info_temp)
                 if (self.__repl_infos.has_key(host_id) == False):
-                    self.__repl_infos[host_id] = base_class.BaseClass(host_info_temp)
+                    self.__repl_infos[host_id] = BaseClass(host_info_temp)
                 if (self.__linux_infos.has_key(host_id) == False):
-                    self.__linux_infos[host_id] = base_class.BaseClass(host_info_temp)
+                    self.__linux_infos[host_id] = BaseClass(host_info_temp)
                 if (self.__status_infos.has_key(host_id) == False):
-                    self.__status_infos[host_id] = base_class.BaseClass(host_info_temp)
+                    self.__status_infos[host_id] = BaseClass(host_info_temp)
                 if (self.__innodb_infos.has_key(host_id) == False):
-                    self.__innodb_infos[host_id] = self.init_innodb_info(base_class.BaseClass(host_info_temp))
+                    self.__innodb_infos[host_id] = self.init_innodb_info(BaseClass(host_info_temp))
                 if (self.__analyze_infos.has_key(host_id) == False):
-                    self.__analyze_infos[host_id] = self.init_analyze_info(base_class.BaseClass(None))
+                    self.__analyze_infos[host_id] = self.init_analyze_info(BaseClass(None))
                 if (self.__innodb_status_infos.has_key(host_id) == False):
-                    self.__innodb_status_infos[host_id] = base_class.BaseClass(host_info_temp)
+                    self.__innodb_status_infos[host_id] = BaseClass(host_info_temp)
                     self.__innodb_status_infos[host_id].buffer_pool_infos = collections.OrderedDict()
 
         self.load_mysql_web_user_infos()
@@ -93,7 +94,7 @@ class Cache(object):
     def load_mysql_web_user_infos(self):
         sql = "select id, user_name, user_password, is_deleted from mysql_web.mysql_web_user_info;"
         for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
-            user_info = base_class.BaseClass(None)
+            user_info = BaseClass(None)
             user_info.user_id = row["id"]
             user_info.user_name = row["user_name"]
             user_info.user_password = row["user_password"]

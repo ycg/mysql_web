@@ -1,5 +1,6 @@
 import json
-import db_util, base_class, settings, traceback, cache
+from entitys import BaseClass
+import db_util, settings, traceback, cache
 
 order_by_options = {1: "last_seen", 2: "Query_time_sum", 3: "ts_cnt", 4: "Lock_time_sum"}
 
@@ -44,7 +45,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
     sql = sql.format(server_id, where_sql, order_by_options[order_by_type], (page_number - 1) * 15)
 
     for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
-        info = base_class.BaseClass(None)
+        info = BaseClass(None)
         info.checksum = row["checksum"]
         info.fingerprint = row["fingerprint"]
         info.fingerprint_tmp = row["fingerprint"].decode("utf-8")[0:35]
@@ -79,7 +80,7 @@ def get_slow_log_detail(checksum, server_id):
              where t1.checksum={1} limit 1;""".format(server_id, checksum)
     slow_log_detail = None
     for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
-        slow_log_detail = base_class.BaseClass(None)
+        slow_log_detail = BaseClass(None)
         slow_log_detail.serverid_max = row["serverid_max"]
         slow_log_detail.db_max = row["db_max"]
         slow_log_detail.user_max = row["user_max"]
@@ -117,7 +118,7 @@ def get_slow_log_explain(server_id, db, sql):
         cursor.execute("use {0};".format(db))
         cursor.execute("explain {0};".format(sql))
         for row in cursor.fetchall():
-            info = base_class.BaseClass(None)
+            info = BaseClass(None)
             info.rows = row["rows"]
             info.select_type = row["select_type"]
             info.Extra = row["Extra"]
@@ -145,7 +146,7 @@ def update_review_detail(obj):
 def get_review_detail_by_checksum(checksum):
     sql = "select is_reviewed, comments, reviewed_on, reviewed_id " \
           "from mysql_web.mysql_slow_query_review where checksum={0}".format(checksum)
-    info = base_class.BaseClass(None)
+    info = BaseClass(None)
     result = db_util.DBUtil().fetchone(settings.MySQL_Host, sql)
     info.checksum = checksum
     info.reviewed_id = result["reviewed_id"]

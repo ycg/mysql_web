@@ -1,8 +1,8 @@
 import collections
-import cache, base_class, json, time
+import cache, entitys, json, time
 
 def get_chart_data_by_host_id(host_id):
-    result = base_class.BaseClass(None)
+    result = entitys.BaseClass(None)
     os_info = cache.Cache().get_linux_info(host_id)
     status_info = cache.Cache().get_status_info(host_id)
     result.qps = status_info.qps

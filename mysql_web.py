@@ -11,12 +11,14 @@ import base64
 import sys
 
 from gevent import pywsgi
-from flask import Flask, render_template, request, app, redirect, url_for, session
+from flask import Flask, render_template, request, app, redirect, url_for
 from flask_login import login_user, login_required, logout_user, LoginManager, current_user
 
-import settings, backup
-from monitor import user_login, base_class, new_slow_log, report
-from monitor.alarm_server import alarm_thread, execute_sql, general_log, thread, user
+import settings
+import backup
+from monitor.entitys import BaseClass
+from monitor import user_login, new_slow_log, report
+from alarm import alarm_thread, execute_sql, general_log, thread, user
 from monitor import cache, server, slow_log, mysql_manager, tablespace, chart
 
 
@@ -39,6 +41,7 @@ monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
 monitor_server.invoke_check_tablespace_method()
+
 
 # endregion
 
@@ -420,7 +423,7 @@ def get_thread_infos(host_id, query_type):
 
 @app.route("/login/verfiy", methods=['GET', 'POST'])
 def login_verfiy():
-    result = base_class.BaseClass(None)
+    result = BaseClass(None)
     result.error = ""
     result.success = ""
     user_tmp = user_login.User(request.form["userName"])
@@ -508,7 +511,7 @@ def update_config_options():
 
 
 def get_config_options_value():
-    info = base_class.BaseClass(None)
+    info = BaseClass(None)
     info.host = settings.EMAIL_HOST
     info.port = settings.EMAIL_PORT
     info.user = settings.EMAIL_USER
@@ -521,7 +524,7 @@ def get_config_options_value():
 
 
 def get_object_from_json(json_value):
-    obj = base_class.BaseClass(None)
+    obj = BaseClass(None)
     for key, value in dict(json_value).items():
         if (value[0].isdigit()):
             setattr(obj, key, int(value[0]))

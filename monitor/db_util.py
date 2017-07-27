@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import base_class
 import pymysql
+from entitys import BaseClass
 from DBUtils.PooledDB import PooledDB
 
 class DBUtil(object):
@@ -88,7 +88,7 @@ class DBUtil(object):
     def get_list_infos(self, host_info, sql):
         result = []
         for row in self.fetchall(host_info, sql):
-            info = base_class.BaseClass(None)
+            info = BaseClass(None)
             for key, value in row.items():
                 setattr(info, key, value)
             result.append(info)
