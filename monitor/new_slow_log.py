@@ -16,6 +16,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
                     b.serverid_max, b.db_max, b.user_max, b.ts_min, b.ts_max, sum(ifnull(b.ts_cnt, 1)) ts_cnt,
                     sum(b.Query_time_sum)/sum(b.ts_cnt) Query_time_avg,
                     max(b.Query_time_max) Query_time_max, min(b.Query_time_min) Query_time_min, sum(b.Query_time_sum) Query_time_sum,
+                    sum(b.Lock_time_sum)/sum(b.ts_cnt) Lock_time_avg,
                     max(b.Lock_time_max) Lock_time_max, min(b.Lock_time_min) Lock_time_min, sum(b.Lock_time_sum) Lock_time_sum
              from mysql_web.mysql_slow_query_review a
              inner join mysql_web.mysql_slow_query_review_history b on a.checksum=b.checksum and b.serverid_max={0}
@@ -30,6 +31,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
                  select b.serverid_max, b.db_max, b.user_max, b.ts_min, b.ts_max, sum(b.ts_cnt) ts_cnt,
                         sum(b.Query_time_sum)/sum(b.ts_cnt) Query_time_avg,
                         max(b.Query_time_max) Query_time_max, min(b.Query_time_min) Query_time_min, sum(b.Query_time_sum) Query_time_sum,
+                        sum(b.Lock_time_sum)/sum(b.ts_cnt) Lock_time_avg,
                         max(b.Lock_time_max) Lock_time_max, min(b.Lock_time_min) Lock_time_min, sum(b.Lock_time_sum) Lock_time_sum
                  from mysql_web.mysql_slow_query_review_history b
                  where b.serverid_max={0} {1}
@@ -61,6 +63,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
         info.Lock_time_max = get_float(row["Lock_time_max"])
         info.Lock_time_min = get_float(row["Lock_time_min"])
         info.Lock_time_sum = get_float(row["Lock_time_sum"])
+        info.Lock_time_avg = get_float(row["Lock_time_avg"])
         result.append(info)
     return result
 

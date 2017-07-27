@@ -8,7 +8,7 @@
             <th colspan="4" rowspan="1" class="text-center">
                 Query Time
             </th>
-            <th colspan="3" rowspan="1" class="text-center">
+            <th colspan="4" rowspan="1" class="text-center">
                 Lock Time
             </th>
             <th>
@@ -32,25 +32,28 @@
                 Count
             </th>
             <th>
-                Total
+                Max
+            </th>
+            <th>
+                Min
             </th>
             <th>
                 Avg
             </th>
             <th>
-                Min
-            </th>
-            <th>
-                Max
-            </th>
-            <th>
                 Total
             </th>
             <th>
+                Max
+            </th>
+            <th>
                 Min
             </th>
             <th>
-                Max
+                Avg
+            </th>
+            <th>
+                Total
             </th>
             <th>
 
@@ -78,25 +81,28 @@
                     {{ status.ts_cnt }}
                 </td>
                 <td>
-                    {{ status.Query_time_sum }}
-                </td>
-                <td>
-                    {{ status.Query_time_avg }}
+                    {{ status.Query_time_max }}
                 </td>
                 <td>
                     {{ status.Query_time_min }}
                 </td>
                 <td>
-                    {{ status.Query_time_max }}
+                    {{ status.Query_time_avg }}
                 </td>
                 <td>
-                    {{ status.Lock_time_sum }}
+                    {{ status.Query_time_sum }}
+                </td>
+                <td>
+                    {{ status.Lock_time_max }}
                 </td>
                 <td>
                     {{ status.Lock_time_min }}
                 </td>
                 <td>
-                    {{ status.Lock_time_max }}
+                    {{ status.Lock_time_avg }}
+                </td>
+                <td>
+                    {{ status.Lock_time_sum }}
                 </td>
                 <td class="text-center">
                     <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>详情</button>
@@ -108,7 +114,7 @@
                 </td>
             </tr>
             <tr id="{{ status.checksum }}" hidden>
-                <td colspan="13">
+                <td colspan="14">
                     {{ status.fingerprint }}
                 </td>
             </tr>
