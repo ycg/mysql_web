@@ -73,6 +73,7 @@
     var cpu_list = [];
     var cpu_load_list = [];
     var dml_data_list = [];
+    var thread_data_list = [];
     var io_qps_tps_data_list = [];
     var io_read_write_data_list = [];
     var qps_data_y = [];
@@ -86,6 +87,7 @@
     var update_date_y = [];
     var delete_date_y = [];
     var thread_data_y = [];
+    var thread_run_data_y = [];
     var cpu_user_data_y = [];
     var cpu_sys_data_y = [];
     var cpu_idle_data_y = [];
@@ -99,16 +101,17 @@
     function init_chart() {
         set_chart_options(qps_chart, "QPS", qps_data_y);
         set_chart_options(tps_chart, "TPS", tps_data_y);
-        set_chart_options(thread_chart, "Threads", thread_data_y);
         set_chart_options(mysql_cpu_chart, "MySQL CPU", mysql_cpu_data_y);
         set_chart_options(mysql_mem_chart, "MySQL Mem", mysql_mem_data_y);
 
+        thread_data_list = [thread_data_y, thread_run_data_y];
         io_qps_tps_data_list = [io_qps_data_y, io_tps_data_y];
         io_read_write_data_list = [io_read_data_y, io_write_data_y];
         cpu_list = [cpu_user_data_y, cpu_sys_data_y, cpu_idle_data_y];
         cpu_load_list = [cpu1_data_y, cpu5_data_y, cpu15_data_y];
         dml_data_list = [select_date_y, insert_date_y, update_date_y, delete_date_y];
 
+        set_multi_line_chart_options(thread_chart, "Thread", ["connected", "running"], thread_data_list);
         set_multi_line_chart_options(io_qps_tps_chart, "IO Q/T", ["qps", "tps"], io_qps_tps_data_list);
         set_multi_line_chart_options(io_read_write_chart, "IO R/W(KB)", ["read", "write"], io_read_write_data_list);
         set_multi_line_chart_options(cpu_chart, "CPU", ["user", "sys", "idle"], cpu_list);
@@ -125,6 +128,7 @@
         cpu5_data_y = [];
         cpu15_data_y = [];
         thread_data_y = [];
+        thread_run_data_y = [];
         select_date_y = [];
         insert_date_y = [];
         update_date_y = [];
@@ -151,6 +155,8 @@
             refresh_chart(thread_chart, thread_data_y);
             refresh_chart(mysql_cpu_chart, mysql_cpu_data_y);
             refresh_chart(mysql_mem_chart, mysql_mem_data_y);
+
+            refresh_multi_line_chart(thread_chart, thread_data_list);
             refresh_multi_line_chart(io_qps_tps_chart, io_qps_tps_data_list);
             refresh_multi_line_chart(io_read_write_chart, io_read_write_data_list);
             refresh_multi_line_chart(cpu_chart, cpu_list);
@@ -172,6 +178,7 @@
             update_date_y.shift();
             delete_date_y.shift();
             thread_data_y.shift();
+            thread_run_data_y.shift();
             cpu_user_data_y.shift();
             cpu_idle_data_y.shift();
             cpu_sys_data_y.shift();
@@ -192,7 +199,8 @@
         insert_date_y.push(obj_data.insert);
         update_date_y.push(obj_data.update);
         delete_date_y.push(obj_data.delete);
-        thread_data_y.push(obj_data.threads)
+        thread_data_y.push(obj_data.threads);
+        thread_run_data_y.push(obj_data.threads_run);
         cpu_user_data_y.push(obj_data.cpu_user);
         cpu_idle_data_y.push(obj_data.cpu_idle);
         cpu_sys_data_y.push(obj_data.cpu_system);
@@ -260,5 +268,5 @@
 
     init_chart();
     clearInterval(timer);
-    timer = setInterval(get_chart_data, 3000);
+    timer = setInterval(get_chart_data, 5000);
 </script>

@@ -8,6 +8,7 @@ def get_chart_data_by_host_id(host_id):
     result.qps = status_info.qps
     result.tps = status_info.tps
     result.threads = status_info.threads_count
+    result.threads_run = status_info.threads_run_count
     result.select = status_info.select_count
     result.insert = status_info.insert_count
     result.update = status_info.update_count
@@ -88,7 +89,7 @@ chart_options = collections.OrderedDict()
 chart_options[1] = get_chart_obj("QPS", "qps:1")
 chart_options[2] = get_chart_obj("TPS", "tps:1")
 chart_options[3] = get_chart_obj("Trxs", "trxs:1")
-chart_options[4] = get_chart_obj("Thread", "threads_count:1")
+chart_options[4] = get_chart_obj("Thread", "threads_count:threads_run_count:1", ["connected", "running"])
 chart_options[5] = get_chart_obj("DML", "insert_count:update_count:delete_count:1", ["insert", "update", "delete"])
 chart_options[6] = get_chart_obj("CPU Load", "cpu_1:cpu_5:cpu_15:2", ["CPU_1", "CPU_5", "CPU_15"])
 chart_options[7] = get_chart_obj("CPU", "cpu_user:cpu_system:cpu_idle:2", ["user", "sys", "idle"])
