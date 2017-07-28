@@ -18,8 +18,7 @@ import settings
 import backup
 from monitor.entitys import BaseClass
 from monitor import user_login, new_slow_log, report
-from alarm import alarm_thread, execute_sql, general_log, thread, user
-from monitor import cache, server, slow_log, mysql_manager, tablespace, chart
+from monitor import cache, server, mysql_manager, tablespace, chart
 
 
 # region load data on run
@@ -165,38 +164,6 @@ def search_table():
 
 # endregion
 
-# region general log api
-
-@app.route("/general/<int:page_number>")
-@login_required
-def get_general_log_by_page_number(page_number):
-    if (page_number <= 5):
-        page_list = range(1, 10)
-    else:
-        page_list = range(page_number - 5, page_number + 6)
-    return render_template("general_log.html", general_logs=general_log.get_general_logs_by_page_index(page_number), page_number=page_number, page_list=page_list)
-
-
-@app.route("/general/<int:page_number>/detail/<checksum>")
-@login_required
-def get_general_log_detail(page_number, checksum):
-    return render_template("general_log_detail.html", page_number=page_number, general_log_detail=general_log.get_general_log_detail(checksum))
-
-
-@app.route("/general/review/<int:checksum>")
-@login_required
-def set_general_log_is_review(checksum):
-    return general_log.set_general_log_is_review(checksum)
-
-
-@app.route("/general/review/<int:host_id>/<int:checksum>")
-@login_required
-def set_general_log_is_review_by_host_id(host_id, checksum):
-    return general_log.set_general_log_is_review_by_host_id(host_id, checksum)
-
-
-# endregion
-
 # region common methon
 
 def gzip_compress(content):
@@ -235,30 +202,6 @@ def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_en
 @login_required
 def slow_log_home():
     return render_template("new_slow_log_home.html", host_infos=mysql_cache.get_all_host_infos(), user_infos=mysql_cache.get_mysql_web_user_infos())
-
-
-@app.route("/slowlog/<int:query_type_id>")
-@login_required
-def get_slow_logs(query_type_id):
-    return render_template("slow_log_display.html", slow_log_infos=slow_log.get_all_slow_infos(0, query_type_id))
-
-
-@app.route("/slowlog/config/load/")
-@login_required
-def load_log_table_config():
-    slow_log.load_slow_log_table_config()
-
-
-@app.route("/slowlog/detail/<int:host_id>/<int:checksum>")
-@login_required
-def get_detail(host_id, checksum):
-    return slow_log.get_slow_log_detail_by_host_id(host_id, checksum)
-
-
-@app.route("/slowlog/detail/new/<int:checksum>")
-@login_required
-def get_slow_log_detail(checksum):
-    return render_template("slow_log_detail.html", slow_low_info=slow_log.get_slow_log_detail(checksum))
 
 
 @app.route("/newslowlog/", methods=['POST'])
@@ -308,22 +251,6 @@ def get_page_number_list(page_number):
     else:
         page_list = range(page_number - 5, page_number + 6)
     return page_list
-
-
-# endregion
-
-# region execute sql api
-
-@app.route("/sql")
-@login_required
-def execute_sql_home():
-    return render_template("execute_sql.html", host_infos=mysql_cache.get_all_host_infos())
-
-
-@app.route("/autoreview", methods=['GET', 'POST'])
-@login_required
-def execute_sql_for_commit():
-    return execute_sql.execute_sql_test(request.form["cluster_name"], request.form["sql_content"], request.form["workflow_name"], request.form["is_backup"])
 
 
 # endregion
@@ -399,22 +326,6 @@ def add_user():
 @login_required
 def drop_user(host_id, name, ip):
     return user.MySQLUser(host_id).drop_user(name, ip)
-
-
-# endregion
-
-# region thread api
-
-@app.route("/thread")
-@login_required
-def thread_home():
-    return render_template("thread.html", host_infos=mysql_cache.get_all_host_infos())
-
-
-@app.route("/thread/<int:host_id>/<int:query_type>")
-@login_required
-def get_thread_infos(host_id, query_type):
-    return render_template("thread_display.html", thread_infos=thread.get_all_thread(host_id, query_type))
 
 
 # endregion
@@ -547,22 +458,6 @@ def get_backup_html():
 @login_required
 def add_backup_task():
     return backup.add_backup(get_object_from_json(request.form))
-
-
-# endregion
-
-# region mysql exception log
-
-@app.route("/mysql_log/all", methods=["POST"])
-@login_required
-def get_mysql_exception_logs():
-    return render_template("mysql_exception_log_display.html", mysql_logs=alarm_thread.get_execption_logs(get_object_from_json(request.form)))
-
-
-@app.route("/mysql_log/")
-@login_required
-def get_mysql_exception_log_html():
-    return render_template("mysql_exception_log.html", host_infos=mysql_cache.get_all_host_infos())
 
 
 # endregion

@@ -1,4 +1,5 @@
-import cache, db_util, base_class
+import cache
+from entitys import BaseClass
 import argparse, sys, pymysql, datetime
 from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.row_event import WriteRowsEvent, UpdateRowsEvent, DeleteRowsEvent
@@ -88,7 +89,7 @@ def check_arguments():
     return args
 
 def get_binlog_info(host_id, query_type, binlog_file, start_value, stop_value, result_type):
-    args = base_class.BaseClass(cache.Cache().get_host_info(host_id))
+    args = BaseClass(cache.Cache().get_host_info(host_id))
     args.databases = ""
     args.tables = ""
     args.connection_settings = {'host': args.host_info.host, 'port': args.host_info.port, 'user': args.host_info.user, 'passwd': args.host_info.password}

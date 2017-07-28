@@ -1,8 +1,25 @@
 # -*- coding: utf-8 -*-
 
 import paramiko, subprocess
+from entitys import BaseClass
 
-import base_class
+
+# 把数据库返回数据转换为对象
+def get_object(row):
+    info = BaseClass()
+    for key, value in row.items():
+        if (value == "None"):
+            value = None
+        setattr(info, key, value)
+    return info
+
+
+# 执行本地命令
+def execute_localhost_command(command):
+    result = subprocess.Popen(command, shell=True)
+    result.wait()
+    return result.stdin, result.stdout, result.stderr
+
 
 # ssh执行远程命令
 def execute_remote_command(host_info, command):
@@ -16,21 +33,3 @@ def execute_remote_command(host_info, command):
     finally:
         if (host_client == None):
             host_client.close()
-
-
-# 执行本地命令
-def execute_localhost_command(command):
-    result = subprocess.Popen(command, shell=True)
-    result.wait()
-    return result.stdin, result.stdout, result.stderr
-
-
-# 把数据库返回数据转换为对象
-def get_object(row):
-    info = base_class.BaseClass()
-    for key, value in row.items():
-        if(value == "None"):
-            value = None
-        setattr(info, key, value)
-    return info
-

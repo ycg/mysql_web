@@ -22,7 +22,6 @@
     <file url="file://$PROJECT_DIR$/monitor/db_util.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/mysql_enum.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/mysql_manager.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/monitor/mysql_status.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/new_slow_log.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/tablespace.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/python_upgrade.sh" charset="UTF-8" />
