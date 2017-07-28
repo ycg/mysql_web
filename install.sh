@@ -27,7 +27,7 @@ cd pip-9.0.1
 install_package
 
 #pip install package
-pip install flask flask-login gevent threadpool pymysql DBUtils six packaging appdirs pymysqlreplication
+pip install flask flask-login gevent threadpool pymysql DBUtils six packaging appdirs pymysqlreplication sqlparse
 
 #new setuptools
 cd /tmp

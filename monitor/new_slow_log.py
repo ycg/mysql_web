@@ -1,4 +1,5 @@
 import json
+import sqlparse
 from entitys import BaseClass
 import db_util, settings, traceback, cache
 
@@ -105,7 +106,7 @@ def get_slow_log_detail(checksum, server_id):
         slow_log_detail.first_seen = row["first_seen"]
         slow_log_detail.last_seen = row["last_seen"]
         slow_log_detail.fingerprint = row["fingerprint"].decode("utf-8")
-        slow_log_detail.sample = row["sample"].decode("utf-8")
+        slow_log_detail.sample = sqlparse.format(row["sample"].decode("utf-8"), reindent=True, keyword_case='upper')
     slow_log_detail.explain_infos = get_slow_log_explain(server_id, slow_log_detail.db_max, slow_log_detail.sample)
     return slow_log_detail
 

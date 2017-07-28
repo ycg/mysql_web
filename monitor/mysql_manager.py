@@ -91,11 +91,12 @@ def skip_slave_error(host_id):
     if (slave_info["Slave_SQL_Running"] == "No"):
         sql = "stop slave sql_thread; set global sql_slave_skip_counter=1; start slave sql_thread;"
         db_util.DBUtil().execute(cache.Cache().get_host_info(host_id), sql)
-        return "复制错误跳过成功"
-    return "复制无异常"
+        return "repl error skip ok."
+    return "repl status is ok."
 
 
 # 优化表空间
 def optimized_table_space(host_id, table_name):
-    pass
+    db_util.DBUtil().execute(cache.Cache().get_host_info(host_id), "alter table {0} engine=innodb;".format(table_name))
+    return "optimized ok."
 

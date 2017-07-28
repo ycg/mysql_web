@@ -37,6 +37,8 @@
     <file url="file://$PROJECT_DIR$/templates/slow_log_detail.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/templates/slow_log_display.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/templates/tablespace_dispaly.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tools/backup/bk_mysqldump.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tools/backup/bk_xtrabackup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools/binlog/binlog_util.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools/mha/app.conf" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools/mha/masterha_master_switch" charset="UTF-8" />
