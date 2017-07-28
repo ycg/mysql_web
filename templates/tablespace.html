@@ -68,6 +68,11 @@
         query_tablespace_info()
     }
 
+    function get_tables_by_host_id(host_id_tmp) {
+        host_id = host_id_tmp;
+        query_tablespace_info();
+    }
+
     function query_tablespace_info() {
         get_table_infos_for_page_number(1)
     }

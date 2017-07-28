@@ -73,7 +73,7 @@
                 <td class="text-center">
                     <button class="btn btn-xs btn-primary" onclick=get_table_detail("{{ status.schema }}","{{ status.t_name }}")>表结构</button>
                     &nbsp;
-                    <button class="btn btn-xs btn-danger">优化空间</button>
+                    <button class="btn btn-xs btn-danger">优化碎片</button>
                 </td>
             </tr>
         {% endfor %}
@@ -95,35 +95,38 @@
 {% if(host_tablespace_infos != None) %}
     <table class="table table-hover table-bordered">
         <thead>
-        <tr>
-            <th>
-                Host
-            </th>
-            <th>
-                Rows_T
-            </th>
-            <th>
-                Data_T
-            </th>
-            <th>
-                Index_T
-            </th>
-            <th>
-                Total
-            </th>
-            <th>
-                File_T
-            </th>
-            <th>
-                Free_T
-            </th>
-            <th title="table count">
-                Table_C
-            </th>
-            <th>
-                Last Update Time
-            </th>
-        </tr>
+            <tr>
+                <th>
+                    Host
+                </th>
+                <th>
+                    Rows_T
+                </th>
+                <th>
+                    Data_T
+                </th>
+                <th>
+                    Index_T
+                </th>
+                <th>
+                    Total
+                </th>
+                <th>
+                    File_T
+                </th>
+                <th>
+                    Free_T
+                </th>
+                <th title="table count">
+                    Table_C
+                </th>
+                <th>
+                    Last Update Time
+                </th>
+                <th>
+
+                </th>
+            </tr>
         </thead>
         <tbody>
         {% for status in host_tablespace_infos %}
@@ -155,6 +158,9 @@
                 <td>
                     {{ status.last_update_time }}
                 </td>
+                <td class="text-center">
+                    <button class="btn btn-primary btn-xs" onclick="get_tables_by_host_id({{ status.host_info.host_id }})">查看</button>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
@@ -165,123 +171,123 @@
     <!--table column-->
     <table class="table table-hover table-bordered">
         <thead>
-        <tr>
-            <th class="text-center" colspan="7">{{ table_detail_info.t_name }}-Columns</th>
-        </tr>
-        <tr>
-            <th>
-                ID
-            </th>
-            <th>
-                Name
-            </th>
-            <th>
-                Default_Value
-            </th>
-            <th>
-                Type
-            </th>
-            <th>
-                Is_Null
-            </th>
-            <th>
-                Key
-            </th>
-            <th>
-                Extra
-            </th>
-        </tr>
+            <tr>
+                <th class="text-center" colspan="7">{{ table_detail_info.t_name }}-Columns</th>
+            </tr>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Default_Value
+                </th>
+                <th>
+                    Type
+                </th>
+                <th>
+                    Is_Null
+                </th>
+                <th>
+                    Key
+                </th>
+                <th>
+                    Extra
+                </th>
+            </tr>
         </thead>
         <tbody>
-        {% for status in table_detail_info.column_infos %}
-            <tr>
-                <td>
-                    {{ status.ordinal_position }}
-                </td>
-                <td>
-                    {{ status.column_name }}
-                </td>
-                <td>
-                    {{ status.column_default }}
-                </td>
-                <td>
-                    {{ status.column_type }}
-                </td>
-                <td>
-                    {{ status.is_nullable }}
-                </td>
-                <td>
-                    {{ status.column_key }}
-                </td>
-                <td>
-                    {{ status.extra }}
-                </td>
-            </tr>
-        {% endfor %}
+            {% for status in table_detail_info.column_infos %}
+                <tr>
+                    <td>
+                        {{ status.ordinal_position }}
+                    </td>
+                    <td>
+                        {{ status.column_name }}
+                    </td>
+                    <td>
+                        {{ status.column_default }}
+                    </td>
+                    <td>
+                        {{ status.column_type }}
+                    </td>
+                    <td>
+                        {{ status.is_nullable }}
+                    </td>
+                    <td>
+                        {{ status.column_key }}
+                    </td>
+                    <td>
+                        {{ status.extra }}
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
     <!--table index-->
     <table class="table table-hover table-bordered">
         <thead>
-        <tr>
-            <th class="text-center" colspan="8">{{ table_detail_info.t_name }}-Indexs</th>
-        </tr>
-        <tr>
-            <th>
-                Name
-            </th>
-            <th>
-                Non_Unique
-            </th>
-            <th>
-                ID
-            </th>
-            <th>
-                Column_Name
-            </th>
-            <th>
-                Collation
-            </th>
-            <th>
-                Cardinality
-            </th>
-            <th>
-                Null
-            </th>
-            <th>
-                Type
-            </th>
-        </tr>
+            <tr>
+                <th class="text-center" colspan="8">{{ table_detail_info.t_name }}-Indexs</th>
+            </tr>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Non_Unique
+                </th>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Column_Name
+                </th>
+                <th>
+                    Collation
+                </th>
+                <th>
+                    Cardinality
+                </th>
+                <th>
+                    Null
+                </th>
+                <th>
+                    Type
+                </th>
+            </tr>
         </thead>
         <tbody>
-        {% for status in table_detail_info.index_infos %}
-            <tr>
-                <td>
-                    {{ status.index_name }}
-                </td>
-                <td>
-                    {{ status.non_unique }}
-                </td>
-                <td>
-                    {{ status.seq_in_index }}
-                </td>
-                <td>
-                    {{ status.column_name }}
-                </td>
-                <td>
-                    {{ status.collation }}
-                </td>
-                <td>
-                    {{ status.cardinality }}
-                </td>
-                <td>
-                    {{ status.nullable }}
-                </td>
-                <td>
-                    {{ status.index_type }}
-                </td>
-            </tr>
-        {% endfor %}
+            {% for status in table_detail_info.index_infos %}
+                <tr>
+                    <td>
+                        {{ status.index_name }}
+                    </td>
+                    <td>
+                        {{ status.non_unique }}
+                    </td>
+                    <td>
+                        {{ status.seq_in_index }}
+                    </td>
+                    <td>
+                        {{ status.column_name }}
+                    </td>
+                    <td>
+                        {{ status.collation }}
+                    </td>
+                    <td>
+                        {{ status.cardinality }}
+                    </td>
+                    <td>
+                        {{ status.nullable }}
+                    </td>
+                    <td>
+                        {{ status.index_type }}
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 {% endif %}
