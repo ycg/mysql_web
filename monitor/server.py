@@ -321,8 +321,7 @@ class MonitorServer(threading.Thread):
             status_info.binlog_size_total = 0
 
         self.read_innodb_status(host_info)
-        # self.analyze_mysql_status(status_info)
-        self.insert_status_log(status_info, innodb_info)
+        # self.insert_status_log(host_info)
 
         host_info.tps = status_info.tps
         host_info.qps = status_info.qps
@@ -348,13 +347,27 @@ class MonitorServer(threading.Thread):
         elif (monitor_type == MonitorEnum.Replication):
             return self.__cache.get_all_repl_infos()
 
-    def insert_status_log(self, status_info, innodb_info):
+    def insert_status_log(self, host_info):
+        status_info = self.__cache.get_status_info(host_info.key)
+        innodb_info = self.__cache.get_innodb_info(host_info.key)
         sql = "insert into mysql_web.mysql_status_log(host_id, qps, tps, commit, rollback, connections, " \
               "thread_count, thread_running_count, tmp_tables, tmp_disk_tables, send_bytes, receive_bytes, `trxs`) VALUES " \
               "({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, \'{10}\', \'{11}\', {12})" \
-            .format(status_info.host_info.host_id, status_info.qps, status_info.tps, status_info.commit, status_info.rollback, status_info.connections_per,
-                    status_info.threads_count, status_info.threads_run_count, status_info.create_tmp_table_count, status_info.create_tmp_disk_table_count,
-                    status_info.send_bytes_bigint, status_info.receive_bytes_bigint, innodb_info.trx_count)
+              .format(status_info.host_info.host_id, status_info.qps, status_info.tps, status_info.commit, status_info.rollback, status_info.connections_per,
+                      status_info.threads_count, status_info.threads_run_count, status_info.create_tmp_table_count, status_info.create_tmp_disk_table_count,
+                      status_info.send_bytes_bigint, status_info.receive_bytes_bigint, innodb_info.trx_count)
+
+        if (settings.LINUX_OS):
+            linux_info = self.__cache.get_linux_info(host_info.key)
+            sql += """INSERT INTO `mysql_web`.`os_monitor_data`
+                     (`host_id`,`cpu1`,`cpu5`,`cpu15`,`cpu_user`,`cpu_sys`,`cpu_iowait`,
+                      `mysql_cpu`,`mysql_memory`,`mysql_size`,`io_qps`,`io_tps`,`io_read`,`io_write`,`io_util`)
+                     VALUES
+                     ({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14});""" \
+                     .format(linux_info.host_info.host_id, linux_info.cpu_1, linux_info.cpu_5, linux_info.cpu_15, linux_info.cpu_user, linux_info.cpu_system, linux_info.cpu_iowait,
+                             linux_info.mysql_cpu, linux_info.mysql_memory, linux_info.mysql_data_size,
+                             linux_info.io_qps, linux_info.io_tps, linux_info.io_read, linux_info.io_write, linux_info.util)
+
         self.__db_util.execute(settings.MySQL_Host, sql)
 
     def insert_os_monitor_log(self, linux_info):
@@ -446,10 +459,6 @@ class MonitorServer(threading.Thread):
         linux_info.cpu_iowait = float(cpu_tmp[3])
         linux_info.cpu_steal = float(cpu_tmp[4])
         linux_info.cpu_idle = float(cpu_tmp[5])
-
-        # self.analyze_os_status(linux_info)
-        # 插入os系统监控数据
-        self.insert_os_monitor_log(linux_info)
 
     def remove_empty_string(self, str):
         result = []
