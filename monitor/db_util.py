@@ -75,13 +75,10 @@ class DBUtil(object):
 
     def get_mysql_connection(self, host_info):
         if(self.__connection_pools.get(host_info.key) == None):
-            # 这边添加超时设置是为了防止多线程操作导致数据库线程堆积
-            # connect_timeout=1, read_timeout=1, write_timeout=1)
-            # 超时还是会导致很多问题发生，比如查找information_schema.tables，它是一秒钟做不完的，那设置10秒？
             pool = PooledDB(creator=pymysql, mincached=5, maxcached=20,
                             host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password,
                             use_unicode=False, charset="utf8", cursorclass=pymysql.cursors.DictCursor, reset=False, autocommit=True,
-                            connect_timeout=10, read_timeout=10, write_timeout=10)
+                            connect_timeout=2, read_timeout=2, write_timeout=2)
             self.__connection_pools[host_info.key] = pool
         return self.__connection_pools[host_info.key].connection()
 

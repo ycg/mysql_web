@@ -5,6 +5,7 @@ import cache, db_util, settings, entitys, tablespace
 from mysql_enum import MonitorEnum, MySQLBranch
 import time, threadpool, threading, paramiko, collections, pymysql
 
+
 class MonitorServer(threading.Thread):
     __times = 1
     __cache = None
@@ -48,22 +49,13 @@ class MonitorServer(threading.Thread):
         self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
 
     def get_mysql_status(self, host_info):
+        aa = time.time()
         host_info.is_running = 1
-        connection = self.__db_util.get_mysql_connection(host_info)
-        cursor = connection.cursor()
-
-        try:
-            mysql_status_old = self.get_dic_data(cursor, show_global_status_sql)
-        except pymysql.err.OperationalError:
-            traceback.print_exc()
-            host_info.is_running = 0
-            return
-
+        mysql_status_old = self.get_dic_data(host_info, show_global_status_sql)
         time.sleep(1)
-        mysql_status_new = self.get_dic_data(cursor, show_global_status_sql)
-        mysql_variables = self.get_dic_data(cursor, "show global variables where variable_name in ('datadir', 'pid_file', 'log_bin', 'log_bin_basename', "
-                                                    "'max_connections', 'table_open_cache', 'table_open_cache_instances', 'innodb_buffer_pool_size', "
-                                                    "'read_only', 'log_bin', 'innodb_spin_wait_delay', 'innodb_sync_spin_loops');")
+        mysql_status_new = self.get_dic_data(host_info, show_global_status_sql)
+        mysql_variables = self.get_dic_data(host_info, show_global_variables_sql)
+
         host_info.uptime = int(mysql_status_new["Uptime"]) / 60 / 60 / 24
         if (host_info.uptime == 0):
             host_info.uptime = 1
@@ -270,8 +262,7 @@ class MonitorServer(threading.Thread):
 
         # 3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         repl_info = self.__cache.get_repl_info(host_info.key)
-        result = self.__db_util.fetchone_for_cursor("show slave status;", cursor=cursor)
-        self.get_binlog_size_total(mysql_variables["log_bin"], status_info, cursor)
+        result = self.__db_util.fetchone(host_info, "show slave status;")
         if (host_info.is_slave):
             repl_info.read_only = mysql_variables["read_only"]
             repl_info.error_message = result["Last_Error"]
@@ -321,7 +312,15 @@ class MonitorServer(threading.Thread):
         else:
             repl_info.rpl_semi_sync = 0
 
-        self.__db_util.close(connection, cursor)
+        # 5.-----------------------------------------------------获取主库生成的二进制大小-------------------------------------------------------------------
+        if (mysql_variables["log_bin"] == "ON"):
+            total_size = 0
+            for row in self.__db_util.fetchall(host_info, "show master logs;"):
+                total_size += int(row["File_size"])
+            status_info.binlog_size_total = tablespace.get_data_length(total_size)
+        else:
+            status_info.binlog_size_total = 0
+
         self.read_innodb_status(host_info)
         # self.analyze_mysql_status(status_info)
         self.insert_status_log(status_info, innodb_info)
@@ -333,19 +332,12 @@ class MonitorServer(threading.Thread):
         host_info.threads_running = status_info.threads_run_count
         host_info.send_bytes = status_info.send_bytes
         host_info.receive_bytes = status_info.receive_bytes
+        bb = time.time()
+        print(bb - aa - 1, host_info.remark)
 
-    def get_binlog_size_total(self, log_bin, status_info, cursor):
-        if (log_bin == "ON"):
-            total_size = 0
-            for row in self.__db_util.fetchall_for_cursor("show master logs;", cursor=cursor):
-                total_size += int(row["File_size"])
-            status_info.binlog_size_total = tablespace.get_data_length(total_size)
-        else:
-            status_info.binlog_size_total = 0
-
-    def get_dic_data(self, cursor, sql):
+    def get_dic_data(self, host_info, sql):
         data = {}
-        for row in self.__db_util.fetchall_for_cursor(sql, cursor=cursor):
+        for row in self.__db_util.fetchall(host_info, sql):
             data[row.get("Variable_name")] = row.get("Value")
         return data
 
@@ -484,7 +476,7 @@ class MonitorServer(threading.Thread):
         net_receive_packet = 0
         result = self.get_remote_command_result(linux_info.host_info, "sar -n DEV 1 2")
         for line in result:
-            if(line.find("Average") >= 0):
+            if (line.find("Average") >= 0):
                 break
             line_num += 1
 
@@ -1008,22 +1000,18 @@ show global status where variable_name in
 show_global_variables_sql = """
 show global variables where variable_name in
 (
-'',
-'',
-'',
-'',
-'',
-'',
-'',
-'',
-'',
-'',
-'',
-'',
-'',
-'',
-'',
-''
+'datadir',
+'pid_file',
+'log_bin',
+'log_bin_basename',
+'max_connections',
+'table_open_cache',
+'table_open_cache_instances',
+'innodb_buffer_pool_size',
+'read_only',
+'innodb_spin_wait_delay',
+'innodb_sync_spin_loops'
 );
 """
+
 # endregion
