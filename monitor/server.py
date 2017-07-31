@@ -320,9 +320,6 @@ class MonitorServer(threading.Thread):
         else:
             status_info.binlog_size_total = 0
 
-        self.read_innodb_status(host_info)
-        # self.insert_status_log(host_info)
-
         host_info.tps = status_info.tps
         host_info.qps = status_info.qps
         host_info.trxs = innodb_info.trx_count
@@ -330,6 +327,10 @@ class MonitorServer(threading.Thread):
         host_info.threads_running = status_info.threads_run_count
         host_info.send_bytes = status_info.send_bytes
         host_info.receive_bytes = status_info.receive_bytes
+
+        self.read_innodb_status(host_info)
+        if (settings.IS_INSERT_MONITOR_LOG):
+            self.insert_status_log(host_info)
 
     def get_dic_data(self, host_info, sql):
         data = {}
