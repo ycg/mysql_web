@@ -49,7 +49,6 @@ class MonitorServer(threading.Thread):
         self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
 
     def get_mysql_status(self, host_info):
-        aa = time.time()
         host_info.is_running = 1
         mysql_status_old = self.get_dic_data(host_info, show_global_status_sql)
         time.sleep(1)
@@ -332,8 +331,6 @@ class MonitorServer(threading.Thread):
         host_info.threads_running = status_info.threads_run_count
         host_info.send_bytes = status_info.send_bytes
         host_info.receive_bytes = status_info.receive_bytes
-        bb = time.time()
-        print(bb - aa - 1, host_info.remark)
 
     def get_dic_data(self, host_info, sql):
         data = {}

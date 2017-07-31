@@ -13,7 +13,6 @@
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/list.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/user.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/test.py" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/alarm/new_alarm.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/backup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/mydumper.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/mysqldump.py" charset="UTF-8" />
