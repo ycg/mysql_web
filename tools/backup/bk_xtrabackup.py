@@ -2,7 +2,7 @@
 
 import os, argparse, sys, time, datetime, subprocess, traceback
 
-# python bk_xtrabackup.py --host=192.168.1.101 --user=yangcg --password=yangcaogui --mode=2 --backup-dir=/opt/my_backup
+# python bk_xtrabackup.py --host=192.168.11.101 --user=yangcg --password=yangcaogui --mode=2 --backup-dir=/opt/my_backup
 # 备份周期是按照一个星期来的，星期天全量备份，其余增量备份
 # 参数详解：
 # --host
@@ -11,7 +11,7 @@ import os, argparse, sys, time, datetime, subprocess, traceback
 # --port
 # --backup-dir:备份目录，需要指定一个不存在的目录才行
 # --mode：备份模式，1代表全量，2代表全量+增量
-# --backup-time：定时备份时间
+# --backup-time：定时备份时间，默认值为14天，也就是只保存两周
 # --expire-days：备份文件过期时间
 # --stream:是否启用压缩，0代表不压缩，1代表使用xbstream的gzip压缩
 
@@ -112,7 +112,7 @@ def full_backup(args):
 def increment_backup(args):
     last_line = read_backup_log_last_line(args.backup_log_file_path)
     if (last_line == None):
-        full_backup(args)
+        return full_backup(args)
 
     last_line_values = last_line.split(":")
     if (len(last_line_values) > 0 and len(last_line_values) < 10):
@@ -133,10 +133,9 @@ def increment_backup(args):
 
 def read_backup_log_last_line(file_path):
     lines = read_file_lines(file_path)
-    if (len(lines) > 0):
+    if (lines != None and len(lines) > 0):
         return lines[-1]
-    else:
-        return None
+    return None
 
 
 def remove_expire_backup_directory(args):
