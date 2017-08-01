@@ -23,6 +23,7 @@ import os, argparse, sys, time, datetime, subprocess, traceback
 # {0}:{1}:{2}:{3}:{4}:{5}:{6}
 # 备份模式:备份路径:备份日志路径:备份开始时间:备份结束时间:备份日期:备份是否正常
 
+# 注意：好像xtrabackup打印的输出信息是错误输出，使用2>>，重定向竟然能成功
 
 FULL_BACKUP = 1
 INCREMENT_BACKUP = 2
@@ -102,7 +103,7 @@ def full_backup(args):
     if (os.path.exists(full_backup_dir) == False):
         os.mkdir(full_backup_dir)
     full_backup_log_path = os.path.join(args.backup_dir, "full_{0}.log".format(start_backup_time))
-    command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp {4} 2>> {5}".format(args.host, args.user, args.password, args.port, full_backup_dir, full_backup_log_path)
+    command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp {4} &> {5}".format(args.host, args.user, args.password, args.port, full_backup_dir, full_backup_log_path)
     result = subprocess.Popen(command, shell=True)
     result.wait()
     stop_backup_time = get_current_time()
@@ -122,7 +123,7 @@ def increment_backup(args):
         if (os.path.exists(increment_backup_dir) == False):
             os.mkdir(increment_backup_dir)
         increment_backup_log_path = os.path.join(args.backup_dir, "increment_{0}.log".format(start_backup_time))
-        command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp --incremental --incremental-basedir={4} {5} 2>> {6}".format(args.host, args.user, args.password, args.port, last_backup_dir, increment_backup_dir, increment_backup_log_path)
+        command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp --incremental --incremental-basedir={4} {5} &> {6}".format(args.host, args.user, args.password, args.port, last_backup_dir, increment_backup_dir, increment_backup_log_path)
         result = subprocess.Popen(command, shell=True)
         result.wait()
         stop_backup_time = get_current_time()
