@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, argparse, sys, time, datetime, subprocess
+import os, argparse, sys, time, datetime, subprocess, traceback
 
 # python bk_xtrabackup.py --host=192.168.1.101 --user=yangcg --password=yangcaogui --mode=2 --backup-dir=/opt/my_backup
 # 备份周期是按照一个星期来的，星期天全量备份，其余增量备份
@@ -13,10 +13,16 @@ import os, argparse, sys, time, datetime, subprocess
 # --mode：备份模式，1代表全量，2代表全量+增量
 # --backup-time：定时备份时间
 # --expire-days：备份文件过期时间
+# --stream:是否启用压缩，0代表不压缩，1代表使用xbstream的gzip压缩
 
 # 调用方式
 # 可以放在crontab里面进行定时调用
 # 也可以直接运行此文件让它在后台运行
+
+# backup.log各个分割字段含义
+# {0}:{1}:{2}:{3}:{4}:{5}:{6}
+# 备份模式:备份路径:备份日志路径:备份开始时间:备份结束时间:备份日期:备份是否正常
+
 
 FULL_BACKUP = 1
 INCREMENT_BACKUP = 2
@@ -35,6 +41,7 @@ def check_arguments():
     parser.add_argument("--backup-time", type=str, dest="backup_time", help="help time", default="03:30")
     parser.add_argument("--ssh-host", type=str, dest="ssh_host", help="backup scp remote ip")
     parser.add_argument("--expire-days", type=int, dest="expire_days", help="expire backup days", default=14)
+    parser.add_argument("--stream", type=int, dest="stream", help="--stream", default=0)
     args = parser.parse_args()
 
     if not args.host or not args.user or not args.password or not args.port:
@@ -63,6 +70,7 @@ def check_arguments():
         sys.exit(1)
 
     args.backup_log_file_path = os.path.join(args.backup_dir, "backup.log")
+    args.checkpoints_file_path = os.path.join(args.backup_dir, "xtrabackup_checkpoints")
     return args
 
 
@@ -124,19 +132,11 @@ def increment_backup(args):
 
 
 def read_backup_log_last_line(file_path):
-    file = None
-    try:
-        file = open(file_path, "r")
-        log_lines = file.readlines()
-        if (len(log_lines) > 0):
-            return log_lines[-1]
-        else:
-            return None
-    except:
+    lines = read_file_lines(file_path)
+    if (len(lines) > 0):
+        return lines[-1]
+    else:
         return None
-    finally:
-        if (file != None):
-            file.close()
 
 
 def remove_expire_backup_directory(args):
@@ -152,17 +152,30 @@ def remove_expire_backup_directory(args):
 
 
 def check_backup_is_correct(xtrabackup_log_path):
-    file = None
-    try:
-        file = open(xtrabackup_log_path)
-        log_values = file.readlines()
+    log_values = read_file_lines(xtrabackup_log_path)
+    if(len(log_values) > 0):
         last_line = log_values[-1]
         if (last_line.find("completed OK") > 0):
             return 1
-        else:
-            return 0
+    return 0
+
+
+def get_xtrabackup_checkpoints(args):
+    lines = read_file_lines(args.checkpoints_file_path)
+    for value in lines:
+        if (value.find("to_lsn") > 0):
+            return value.split("=")[1].lstrip()
+    return 0
+
+
+def read_file_lines(file_path):
+    file = None
+    try:
+        file = open(file_path, "r")
+        return file.readlines()
     except:
-        return 0
+        traceback.print_exc()
+        return None
     finally:
         if (file != None):
             file.close()
