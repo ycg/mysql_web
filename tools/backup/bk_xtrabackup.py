@@ -2,7 +2,7 @@
 
 import os, argparse, sys, time, datetime, subprocess
 
-# python bk_xtrabackup.py --host=192.168.1.101 --user=yangcg --password=yangcaogui --mode=1 --backup-dir=/opt/my_backup
+# python bk_xtrabackup.py --host=192.168.1.101 --user=yangcg --password=yangcaogui --mode=2 --backup-dir=/opt/my_backup
 # 备份周期是按照一个星期来的，星期天全量备份，其余增量备份
 # 参数详解：
 # --host
@@ -10,9 +10,13 @@ import os, argparse, sys, time, datetime, subprocess
 # --password
 # --port
 # --backup-dir:备份目录，需要指定一个不存在的目录才行
-# --mode：备份模式，1代表全量，2代表增量
+# --mode：备份模式，1代表全量，2代表全量+增量
 # --backup-time：定时备份时间
 # --expire-days：备份文件过期时间
+
+# 调用方式
+# 可以放在crontab里面进行定时调用
+# 也可以直接运行此文件让它在后台运行
 
 FULL_BACKUP = 1
 INCREMENT_BACKUP = 2
@@ -63,6 +67,7 @@ def check_arguments():
 
 
 def backup(args):
+    print("start backup.")
     if (args.mode == FULL_BACKUP):
         full_backup(args)
     else:
@@ -93,9 +98,7 @@ def full_backup(args):
     result = subprocess.Popen(command, shell=True)
     result.wait()
     stop_backup_time = get_current_time()
-    log_value = "{0}:{1}:{2}:{3}:{4}:{5}:{6}\n" \
-                .format(FULL_BACKUP, full_backup_dir, full_backup_log_path, start_backup_time, stop_backup_time, get_backup_date, check_backup_is_correct(full_backup_log_path))
-    write_log_file(args.backup_log_file_path, log_value, WRITE_FILE_APPEND)
+    write_backup_log_file(args.backup_log_file_path, FULL_BACKUP, full_backup_dir, full_backup_log_path, start_backup_time, stop_backup_time)
 
 
 def increment_backup(args):
@@ -111,14 +114,11 @@ def increment_backup(args):
         if (os.path.exists(increment_backup_dir) == False):
             os.mkdir(increment_backup_dir)
         increment_backup_log_path = os.path.join(args.backup_dir, "increment_{0}.log".format(start_backup_time))
-        command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp --incremental --incremental-basedir={4} {5} 2>> {6}" \
-            .format(args.host, args.user, args.password, args.port, last_backup_dir, increment_backup_dir, increment_backup_log_path)
+        command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp --incremental --incremental-basedir={4} {5} 2>> {6}".format(args.host, args.user, args.password, args.port, last_backup_dir, increment_backup_dir, increment_backup_log_path)
         result = subprocess.Popen(command, shell=True)
         result.wait()
         stop_backup_time = get_current_time()
-        log_value = "{0}:{1}:{2}:{3}:{4}:{5}:{6}\n" \
-                    .format(FULL_BACKUP, increment_backup_dir, increment_backup_log_path, start_backup_time, stop_backup_time, get_backup_date(), check_backup_is_correct(increment_backup_log_path))
-        write_log_file(args.backup_log_file_path, log_value, WRITE_FILE_APPEND)
+        write_backup_log_file(args.backup_log_file_path, INCREMENT_BACKUP, increment_backup_dir, increment_backup_log_path, start_backup_time, stop_backup_time)
     else:
         full_backup(args)
 
@@ -168,19 +168,18 @@ def check_backup_is_correct(xtrabackup_log_path):
             file.close()
 
 
-def write_log_file(file_path, log_value, write_type):
+def write_backup_log_file(file_path, backup_mode, backup_dir, backup_log_path, start_time, stop_time):
     file = None
     try:
-        file = open(file_path, write_type)
-        if (isinstance(log_value, list)):
-            file.writelines(log_value)
-        else:
-            file.write(log_value)
+        log_value = "{0}:{1}:{2}:{3}:{4}:{5}:{6}\n".format(backup_mode, backup_dir, backup_log_path, start_time, stop_time, get_backup_date(), check_backup_is_correct(backup_log_path))
+        file = open(file_path, "a")
+        file.write(log_value)
     finally:
         if (file != None):
             file.close()
 
 
+# 后台运行代码
 '''args = check_arguments()
 while (True):
     current_time = time.strftime('%H:%M', time.localtime(time.time()))
@@ -188,6 +187,5 @@ while (True):
         backup(args)
     time.sleep(10)'''
 
-backup(check_arguments())
-# write_log_file("C:\\Users\\Administrator\\Desktop\\123.txt", "aaa\n", WRITE_FILE_APPEND)
-# write_log_file("C:\\Users\\Administrator\\Desktop\\123.txt", "bbb\n", WRITE_FILE_APPEND)
+# crontab运行代码
+# backup(check_arguments())
