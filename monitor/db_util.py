@@ -4,6 +4,7 @@ import pymysql
 from entitys import BaseClass
 from DBUtils.PooledDB import PooledDB
 
+
 class DBUtil(object):
     __instance = None
     __connection_pools = {}
@@ -12,7 +13,7 @@ class DBUtil(object):
         pass
 
     def __new__(cls, *args, **kwargs):
-        if(DBUtil.__instance is None):
+        if (DBUtil.__instance is None):
             DBUtil.__instance = object.__new__(cls, *args, **kwargs)
         return DBUtil.__instance
 
@@ -51,15 +52,15 @@ class DBUtil(object):
         return cursor.fetchall()
 
     def cursor_execute(self, connection, cursor, sql):
-        if(cursor == None):
+        if (cursor == None):
             cursor = connection.cursor()
         cursor.execute(sql)
         return cursor
 
     def close(self, connection, cursor):
-        if(cursor != None):
+        if (cursor != None):
             cursor.close()
-        if(connection != None):
+        if (connection != None):
             connection.commit()
             connection.close()
 
@@ -74,13 +75,16 @@ class DBUtil(object):
         return connection, cursor
 
     def get_mysql_connection(self, host_info):
-        if(self.__connection_pools.get(host_info.key) == None):
-            pool = PooledDB(creator=pymysql, mincached=4, maxcached=8, maxconnections=10,
+        if (self.__connection_pools.get(host_info.key) == None):
+            pool = PooledDB(creator=pymysql, mincached=4, maxcached=8, maxconnections=10, blocking=True,
                             host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password,
                             use_unicode=False, charset="utf8", cursorclass=pymysql.cursors.DictCursor, reset=False, autocommit=True,
                             connect_timeout=2, read_timeout=2, write_timeout=2)
             self.__connection_pools[host_info.key] = pool
-        return self.__connection_pools[host_info.key].connection()
+        pool_tmp = self.__connection_pools[host_info.key]
+        if (pool_tmp._connections > 0):
+            print("{0} - conns: {1} || idle_cache: {2}".format(host_info.remark, pool_tmp._connections, len(pool_tmp._idle_cache)))
+        return pool_tmp.connection()
 
     def get_list_infos(self, host_info, sql):
         result = []
@@ -93,4 +97,3 @@ class DBUtil(object):
 
     def escape(self, string):
         return pymysql.escape_string(string)
-
