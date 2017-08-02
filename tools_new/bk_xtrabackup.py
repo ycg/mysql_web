@@ -2,6 +2,7 @@
 
 import os, argparse, sys, time, datetime, subprocess, traceback
 
+# xtrabackup备份脚本
 # python bk_xtrabackup.py --host=192.168.11.101 --user=yangcg --password=yangcaogui --mode=2 --backup-dir=/opt/my_backup
 # 备份周期是按照一个星期来的，星期天全量备份，其余增量备份
 # 参数详解：
@@ -13,7 +14,7 @@ import os, argparse, sys, time, datetime, subprocess, traceback
 # --mode：备份模式，1代表全量，2代表全量+增量
 # --backup-time：定时备份时间，默认值为14天，也就是只保存两周
 # --expire-days：备份文件过期时间
-# --stream:是否启用压缩，0代表不压缩，1代表使用xbstream的gzip压缩
+# --stream：是否启用压缩，0代表不压缩，1代表使用xbstream的gzip压缩
 
 # 调用方式
 # 可以放在crontab里面进行定时调用
@@ -25,6 +26,7 @@ import os, argparse, sys, time, datetime, subprocess, traceback
 
 # 注意：好像xtrabackup打印的输出信息是错误输出，使用2>>，重定向竟然能成功
 
+SUNDAY_INT = 6
 FULL_BACKUP = 1
 INCREMENT_BACKUP = 2
 WRITE_FILE_COVER = "w"
@@ -81,7 +83,7 @@ def backup(args):
         full_backup(args)
     else:
         day_of_week = datetime.datetime.now().weekday()
-        if (day_of_week == 6):
+        if (day_of_week == SUNDAY_INT):
             full_backup(args)
         else:
             increment_backup(args)
@@ -147,13 +149,15 @@ def remove_expire_backup_directory(args):
         if ((current_time - dir_or_file_time).days > args.expire_days):
             if (os.path.isdir(full_path)):
                 os.rmdir(full_path)
+                print("remove dir {0} ok.".format(full_path))
             elif (os.path.isfile(full_path)):
                 os.remove(full_path)
+                print("remove file {0} ok.".format(full_path))
 
 
 def check_backup_is_correct(xtrabackup_log_path):
     log_values = read_file_lines(xtrabackup_log_path)
-    if(len(log_values) > 0):
+    if (len(log_values) > 0):
         last_line = log_values[-1]
         if (last_line.find("completed OK") > 0):
             return 1
