@@ -34,10 +34,8 @@ class MonitorServer(threading.Thread):
             try:
                 if (self.__times % settings.UPDATE_INTERVAL == 0):
                     self.__cache.join_thread_pool(self.get_mysql_status)
-                if (self.__times % settings.UPDATE_INTERVAL == 0):
                     if (settings.LINUX_OS):
                         self.__cache.join_thread_pool(self.monitor_host_status)
-                        self.__cache.join_thread_pool(self.monitor_host_for_cpu_and_io)
                 if (self.__times % settings.TABLE_CHECK_INTERVAL == 0):
                     self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
             except Exception as e:
@@ -393,6 +391,8 @@ class MonitorServer(threading.Thread):
         self.monitor_host_for_memory(linux_info)
         # 监控mysql的cpu和memory以及data大小
         self.monitor_host_for_mysql_cpu_and_memory(host_info, linux_info)
+        # 监控主机的cpu和io
+        self.monitor_host_for_cpu_and_io(host_info)
 
     def monitor_host_for_cpu_and_io(self, host_info):
         linux_info = self.__cache.get_linux_info(host_info.key)
