@@ -1402,7 +1402,7 @@
                                 {{ status.error_message }}
                             </td>
                             <td class="text-center">
-                                <button class="btn btn-default btn-xs" onclick=start("/replication/{{ status.host_info.key }}","repl")>Detail</button>
+                                <button class="btn btn-primary btn-xs" onclick=start("/replication/{{ status.host_info.key }}","repl")>Detail</button>
                                 {% if(status.sql_status == "No") %}
                                     <button class="btn btn-danger btn-xs" onclick=skip_slave_error({{ status.host_info.key }})>Skip</button>
                                 {% else %}
