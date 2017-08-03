@@ -16,13 +16,13 @@ password=""
 host_list=("192.168.1.101" "192.168.1.102")
 
 start_timestamp=`date +%s -d "2017-08-04 00:49:00"`
-end_timestamp=`date +%s -d "2017-08-04 00:53:00"`
-echo ${start_timestamp}, ${end_timestamp}
+stop_timestamp=`date +%s -d "2017-08-04 00:53:00"`
+echo ${start_timestamp}, ${stop_timestamp}
 
 innodb_engine_status="show engine innodb status\G"
 show_processlist="SELECT * FROM information_schema.processlist where COMMAND != 'Sleep'\G"
 
-function collect_status()
+function collect_status_log()
 {
     for host in ${host_list[*]}
     do
@@ -38,11 +38,16 @@ function collect_status()
     done
 }
 
+if [ ${start_timestamp} -gt ${stop_timestamp} ]; then
+    echo "start time must less then stop time"
+    exit
+fi
+
 now_timestamp=`date +%s`
-while [ ${now_timestamp} -le ${end_timestamp} ]
+while [ ${now_timestamp} -le ${stop_timestamp} ]
 do
-    if [ ${now_timestamp} -ge ${start_timestamp} ] && [ ${now_timestamp} -le ${end_timestamp} ]; then
-        collect_status
+    if [ ${now_timestamp} -ge ${start_timestamp} ] && [ ${now_timestamp} -le ${stop_timestamp} ]; then
+        collect_status_log
         echo "collect ok"
     else
         echo "no collect"

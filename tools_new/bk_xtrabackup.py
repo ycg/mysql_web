@@ -51,18 +51,9 @@ def check_arguments():
         print("[error]:Please input host or user or password or port.")
         sys.exit(1)
 
-    '''if not args.backup_dir:
-        print("[error]:Please input backup directory.")
-        sys.exit(1)
-    else:
-        if (os.path.exists(args.backup_dir)):
-            print("[error]:Backup directory exists.")
-            sys.exit(1)
-        else:
-            os.mkdir(args.backup_dir)'''
-
     if not args.backup_dir:
         print("[error]:Please input backup directory.")
+        print(parser.print_usage())
         sys.exit(1)
 
     if (os.path.exists(args.backup_dir) == False):
@@ -70,6 +61,7 @@ def check_arguments():
 
     if (args.mode != FULL_BACKUP and args.mode != INCREMENT_BACKUP):
         print("[error]:Backup mode value is 1 or 2.")
+        print(parser.print_usage())
         sys.exit(1)
 
     args.backup_log_file_path = os.path.join(args.backup_dir, "backup.log")
