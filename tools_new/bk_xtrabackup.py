@@ -148,11 +148,13 @@ def remove_expire_backup_directory(args):
         dir_or_file_time = datetime.datetime.fromtimestamp(os.path.getmtime(full_path))
         if ((current_time - dir_or_file_time).days > args.expire_days):
             if (os.path.isdir(full_path)):
-                os.rmdir(full_path)
-                print("remove dir {0} ok.".format(full_path))
+                if (os.path.exists(full_path)):
+                    os.rmdir(full_path)
+                    print("remove dir {0} ok.".format(full_path))
             elif (os.path.isfile(full_path)):
-                os.remove(full_path)
-                print("remove file {0} ok.".format(full_path))
+                if (os.path.exists(full_path)):
+                    os.remove(full_path)
+                    print("remove file {0} ok.".format(full_path))
 
 
 def check_backup_is_correct(xtrabackup_log_path):
