@@ -6,10 +6,10 @@ from monitor.entitys import HoseInfo
 MySQL_Host = HoseInfo(host="192.168.11.101", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
 
 ONE_DAY = 24 * 60 * 60
-UPDATE_INTERVAL = 5
+UPDATE_INTERVAL = 8
 THREAD_POOL_SIZE = 50
-REPORT_INTERVAL = 24 * 60 * 60
-TABLE_CHECK_INTERVAL = 24 * 60 * 60
+REPORT_INTERVAL = ONE_DAY
+TABLE_CHECK_INTERVAL = ONE_DAY
 
 EMAIL_HOST = ""
 EMAIL_PORT = 25
