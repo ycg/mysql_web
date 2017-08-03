@@ -70,7 +70,7 @@ function check_slow_log()
 
     echo "================check slow log [$slow_log_file] ok===================="
     if [ -f "$slow_log_file" ]; then
-        rm -rf "$slow_log_file"
+        rm -f "$slow_log_file"
         echo "remove $slow_log_file ok."
     fi
     echo ""
