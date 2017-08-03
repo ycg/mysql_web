@@ -16,7 +16,7 @@ def get_object(row):
 
 # 执行本地命令
 def execute_localhost_command(command):
-    result = subprocess.Popen(command, shell=True)
+    result = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     result.wait()
     return result.stdin, result.stdout, result.stderr
 
