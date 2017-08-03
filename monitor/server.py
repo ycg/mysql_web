@@ -34,8 +34,6 @@ class MonitorServer(threading.Thread):
             try:
                 if (self.__times % settings.UPDATE_INTERVAL == 0):
                     self.__cache.join_thread_pool(self.get_mysql_status)
-                    if (settings.LINUX_OS):
-                        self.__cache.join_thread_pool(self.monitor_host_status)
                 if (self.__times % settings.TABLE_CHECK_INTERVAL == 0):
                     self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
             except Exception as e:
@@ -327,6 +325,8 @@ class MonitorServer(threading.Thread):
         host_info.receive_bytes = status_info.receive_bytes
 
         self.read_innodb_status(host_info)
+        if (settings.LINUX_OS):
+            self.monitor_host_status(host_info)
         if (settings.IS_INSERT_MONITOR_LOG):
             self.insert_status_log(host_info)
 

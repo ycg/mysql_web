@@ -76,15 +76,12 @@ class DBUtil(object):
 
     def get_mysql_connection(self, host_info):
         if (self.__connection_pools.get(host_info.key) == None):
-            pool = PooledDB(creator=pymysql, mincached=4, maxcached=8, maxconnections=10, blocking=True,
+            pool = PooledDB(creator=pymysql, mincached=4, maxcached=8, maxconnections=10,
                             host=host_info.host, port=host_info.port, user=host_info.user, passwd=host_info.password,
                             use_unicode=False, charset="utf8", cursorclass=pymysql.cursors.DictCursor, reset=False, autocommit=True,
                             connect_timeout=2, read_timeout=2, write_timeout=2)
             self.__connection_pools[host_info.key] = pool
-        pool_tmp = self.__connection_pools[host_info.key]
-        if (pool_tmp._connections > 0):
-            print("{0} - conns: {1} || idle_cache: {2}".format(host_info.remark, pool_tmp._connections, len(pool_tmp._idle_cache)))
-        return pool_tmp.connection()
+        return self.__connection_pools[host_info.key].connection()
 
     def get_list_infos(self, host_info, sql):
         result = []
