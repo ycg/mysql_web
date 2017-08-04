@@ -29,11 +29,11 @@ function collect_status_log()
         processlist_file="/tmp/${host}_processlist.txt"
         innodb_status_file="/tmp/${host}_innodb_status.txt"
         echo "-----------------------------------------`date "+%Y-%m-%d %H:%M:%S"`-------------------------------------------" >> ${processlist_file}
-        mysql -h${host} -u${user} -p${password} -e"$show_processlist" >> ${processlist_file}
+        mysql -h${host} -u${user} -p${password} --default-character-set=utf8 -e"$show_processlist" >> ${processlist_file}
         echo "" >> ${processlist_file}
 
         echo "-----------------------------------------`date "+%Y-%m-%d %H:%M:%S"`-------------------------------------------" >> ${innodb_status_file}
-        mysql -h${host} -u${user} -p${password} -e"$innodb_engine_status" >> ${innodb_status_file}
+        mysql -h${host} -u${user} -p${password} --default-character-set=utf8 -e"$innodb_engine_status" >> ${innodb_status_file}
         echo "" >> ${innodb_status_file}
     done
 }
@@ -48,12 +48,12 @@ while [ ${now_timestamp} -le ${stop_timestamp} ]
 do
     if [ ${now_timestamp} -ge ${start_timestamp} ] && [ ${now_timestamp} -le ${stop_timestamp} ]; then
         collect_status_log
-        echo "collect ok"
+        echo "[`date "+%Y-%m-%d %H:%M:%S"`] collect ok"
     else
-        echo "no collect"
+        echo "[`date "+%Y-%m-%d %H:%M:%S"`] no collect"
     fi
     sleep 1
     now_timestamp=`date +%s`
 done
 
-echo "collect mysql log stop"
+echo "[`date "+%Y-%m-%d %H:%M:%S"`] collect mysql log stop"
