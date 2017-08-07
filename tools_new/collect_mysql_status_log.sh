@@ -20,7 +20,7 @@ stop_timestamp=`date +%s -d "2017-08-04 00:53:00"`
 echo ${start_timestamp}, ${stop_timestamp}
 
 innodb_engine_status="show engine innodb status\G"
-show_processlist="SELECT * FROM information_schema.processlist where COMMAND != 'Sleep'\G"
+show_processlist="SELECT * FROM information_schema.processlist where COMMAND != 'Sleep' and LENGTH(info) > 0\G"
 
 function collect_status_log()
 {
