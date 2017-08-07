@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../mysql_audit/.idea/mysql_audit.iml" filepath="$PROJECT_DIR$/../mysql_audit/.idea/mysql_audit.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/mysql_web.iml" filepath="$PROJECT_DIR$/.idea/mysql_web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../py-util/.idea/py-util.iml" filepath="$PROJECT_DIR$/../py-util/.idea/py-util.iml" />
     </modules>
   </component>
 </project>

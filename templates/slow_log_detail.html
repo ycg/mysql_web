@@ -258,5 +258,49 @@
         {% endfor %}
         </tbody>
     </table>
+
+
+    {% if(table_infos != None) %}
+        {% for value in table_info %}
+            <div class="row">
+                <div class="col-md-2">
+                    <div id="myTab" class="list-group">
+                        <a href="javascript:void(0)">{% value.table_name_full %}</a>
+                    </div>
+                </div>
+                <div class="col-md-10">
+
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div></div>
+    </div>
+
+    {% for value in table_info %}
+        <div class="tab-pane fade" id="basics_config">
+        </div>
+    {% endfor %}
+
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active">
+            <a href="#basics_config" data-toggle="tab">表创建语句</a>
+        </li>
+        <li>
+            <a href="#email_config" data-toggle="tab">表索引</a>
+        </li>
+        <li>
+            <a href="#alarm_config" data-toggle="tab">表信息</a>
+        </li>
+    </ul>
+
+    <div class="tab-pane fade in active" id="basics_config">
+    </div>
+    <div class="tab-pane fade" id="email_config">
+    </div>
+    <div class="tab-pane fade" id="alarm_config">
+    </div>
 {% endif %}
 

@@ -39,7 +39,7 @@ mysql_cache.load_all_host_infos()
 monitor_server = server.MonitorServer()
 monitor_server.load()
 monitor_server.start()
-monitor_server.invoke_check_tablespace_method()
+#monitor_server.invoke_check_tablespace_method()
 
 
 # endregion
@@ -225,7 +225,8 @@ def new_get_slow_logs():
 @app.route("/newslowlog/detail/<int:checksum>/<int:host_id>")
 @login_required
 def new_get_slow_log_detail(checksum, host_id):
-    return render_template("slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, host_id))
+    return render_template("new_slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, host_id))
+    # return render_template("slow_log_detail.html", slow_low_info=new_slow_log.get_slow_log_detail(checksum, host_id))
 
 
 @app.route("/newslowlog/explain/<int:checksum>/<int:host_id>")

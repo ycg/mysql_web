@@ -42,6 +42,11 @@
 <div class="row">
     <div id="display_slow_log" class="col-md-12"></div>
 </div>
+</br>
+</br>
+<div class="row">
+    <div id="display_slow_log_detail" class="col-md-12"></div>
+</div>
 
 <iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>
 
@@ -186,8 +191,9 @@
         var host_id = $("#host_ids").val();
         var url = "/newslowlog/detail/" + checksum + "/" + host_id
         $.get(url, "", function (data) {
-            $("#slow_log_detail").html(data);
-            show_modal_dialog()
+            // $("#slow_log_detail").html(data);
+            // show_modal_dialog()
+            $("#display_slow_log_detail").html(data);
         })
     }
 

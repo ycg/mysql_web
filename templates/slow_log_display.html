@@ -105,7 +105,8 @@
                     {{ status.Lock_time_sum }}
                 </td>
                 <td class="text-center">
-                    <button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>详情</button>
+                    <!--<button class="btn btn-xs btn-primary" onclick=get_slow_log_detail("{{ status.checksum }}")>详情</button>-->
+                    <button class="btn btn-xs btn-primary" onclick=window.open("/newslowlog/detail/{{ status.checksum }}/{{ status.serverid_max }}")>详情</button>
                     {% if(status.is_reviewed == 0) %}
                         <button class="btn btn-xs btn-danger" onclick=show_review_dialog_modal("{{ status.checksum }}")>审核</button>
                     {% else %}

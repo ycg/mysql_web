@@ -6,7 +6,7 @@ from entitys import BaseClass
 
 # 把数据库返回数据转换为对象
 def get_object(row):
-    info = BaseClass()
+    info = BaseClass(None)
     for key, value in row.items():
         if (value == "None"):
             value = None
