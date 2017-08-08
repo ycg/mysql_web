@@ -184,6 +184,7 @@ def get_table_infos(host_id, db_name, sql):
     if (db_name == None):
         return None
     try:
+        number = 1
         table_infos = []
         table_names = QueryTableParser().parse(sql)
         host_info = cache.Cache().get_host_info(host_id)
@@ -196,11 +197,13 @@ def get_table_infos(host_id, db_name, sql):
             else:
                 db_name_tmp = db_name
                 table_name_tmp = name
-            entity.table_name_full = db_name_tmp + "." + table_name_tmp
+            entity.key = number
+            entity.table_name_full = (db_name_tmp + "." + table_name_tmp).lower()
             entity.index_infos = get_show_index(host_info, entity.table_name_full)
             entity.status_info = get_show_table_status(host_info, db_name_tmp, table_name_tmp)
             entity.create_table_info = get_show_create_table(host_info, entity.table_name_full)
             table_infos.append(entity)
+            number += 1
         return table_infos
     except:
         traceback.print_exc()

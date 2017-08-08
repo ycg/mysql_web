@@ -6,294 +6,490 @@
     <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
     <script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>
     <script src={{ url_for("static", filename="js/bootstrap.min.js") }} type="text/javascript"></script>
+
+    <style type="text/css">
+        pre {
+            border: 0px;
+            background: none;
+            font-size: 13px;
+            margin: 0 0 0px;
+            padding: 0px;
+            white-space: pre-wrap;
+        }
+
+        .my_titile {
+            background-color: #398439;
+            color: white;
+            font-size: medium;
+        }
+    </style>
 </head>
 <body>
 </br>
 </br>
-<div class="row">
-    {% if(slow_low_info != None) %}
-        <div class="col-md-12">
-            <table class="table table-hover table-bordered">
-                <tbody style="word-break:break-all">
-                <tr>
-                    <td style="width: 100px">
-                        <strong>DB</strong>
-                    </td>
-                    <td colspan="2" rowspan="1">
-                        {{ slow_low_info.db_max }}
-                    </td>
-                    <td>
-                        <strong>User</strong>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        {{ slow_low_info.user_max }}
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width: 100px">
-                        <strong>Checksum</strong>
-                    </td>
-                    <td colspan="2" rowspan="1">
-                        {{ slow_low_info.checksum }}
-                    </td>
-                    <td>
-                        <strong>Count</strong>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        {{ slow_low_info.count }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <strong>First Seen</strong>
-                    </td>
-                    <td colspan="2" rowspan="1">
-                        {{ slow_low_info.first_seen }}
-                    </td>
-                    <td>
-                        <strong>Last Seen</strong>
-                    </td>
-                    <td colspan="1" rowspan="1">
-                        {{ slow_low_info.last_seen }}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="2">
-                        <strong>Query Time</strong>
-                    </td>
-                    <td>
-                        <strong>Query_time_sum</strong>
-                    </td>
-                    <td>
-                        <strong>Query_time_max</strong>
-                    </td>
-                    <td>
-                        <strong>Query_time_min</strong>
-                    </td>
-                    <td>
-                        <strong>Query_time_pct_95</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        {{ slow_low_info.query_time_sum }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.query_time_max }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.query_time_min }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.query_time_pct_95 }}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="2">
-                        <strong>Lock Time</strong>
-                    </td>
-                    <td>
-                        <strong>Lock_time_sum</strong>
-                    </td>
-                    <td>
-                        <strong>Lock_time_max</strong>
-                    </td>
-                    <td>
-                        <strong>Lock_time_min</strong>
-                    </td>
-                    <td>
-                        <strong>Lock_time_pct_95</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        {{ slow_low_info.lock_time_sum }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.lock_time_max }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.lock_time_max }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.lock_time_pct_95 }}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="2">
-                        <strong>Rows Send</strong>
-                    </td>
-                    <td>
-                        <strong>Rows_sent_sum</strong>
-                    </td>
-                    <td>
-                        <strong>Rows_sent_max</strong>
-                    </td>
-                    <td>
-                        <strong>Rows_sent_min</strong>
-                    </td>
-                    <td>
-                        <strong>Rows_sent_pct_95</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        {{ slow_low_info.rows_sent_sum }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.rows_sent_max }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.rows_sent_min }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.rows_sent_pct_95 }}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1" rowspan="2">
-                        <strong>Rows Scan</strong>
-                    </td>
-                    <td>
-                        <strong>Rows_examined_sum</strong>
-                    </td>
-                    <td>
-                        <strong>Rows_examined_max</strong>
-                    </td>
-                    <td>
-                        <strong>Rows_examined_min</strong>
-                    </td>
-                    <td>
-                        <strong>Rows_examined_pct_95</strong>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        {{ slow_low_info.rows_examined_sum }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.rows_examined_max }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.rows_examined_min }}
-                    </td>
-                    <td>
-                        {{ slow_low_info.rows_examined_pct_95 }}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1">
-                        <strong>Format</strong>
-                    </td>
-                    <td colspan="4" rowspan="1">
-                        {{ slow_low_info.fingerprint }}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1">
-                        <strong>SQL</strong>
-                    </td>
-                    <td colspan="4" rowspan="1">
-                        <pre>{{ slow_low_info.sample }}</pre>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
-            <table class="table table-hover table-bordered">
-                <thead>
-                <tr>
-                    <td colspan="10" class="text-center">
-                        Explain分析结果
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        id
-                    </th>
-                    <th>
-                        select_type
-                    </th>
-                    <th>
-                        table
-                    </th>
-                    <th>
-                        type
-                    </th>
-                    <th>
-                        possible_keys
-                    </th>
-                    <th>
-                        key
-                    </th>
-                    <th>
-                        key_len
-                    </th>
-                    <th>
-                        ref
-                    </th>
-                    <th>
-                        rows
-                    </th>
-                    <th>
-                        Extra
-                    </th>
-                </tr>
-                </thead>
-                <tbody style="word-break:break-all">
-                {% for status in slow_low_info.explain_infos %}
-                    <tr>
-                        <td>
-                            {{ status.id }}
-                        </td>
-                        <td>
-                            {{ status.select_type }}
-                        </td>
-                        <td>
-                            {{ status.table }}
-                        </td>
-                        <td>
-                            {{ status.type }}
-                        </td>
-                        <td>
-                            {{ status.possible_keys }}
-                        </td>
-                        <td>
-                            {{ status.key }}
-                        </td>
-                        <td>
-                            {{ status.key_len }}
-                        </td>
-                        <td>
-                            {{ status.ref }}
-                        </td>
-                        <td>
-                            {{ status.rows }}
-                        </td>
-                        <td>
-                            {{ status.Extra }}
+<div class="container-fluid">
+    <div class="row">
+        {% if(slow_low_info != None) %}
+            <div class="col-md-12">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr class="my_titile text-center">
+                            <td colspan="5">SQL执行基本信息</td>
+                        </tr>
+                    </thead>
+                    <tbody style="word-break:break-all">
+                        <tr>
+                            <td style="width: 100px">
+                                <strong>DB</strong>
+                            </td>
+                            <td colspan="2" rowspan="1">
+                                {{ slow_low_info.db_max }}
+                            </td>
+                            <td>
+                                <strong>User</strong>
+                            </td>
+                            <td colspan="1" rowspan="1">
+                                {{ slow_low_info.user_max }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 100px">
+                                <strong>Checksum</strong>
+                            </td>
+                            <td colspan="2" rowspan="1">
+                                {{ slow_low_info.checksum }}
+                            </td>
+                            <td>
+                                <strong>Count</strong>
+                            </td>
+                            <td colspan="1" rowspan="1">
+                                {{ slow_low_info.count }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>First Seen</strong>
+                            </td>
+                            <td colspan="2" rowspan="1">
+                                {{ slow_low_info.first_seen }}
+                            </td>
+                            <td>
+                                <strong>Last Seen</strong>
+                            </td>
+                            <td colspan="1" rowspan="1">
+                                {{ slow_low_info.last_seen }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="1" rowspan="2">
+                                <strong>Query Time</strong>
+                            </td>
+                            <td>
+                                <strong>Query_time_sum</strong>
+                            </td>
+                            <td>
+                                <strong>Query_time_max</strong>
+                            </td>
+                            <td>
+                                <strong>Query_time_min</strong>
+                            </td>
+                            <td>
+                                <strong>Query_time_pct_95</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {{ slow_low_info.query_time_sum }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.query_time_max }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.query_time_min }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.query_time_pct_95 }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="1" rowspan="2">
+                                <strong>Lock Time</strong>
+                            </td>
+                            <td>
+                                <strong>Lock_time_sum</strong>
+                            </td>
+                            <td>
+                                <strong>Lock_time_max</strong>
+                            </td>
+                            <td>
+                                <strong>Lock_time_min</strong>
+                            </td>
+                            <td>
+                                <strong>Lock_time_pct_95</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {{ slow_low_info.lock_time_sum }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.lock_time_max }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.lock_time_max }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.lock_time_pct_95 }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="1" rowspan="2">
+                                <strong>Rows Send</strong>
+                            </td>
+                            <td>
+                                <strong>Rows_sent_sum</strong>
+                            </td>
+                            <td>
+                                <strong>Rows_sent_max</strong>
+                            </td>
+                            <td>
+                                <strong>Rows_sent_min</strong>
+                            </td>
+                            <td>
+                                <strong>Rows_sent_pct_95</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {{ slow_low_info.rows_sent_sum }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.rows_sent_max }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.rows_sent_min }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.rows_sent_pct_95 }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="1" rowspan="2">
+                                <strong>Rows Scan</strong>
+                            </td>
+                            <td>
+                                <strong>Rows_examined_sum</strong>
+                            </td>
+                            <td>
+                                <strong>Rows_examined_max</strong>
+                            </td>
+                            <td>
+                                <strong>Rows_examined_min</strong>
+                            </td>
+                            <td>
+                                <strong>Rows_examined_pct_95</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {{ slow_low_info.rows_examined_sum }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.rows_examined_max }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.rows_examined_min }}
+                            </td>
+                            <td>
+                                {{ slow_low_info.rows_examined_pct_95 }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="1">
+                                <strong>Format</strong>
+                            </td>
+                            <td colspan="4" rowspan="1">
+                                {{ slow_low_info.fingerprint }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="1">
+                                <strong>SQL</strong>
+                            </td>
+                            <td colspan="4" rowspan="1">
+                                <pre>{{ slow_low_info.sample }}</pre>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                </br>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr class="my_titile">
+                        <td colspan="10" class="text-center">
+                            Explain分析结果
                         </td>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    <tr>
+                        <th>
+                            id
+                        </th>
+                        <th>
+                            select_type
+                        </th>
+                        <th>
+                            table
+                        </th>
+                        <th>
+                            type
+                        </th>
+                        <th>
+                            possible_keys
+                        </th>
+                        <th>
+                            key
+                        </th>
+                        <th>
+                            key_len
+                        </th>
+                        <th>
+                            ref
+                        </th>
+                        <th>
+                            rows
+                        </th>
+                        <th>
+                            Extra
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody style="word-break:break-all">
+                    {% for status in slow_low_info.explain_infos %}
+                        <tr>
+                            <td>
+                                {{ status.id }}
+                            </td>
+                            <td>
+                                {{ status.select_type }}
+                            </td>
+                            <td>
+                                {{ status.table }}
+                            </td>
+                            <td>
+                                {{ status.type }}
+                            </td>
+                            <td>
+                                {{ status.possible_keys }}
+                            </td>
+                            <td>
+                                {{ status.key }}
+                            </td>
+                            <td>
+                                {{ status.key_len }}
+                            </td>
+                            <td>
+                                {{ status.ref }}
+                            </td>
+                            <td>
+                                {{ status.rows }}
+                            </td>
+                            <td>
+                                {{ status.Extra }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        {% if(slow_low_info.table_infos != None) %}
-            {% for value in slow_low_info.table_infos %}
-                <div class="row">
-                    <div class="col-md-2">
-                        <div id="myTab" class="list-group">
-                            <a href="javascript:void(0)">{{ value.table_name_full }}</a>
-                        </div>
-                    </div>
-                    <div class="col-md-10">
-
-                    </div>
+            <div class="col-md-12">
+                </br>
+                </br>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr class="my_titile">
+                            <td class="text-center">
+                                表结构信息
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <!--表名称信息-->
+            <div class="col-md-2">
+                <div id="myTab" class="list-group">
+                    <a href="javascript:void(0)" class="list-group-item">表名称</a>
+                    {% if(slow_low_info.table_infos != None) %}
+                        {% for value in slow_low_info.table_infos %}
+                            <a href="javascript:void(0)" class="list-group-item">{{ value.table_name_full }}</a>
+                        {% endfor %}
+                    {% endif %}
                 </div>
-            {% endfor %}
+            </div>
+            <!--表信息-->
+            <div class="col-md-10">
+                {% if(slow_low_info.table_infos != None) %}
+                    {% for value in slow_low_info.table_infos %}
+                        <ul id="tab_{{ value.key }}" class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#create_table_{{ value.key }}" data-toggle="tab">表创建语句</a>
+                            </li>
+                            <li>
+                                <a href="#index_{{ value.key }}" data-toggle="tab">表索引</a>
+                            </li>
+                            <li>
+                                <a href="#table_status_{{ value.key }}" data-toggle="tab">表信息</a>
+                            </li>
+                        </ul>
+
+                        <div id="tab_content_{{ value.key }}" class="tab-content">
+                            <div class="tab-pane fade in active" id="create_table_{{ value.key }}">
+                                </br>
+                                <pre>{{ value.create_table_info }}</pre>
+                            </div>
+                            <div class="tab-pane fade" id="index_{{ value.key }}">
+                                </br>
+                                <table class="table table-hover table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Name
+                                            </th>
+                                            <th>
+                                                Non_Unique
+                                            </th>
+                                            <th>
+                                                ID
+                                            </th>
+                                            <th>
+                                                Column_Name
+                                            </th>
+                                            <th>
+                                                Collation
+                                            </th>
+                                            <th>
+                                                Cardinality
+                                            </th>
+                                            <th>
+                                                Null
+                                            </th>
+                                            <th>
+                                                Type
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for status in value.index_infos %}
+                                        <tr>
+                                            <td>
+                                                {{ status.Key_name }}
+                                            </td>
+                                            <td>
+                                                {{ status.Non_unique }}
+                                            </td>
+                                            <td>
+                                                {{ status.Seq_in_index }}
+                                            </td>
+                                            <td>
+                                                {{ status.Column_name }}
+                                            </td>
+                                            <td>
+                                                {{ status.Collation }}
+                                            </td>
+                                            <td>
+                                                {{ status.Cardinality }}
+                                            </td>
+                                            <td>
+                                                {{ status.Null }}
+                                            </td>
+                                            <td>
+                                                {{ status.Index_type }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="table_status_{{ value.key }}">
+                                </br>
+                                <table class="table table-hover table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            Name
+                                        </th>
+                                        <th>
+                                            Engine
+                                        </th>
+                                        <th>
+                                            Rows
+                                        </th>
+                                        <th>
+                                            Avg_Row_Length
+                                        </th>
+                                        <th>
+                                            Data_Length
+                                        </th>
+                                        <th>
+                                            Index_Length
+                                        </th>
+                                        <th>
+                                            Date_Free
+                                        </th>
+                                        <th>
+                                            Auto_Inc
+                                        </th>
+                                        <th>
+                                            Created_Time
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                {{ value.status_info.Name }}
+                                            </td>
+                                            <td>
+                                                {{ value.status_info.Engine }}
+                                            </td>
+                                            <td>
+                                                {{ value.status_info.Rows }}
+                                            </td>
+                                            <td>
+                                                {{ value.status_info.Avg_row_length }}
+                                            </td>
+                                            <td>
+                                                {{ value.status_info.Data_length }}
+                                            </td>
+                                            <td>
+                                                {{ value.status_info.Index_length }}
+                                            </td>
+                                            <td>
+                                                {{ value.status_info.Data_free }}
+                                            </td>
+                                            <td>
+                                                {{ value.status_info.Auto_increment }}
+                                            </td>
+                                            <td>
+                                                {{ value.status_info.Create_time }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        </br>
+                    {% endfor %}
+                {% endif %}
+            </div>
         {% endif %}
-    {% endif %}
+    </div>
 </div>
+</br>
+</br>
+</br>
+</br>
+</br>
 </body>
 </html>
+
