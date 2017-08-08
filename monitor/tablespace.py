@@ -59,6 +59,8 @@ def check_table_has_primary_key(table_schema, table_name):
     return False
 
 def get_data_length(data_length):
+    if(data_length == 0):
+        return "0"
     if(data_length < B):
         return str(data_length) + "B"
     elif(data_length < KB):

@@ -3,7 +3,7 @@
 import json, re
 import sqlparse
 from entitys import BaseClass
-import db_util, settings, traceback, cache, common
+import db_util, settings, traceback, cache, common, tablespace
 
 order_by_options = {1: "last_seen", 2: "Query_time_sum", 3: "ts_cnt", 4: "Lock_time_sum"}
 
@@ -224,7 +224,12 @@ def get_show_create_table(host_info, table_name):
 
 def get_show_table_status(host_info, db_name, table_name):
     result = db_util.DBUtil().fetchone(host_info, "show table status from {0} like '{1}';".format(db_name, table_name))
-    return common.get_object(result)
+    entity = common.get_object(result)
+    entity.free_size = tablespace.get_data_length(entity.Data_free)
+    entity.date_size = tablespace.get_data_length(entity.Data_length)
+    entity.index_size = tablespace.get_data_length(entity.Index_length)
+    entity.avg_row_size = tablespace.get_data_length(entity.Avg_row_length)
+    return entity
 
 
 class QueryTableParser(object):
