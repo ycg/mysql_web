@@ -318,19 +318,19 @@
             </div>
             <!--表名称信息-->
             <div class="col-md-2">
-                <div id="myTab" class="list-group">
-                    <a href="javascript:void(0)" class="list-group-item">表名称</a>
+                <div id="table_tab" class="list-group">
+                    <a href="javascript:void(0)" id="0" class="list-group-item">表名称</a>
                     {% if(slow_low_info.table_infos != None) %}
                         {% for value in slow_low_info.table_infos %}
-                            <a href="javascript:void(0)" class="list-group-item">{{ value.table_name_full }}</a>
+                            <a href="javascript:void(0)" id="a_{{ value.key }}" onclick="show_div({{ value.key }})" class="list-group-item">{{ value.table_name_full }}</a>
                         {% endfor %}
                     {% endif %}
                 </div>
             </div>
             <!--表信息-->
-            <div class="col-md-10">
-                {% if(slow_low_info.table_infos != None) %}
-                    {% for value in slow_low_info.table_infos %}
+            {% if(slow_low_info.table_infos != None) %}
+                {% for value in slow_low_info.table_infos %}
+                    <div id="div_{{ value.key }}" class="col-md-10">
                         <ul id="tab_{{ value.key }}" class="nav nav-tabs">
                             <li class="active">
                                 <a href="#create_table_{{ value.key }}" data-toggle="tab">表创建语句</a>
@@ -479,10 +479,10 @@
                                 </table>
                             </div>
                         </div>
-                        </br>
-                    {% endfor %}
-                {% endif %}
-            </div>
+                    </div>
+                    </br>
+                {% endfor %}
+            {% endif %}
         {% endif %}
     </div>
 </div>
@@ -491,4 +491,26 @@
 </br>
 </body>
 </html>
+
+<script type="text/javascript">
+    function show_div(key) {
+        var number = 0;
+        var id_name_tmp = "a_" + key;
+        $("#table_tab").find("a").each(function () {
+            var id_name = $(this).attr("id");
+            var div_id_name = "#div_" + number;
+            if (id_name == id_name_tmp) {
+                $(div_id_name).show();
+                $(this).addClass("active");
+            }
+            else {
+                $(div_id_name).hide();
+                $(this).removeClass("active");
+            }
+            number += 1;
+        });
+    }
+
+    show_div("1")
+</script>
 
