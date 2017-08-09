@@ -161,7 +161,8 @@
                 {{ data.user }}
             </td>
             <td class="text-center">
-                <button class="btn btn-primary btn-xs" onclick=start("/mysql/{{ data.key }}","mysql")>Detail</button>
+                <button class="btn btn-info btn-xs" onclick=start("/mysql/{{ data.key }}","mysql")>Detail</button>
+                <button class="btn btn-primary btn-xs" onclick=window.open("/chart_new/new/{{ data.key }}")>Chart</button>
             </td>
         </tr>
     {% endfor %}

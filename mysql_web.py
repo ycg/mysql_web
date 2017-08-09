@@ -402,6 +402,11 @@ def get_chart_options(key):
     return chart.get_chart_option(key)
 
 
+@app.route("/chart_new/new/<int:host_id>", methods=["GET", "POST"])
+@login_required
+def open_new_chart_page(host_id):
+    return render_template("chart_mysql.html", host_info=cache.Cache().get_host_info(host_id))
+
 # endregion
 
 # region config

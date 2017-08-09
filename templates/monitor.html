@@ -890,7 +890,8 @@
                         {{ status.innodb_deadlocks }}
                     </td>
                     <td class="text-center">
-                        <a href="javascript:void(0)" onclick=start("/innodb/{{ status.host_info.key }}","") href="/innodb/{{ status.host_info.key }}">Innodb Status</a>
+                        <!--<a href="javascript:void(0)" onclick=start("/innodb/{{ status.host_info.key }}","") href="/innodb/{{ status.host_info.key }}">Innodb Status</a>-->
+                        <button class="btn btn-primary btn-xs" onclick=start("/innodb/{{ status.host_info.key }}","") href="/innodb/{{ status.host_info.key }}">Innodb Status</button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -1670,26 +1671,26 @@
     </div>
 
     {% if(data_engine_innodb.latest_deadlock != None) %}
-    <div class="col-md-12">
-        <table class="table table-hover table-bordered">
-            <thead>
-                <tr>
-                    <th class="text-center">
-                        Latest Deadlock
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        {% for line in data_engine_innodb.latest_deadlock %}
-                            {{ line }} </br>
-                        {% endfor %}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="col-md-12">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center">
+                            Latest Deadlock
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {% for line in data_engine_innodb.latest_deadlock %}
+                                {{ line }} </br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     {% endif %}
 </div>
 {% endif %}
