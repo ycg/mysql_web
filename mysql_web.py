@@ -56,9 +56,9 @@ def get_mysql_data():
 @login_required
 def get_mysql_data_by_id(id):
     return get_monitor_data(data_host=convert_object_to_list(mysql_cache.get_linux_info(id)),
-                            data_status=convert_object_to_list(mysql_cache.get_status_infos(id)),
+                            data_status=convert_object_to_list(mysql_cache.get_status_info(id)),
                             data_repl=convert_object_to_list(mysql_cache.get_repl_info(id)),
-                            data_innodb=convert_object_to_list(mysql_cache.get_innodb_infos(id)),
+                            data_innodb=convert_object_to_list(mysql_cache.get_innodb_info(id)),
                             data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(id))
 
 
@@ -92,7 +92,8 @@ def get_innodb_data():
 @app.route("/innodb/<int:id>")
 @login_required
 def get_innodb_data_by_id(id):
-    return get_monitor_data(data_innodb=convert_object_to_list(mysql_cache.get_innodb_infos(id)), data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(id))
+    return get_monitor_data(data_innodb=convert_object_to_list(mysql_cache.get_innodb_info(id)),
+                            data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(id))
 
 
 # endregion
@@ -185,13 +186,19 @@ def gzip_decompress(content):
 def convert_object_to_list(obj):
     list_tmp = None
     if (obj != None):
-        list_tmp = []
-        list_tmp.append(obj)
+        list_tmp = [obj]
     return list_tmp
 
 
 def get_monitor_data(data_status=None, data_innodb=None, data_repl=None, data_engine_innodb=None, data_host=None, slave_status=None, tablespace_status=None):
-    return render_template("monitor.html", data_engine_innodb=data_engine_innodb, data_status=data_status, data_innodb=data_innodb, data_repl=data_repl, data_host=data_host, slave_status=slave_status, tablespace_status=tablespace_status)
+    return render_template("monitor.html",
+                           data_engine_innodb=data_engine_innodb,
+                           data_status=data_status,
+                           data_innodb=data_innodb,
+                           data_repl=data_repl,
+                           data_host=data_host,
+                           slave_status=slave_status,
+                           tablespace_status=tablespace_status)
 
 
 # endregion
