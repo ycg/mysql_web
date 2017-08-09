@@ -90,7 +90,7 @@
     {% for data in mysql_infos %}
         <tr>
             <td>
-                {{ data.remark }}
+                <a href="javascript:void(0)" onclick=start("/mysql/{{ data.key }}","mysql")>{{ data.remark }}</a>
             </td>
             <td>
                 {{ data.host }}:{{ data.port }}
@@ -161,7 +161,7 @@
                 {{ data.user }}
             </td>
             <td class="text-center">
-                <a href="javascript:void(0)" onclick=start("/mysql/{{ data.key }}","mysql")>Details</a>
+                <button class="btn btn-primary btn-xs" onclick=start("/mysql/{{ data.key }}","mysql")>Detail</button>
             </td>
         </tr>
     {% endfor %}
