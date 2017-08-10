@@ -604,6 +604,7 @@ class MonitorServer(threading.Thread):
             self.get_innodb_lock_infos(host_info, innodb_status["SEMAPHORES"])
 
     def get_lsn_info(self, host_info, values):
+        innodb_info = self.__cache.get_innodb_info(host_info.key)
         info_tmp = self.__cache.get_engine_innodb_status_infos(host_info.key)
         num = 0
         for line in values:
@@ -617,10 +618,24 @@ class MonitorServer(threading.Thread):
                 info_tmp.page_flush_lsn = split_value
             elif (num == 4):
                 info_tmp.checkpoint_lsn = split_value
-            num = num + 1
+            num += 1
         info_tmp.log_flush_diff = int(info_tmp.log_lsn) - int(info_tmp.log_flush_lsn)
         info_tmp.page_flush_diff = int(info_tmp.log_lsn) - int(info_tmp.page_flush_lsn)
         info_tmp.checkpoint_diff = int(info_tmp.log_lsn) - int(info_tmp.checkpoint_lsn)
+        info_tmp.log_flush_diff_value = tablespace.get_data_length(info_tmp.log_flush_diff)
+        info_tmp.page_flush_diff_value = tablespace.get_data_length(info_tmp.page_flush_diff)
+        info_tmp.checkpoint_diff_value = tablespace.get_data_length(info_tmp.checkpoint_diff)
+
+        innodb_info.log_lsn = info_tmp.log_lsn
+        innodb_info.log_flush_lsn = info_tmp.log_flush_lsn
+        innodb_info.page_flush_lsn = info_tmp.page_flush_lsn
+        innodb_info.checkpoint_lsn = info_tmp.checkpoint_lsn
+        innodb_info.log_flush_diff = info_tmp.log_flush_diff
+        innodb_info.page_flush_diff = info_tmp.page_flush_diff
+        innodb_info.checkpoint_diff = info_tmp.checkpoint_diff
+        innodb_info.log_flush_diff_value = info_tmp.log_flush_diff_value
+        innodb_info.page_flush_diff_value = info_tmp.page_flush_diff_value
+        innodb_info.checkpoint_diff_value = info_tmp.checkpoint_diff_value
 
     def get_buffer_pool_infos(self, host_info, values):
         buffer_pool_key = ""

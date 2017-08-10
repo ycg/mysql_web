@@ -1123,9 +1123,9 @@
                     </th>
                 </tr>
             </thead>
-            <tbody class="text-center">
+            <tbody>
                 {% for status in data_innodb %}
-                <tr>
+                    <tr>
                     <td class="text-left">
                         {{ status.host_info.remark }}
                     </td>
@@ -1172,6 +1172,84 @@
                         {{ status.innodb_s_ratio }}
                     </td>
                 </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>
+
+                    </th>
+                    <th colspan="8" rowspan="1" class="text-center">
+                        LSN Value
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        Host
+                    </th>
+                    <th>
+                        Log_LSN
+                    </th>
+                    <th>
+                        Log_Flush_LSN
+                    </th>
+                    <th>
+                        Log_Flush_Diff
+                    </th>
+                    <th>
+                        Page_Flush_LSN
+                    </th>
+                    <th>
+                        Page_Flush_Diff
+                    </th>
+                    <th>
+                        Checkpoint_LSN
+                    </th>
+                    <th>
+                        Checkpoint_Diff
+                    </th>
+                    <th>
+                        Undo_Len
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in data_innodb %}
+                    <tr>
+                        <td>
+                            {{ status.host_info.remark }}
+                        </td>
+                        <td>
+                            {{ status.log_lsn }}
+                        </td>
+                        <td>
+                            {{ status.log_flush_lsn }}
+                        </td>
+                        <td>
+                            {{ status.log_flush_diff_value }}
+                        </td>
+                        <td >
+                            {{ status.page_flush_lsn }}
+                        </td>
+                        <td>
+                            {{ status.page_flush_diff_value }}
+                        </td>
+                        <td >
+                            {{ status.checkpoint_lsn }}
+                        </td>
+                        <td>
+                            {{ status.checkpoint_diff_value }}
+                        </td>
+                        <td>
+                            {{ status.history_list_length }}
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -1239,7 +1317,7 @@
             </thead>
             <tbody>
                 {% for status in data_innodb %}
-                <tr>
+                    <tr>
                     <td class="text-left">
                         {{ status.host_info.remark }}
                     </td>
