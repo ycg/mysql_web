@@ -272,14 +272,14 @@
 {% if(data_status != None) %}
 <div class="row">
     <!--QPS TPS-->
-    <div class="col-md-6">
+    <div class="col-md-7">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>
 
                     </th>
-                    <th colspan="7" class="text-center">
+                    <th colspan="9" class="text-center">
                         QPS TPS
                     </th>
                     <th colspan="2" class="text-center">
@@ -301,6 +301,12 @@
                     </th>
                     <th>
                         Delete
+                    </th>
+                    <th>
+                        Comm
+                    </th>
+                    <th>
+                        Roll
                     </th>
                     <th>
                         QPS
@@ -337,6 +343,12 @@
                     <td>
                         {{ status.delete_count }}
                     </td>
+                    <td>
+                        {{ status.commit }}
+                    </td>
+                    <td {% if(status.rollback > 0) %} class="text-danger" {% endif %}>
+                        {{ status.rollback }}
+                    </td>
                     <td {% if(status.qps > 10000) %} class="text-danger" {% endif %}>
                         {{ status.qps }}
                     </td>
@@ -358,7 +370,7 @@
         </table>
     </div>
     <!--Thread-->
-    <div class="col-md-6">
+    <div class="col-md-5">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
