@@ -74,7 +74,7 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
 
 
 def get_slow_log_detail(checksum, server_id):
-    sql = """select t1.checksum, ifnull(t2.ts_cnt, 1) as ts_cnt,  t1.first_seen, t1.last_seen, t1.fingerprint, t2.sample,
+    sql = """select t1.checksum, sum(ifnull(t2.ts_cnt, 1)) as ts_cnt,  t1.first_seen, t1.last_seen, t1.fingerprint, t2.sample,
              t2.serverid_max, t2.db_max, t2.user_max,
              t2.Query_time_min, t2.Query_time_max, t2.Query_time_sum, t2.Query_time_pct_95,
              Lock_time_sum,Lock_time_min,Lock_time_max,Lock_time_pct_95,

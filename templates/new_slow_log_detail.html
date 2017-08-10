@@ -62,7 +62,7 @@
                             <td>
                                 <strong>Count</strong>
                             </td>
-                            <td colspan="1" rowspan="1">
+                            <td colspan="1" rowspan="1" {% if(slow_low_info.count > 10) %} class="text-danger" {% endif %}>
                                 {{ slow_low_info.count }}
                             </td>
                         </tr>
