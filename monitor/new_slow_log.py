@@ -358,3 +358,4 @@ class QueryTableParser(object):
         end = pos
         self.pos = pos + 1
         return self.query[start:end]
+
