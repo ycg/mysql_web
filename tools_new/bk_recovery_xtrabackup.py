@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import argparse, sys, os, traceback, collections, subprocess
+import argparse, sys, os, traceback, subprocess
 
 # xtrabackup备份恢复脚本
 # 一个重要细节
@@ -11,8 +11,12 @@ import argparse, sys, os, traceback, collections, subprocess
 # {0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}
 # 备份模式:备份路径:备份日志路径:备份开始时间:备份结束时间:备份日期:备份是否正常:备份目录名称
 
-# 调用示例
+# 本地恢复调用：
 # python bk_recovery_xtrabackup.py --log-file=/backup_test/bk_dir/backup.log --recovery-dir=/backup_test/recovery_dir/
+
+# 远程恢复调用：
+# python bk_recovery_xtrabackup.py --ssh-host=192.168.11.101 --log-file=/backup_test/bk_dir/backup.log --recovery-dir=/backup_test/recovery_dir/
+
 
 BACKUP_OK = "1"
 FULL_BACKUP = "1"
@@ -33,12 +37,13 @@ def check_arguments():
     parser.add_argument("--recovery-dir", type=str, dest="recovery_dir", help="backup recovery dir")
     args = parser.parse_args()
 
-    if not args.log_file:
+    if not args.log_file or not args.recovery_dir:
         print("[error]:Please input log file path.")
         sys.exit(1)
     return args
 
 
+# 备份恢复总目录
 def backup_recover(args):
     log_lines = check_log_file_is_correct(args)
     backup_infos = get_backup_recover_dir_infos(args, log_lines)
@@ -46,7 +51,13 @@ def backup_recover(args):
     xtrbackup_recovery(backup_infos)
 
 
+# 监测备份日志数据是否正常
 def check_log_file_is_correct(args):
+    if (args.ssh_host != None):
+        log_file_save_path = "/tmp/"
+        execute_linux_command("scp root@{0}:{1} {2}".format(args.ssh_host, args.log_file, log_file_save_path))
+        args.log_file = log_file_save_path
+
     if (os.path.exists(args.log_file) == False):
         print("[error]:backup log file path is error.")
         sys.exit(1)
@@ -66,6 +77,7 @@ def check_log_file_is_correct(args):
     return log_lines
 
 
+# 根据备份日志获取备份目录地址
 def get_backup_recover_dir_infos(args, log_lines):
     backup_infos = []
     length = len(log_lines)
@@ -85,6 +97,7 @@ def get_backup_recover_dir_infos(args, log_lines):
     return backup_infos
 
 
+# 拷贝备份目录到指定的路径
 def copy_backup_dir_to_recovery_dir(args, backup_infos):
     for info in backup_infos:
         if (args.ssh_host != None):
@@ -103,6 +116,7 @@ def copy_backup_dir_to_recovery_dir(args, backup_infos):
             print("[info]:copy {0} to {1} ok.".format(info.backup_dir, args.recovery_dir))
 
 
+# 使用xtrabackup进行恢复
 def xtrbackup_recovery(backup_infos):
     if (len(backup_infos) > 0):
         if (len(backup_infos) == 1):
@@ -134,12 +148,14 @@ def xtrbackup_recovery(backup_infos):
         print("[error]:backup log infos is empty.")
 
 
+# 执行linux命令
 def execute_linux_command(command):
     result = subprocess.Popen(command, shell=True)
     result.wait()
     return result
 
 
+# 获取文件所有的行数据
 def read_file_lines(file_path):
     file = None
     try:
