@@ -69,6 +69,7 @@ def check_arguments():
     return args
 
 
+# 备份主方法
 def backup(args):
     print("start backup.")
     if (args.mode == FULL_BACKUP):
@@ -83,14 +84,17 @@ def backup(args):
     print("backup complete ok.")
 
 
+# 获取当前日期
 def get_backup_date():
     return time.strftime('%Y-%m-%d', time.localtime(time.time()))
 
 
+# 获取当前日期+时间
 def get_current_time():
     return time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime(time.time()))
 
 
+# 全量备份
 def full_backup(args):
     start_backup_time = get_current_time()
     backup_dir_name = "full_{0}".format(start_backup_time)
@@ -106,6 +110,7 @@ def full_backup(args):
     write_backup_log_file(args.backup_log_file_path, FULL_BACKUP, full_backup_dir, full_backup_log_path, start_backup_time, stop_backup_time, backup_dir_name)
 
 
+# 增量备份，首先会找上一个备份
 def increment_backup(args):
     last_line = read_backup_log_last_line(args.backup_log_file_path)
     if (last_line == None):
@@ -130,6 +135,7 @@ def increment_backup(args):
         full_backup(args)
 
 
+# 增量备份，获取上一个备份的日志数据
 def read_backup_log_last_line(file_path):
     lines = read_file_lines(file_path)
     if (lines != None and len(lines) > 0):
@@ -137,6 +143,7 @@ def read_backup_log_last_line(file_path):
     return None
 
 
+# 备份会检查过期备份目录，节省磁盘空间
 def remove_expire_backup_directory(args):
     current_time = datetime.datetime.now()
     for path in os.listdir(args.backup_dir):
@@ -153,6 +160,7 @@ def remove_expire_backup_directory(args):
                     print("remove file {0} ok.".format(full_path))
 
 
+# 根据xtrabackup的输出日志判断备份是否正常
 def check_backup_is_correct(xtrabackup_log_path):
     log_values = read_file_lines(xtrabackup_log_path)
     if (len(log_values) > 0):
@@ -162,6 +170,7 @@ def check_backup_is_correct(xtrabackup_log_path):
     return 0
 
 
+# 增量备份，获取上一个备份的LSN
 def get_xtrabackup_checkpoints(args):
     lines = read_file_lines(args.checkpoints_file_path)
     for value in lines:
@@ -170,6 +179,7 @@ def get_xtrabackup_checkpoints(args):
     return 0
 
 
+# 读取文件所有的数据行
 def read_file_lines(file_path):
     file = None
     try:
@@ -183,6 +193,7 @@ def read_file_lines(file_path):
             file.close()
 
 
+# 写入数据到备份日志文件中去
 def write_backup_log_file(file_path, backup_mode, backup_dir, backup_log_path, start_time, stop_time, backup_dir_name):
     file = None
     try:
