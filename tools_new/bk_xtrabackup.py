@@ -21,8 +21,8 @@ import os, argparse, sys, time, datetime, subprocess, traceback
 # 也可以直接运行此文件让它在后台运行
 
 # backup.log各个分割字段含义
-# {0}:{1}:{2}:{3}:{4}:{5}:{6}
-# 备份模式:备份路径:备份日志路径:备份开始时间:备份结束时间:备份日期:备份是否正常
+# {0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}
+# 备份模式:备份路径:备份日志路径:备份开始时间:备份结束时间:备份日期:备份是否正常:备份目录名称
 
 # 注意：好像xtrabackup打印的输出信息是错误输出，使用2>>，重定向竟然能成功
 
@@ -93,15 +93,17 @@ def get_current_time():
 
 def full_backup(args):
     start_backup_time = get_current_time()
-    full_backup_dir = os.path.join(args.backup_dir, "full_{0}".format(start_backup_time))
+    backup_dir_name = "full_{0}".format(start_backup_time)
+    full_backup_dir = os.path.join(args.backup_dir, backup_dir_name)
     if (os.path.exists(full_backup_dir) == False):
         os.mkdir(full_backup_dir)
     full_backup_log_path = os.path.join(args.backup_dir, "full_{0}.log".format(start_backup_time))
-    command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp {4} &> {5}".format(args.host, args.user, args.password, args.port, full_backup_dir, full_backup_log_path)
+    command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp {4} &> {5}"\
+              .format(args.host, args.user, args.password, args.port, full_backup_dir, full_backup_log_path)
     result = subprocess.Popen(command, shell=True)
     result.wait()
     stop_backup_time = get_current_time()
-    write_backup_log_file(args.backup_log_file_path, FULL_BACKUP, full_backup_dir, full_backup_log_path, start_backup_time, stop_backup_time)
+    write_backup_log_file(args.backup_log_file_path, FULL_BACKUP, full_backup_dir, full_backup_log_path, start_backup_time, stop_backup_time, backup_dir_name)
 
 
 def increment_backup(args):
@@ -113,15 +115,17 @@ def increment_backup(args):
     if (len(last_line_values) > 0 and len(last_line_values) < 10):
         last_backup_dir = last_line_values[1]
         start_backup_time = get_current_time()
-        increment_backup_dir = os.path.join(args.backup_dir, "increment_{0}".format(start_backup_time))
+        backup_dir_name = "increment_{0}".format(start_backup_time)
+        increment_backup_dir = os.path.join(args.backup_dir, backup_dir_name)
         if (os.path.exists(increment_backup_dir) == False):
             os.mkdir(increment_backup_dir)
         increment_backup_log_path = os.path.join(args.backup_dir, "increment_{0}.log".format(start_backup_time))
-        command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp --incremental --incremental-basedir={4} {5} &> {6}".format(args.host, args.user, args.password, args.port, last_backup_dir, increment_backup_dir, increment_backup_log_path)
+        command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp --incremental --incremental-basedir={4} {5} &> {6}"\
+                  .format(args.host, args.user, args.password, args.port, last_backup_dir, increment_backup_dir, increment_backup_log_path)
         result = subprocess.Popen(command, shell=True)
         result.wait()
         stop_backup_time = get_current_time()
-        write_backup_log_file(args.backup_log_file_path, INCREMENT_BACKUP, increment_backup_dir, increment_backup_log_path, start_backup_time, stop_backup_time)
+        write_backup_log_file(args.backup_log_file_path, INCREMENT_BACKUP, increment_backup_dir, increment_backup_log_path, start_backup_time, stop_backup_time, backup_dir_name)
     else:
         full_backup(args)
 
@@ -179,10 +183,17 @@ def read_file_lines(file_path):
             file.close()
 
 
-def write_backup_log_file(file_path, backup_mode, backup_dir, backup_log_path, start_time, stop_time):
+def write_backup_log_file(file_path, backup_mode, backup_dir, backup_log_path, start_time, stop_time, backup_dir_name):
     file = None
     try:
-        log_value = "{0}:{1}:{2}:{3}:{4}:{5}:{6}\n".format(backup_mode, backup_dir, backup_log_path, start_time, stop_time, get_backup_date(), check_backup_is_correct(backup_log_path))
+        log_value = "{0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}\n".format(backup_mode,
+                                                               backup_dir,
+                                                               backup_log_path,
+                                                               start_time,
+                                                               stop_time,
+                                                               get_backup_date(),
+                                                               check_backup_is_correct(backup_log_path),
+                                                               backup_dir_name)
         file = open(file_path, "a")
         file.write(log_value)
     finally:
