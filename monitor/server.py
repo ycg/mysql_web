@@ -154,6 +154,7 @@ class MonitorServer(threading.Thread):
         if (mysql_status_new.get("Innodb_history_list_length") != None):
             # percona
             innodb_info.history_list_length = int(mysql_status_new["Innodb_history_list_length"])
+            innodb_info.undo_size = tablespace.get_data_length(innodb_info.history_list_length * 16 * 1024)
         if (mysql_status_new.get("Innodb_current_row_locks") != None):
             # percona
             innodb_info.current_row_locks = mysql_status_new["Innodb_current_row_locks"]
@@ -175,7 +176,7 @@ class MonitorServer(threading.Thread):
         innodb_info.innodb_log_write_requests = int(mysql_status_new["Innodb_log_write_requests"]) - int(mysql_status_old["Innodb_log_write_requests"])
         innodb_info.innodb_os_log_pending_fsyncs = int(mysql_status_new["Innodb_os_log_pending_fsyncs"])
         innodb_info.innodb_os_log_pending_writes = int(mysql_status_new["Innodb_os_log_pending_writes"])
-        innodb_info.innodb_os_log_written = int(mysql_status_new["Innodb_os_log_written"]) - int(mysql_status_old["Innodb_os_log_written"])
+        innodb_info.innodb_os_log_written = tablespace.get_data_length(int(mysql_status_new["Innodb_os_log_written"]) - int(mysql_status_old["Innodb_os_log_written"]))
 
         # buffer pool page
         innodb_info.page_data_count = int(mysql_status_new["Innodb_buffer_pool_pages_data"])
@@ -202,10 +203,11 @@ class MonitorServer(threading.Thread):
         innodb_info.buffer_pool_read_requests = int(mysql_status_new["Innodb_buffer_pool_read_requests"]) - int(mysql_status_old["Innodb_buffer_pool_read_requests"])
 
         # innodb data
-        innodb_info.innodb_data_read = int(mysql_status_new["Innodb_data_read"]) - int(mysql_status_old["Innodb_data_read"])
+        # 物理读的字节数量
+        innodb_info.innodb_data_read = tablespace.get_data_length(int(mysql_status_new["Innodb_data_read"]) - int(mysql_status_old["Innodb_data_read"]))
         innodb_info.innodb_data_reads = int(mysql_status_new["Innodb_data_reads"]) - int(mysql_status_old["Innodb_data_reads"])
         innodb_info.innodb_data_writes = int(mysql_status_new["Innodb_data_writes"]) - int(mysql_status_old["Innodb_data_writes"])
-        innodb_info.innodb_data_written = int(mysql_status_new["Innodb_data_written"]) - int(mysql_status_old["Innodb_data_written"])
+        innodb_info.innodb_data_written = tablespace.get_data_length(int(mysql_status_new["Innodb_data_written"]) - int(mysql_status_old["Innodb_data_written"]))
         innodb_info.innodb_data_fsyncs = int(mysql_status_new["Innodb_data_fsyncs"]) - int(mysql_status_old["Innodb_data_fsyncs"])
         innodb_info.innodb_data_pending_fsyncs = int(mysql_status_new["Innodb_data_pending_fsyncs"])
         innodb_info.innodb_data_pending_reads = int(mysql_status_new["Innodb_data_pending_reads"])
@@ -704,6 +706,7 @@ class MonitorServer(threading.Thread):
                     innodb_info.history_list_length = int(split_value)
                 else:
                     info_tmp.undo_history_list_len = innodb_info.history_list_length
+                innodb_info.undo_size = tablespace.get_data_length(innodb_info.history_list_length * 16 * 1024)
             elif (line.find("Trx id counter") >= 0):
                 # 因为官方mysql版本没有Innodb_max_trx_id状态值
                 # 需要去show engine innodb status去进行计算

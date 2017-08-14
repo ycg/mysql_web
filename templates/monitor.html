@@ -975,10 +975,10 @@
                         Writes
                     </th>
                     <th>
-                        Read(KB)
+                        Read
                     </th>
                     <th>
-                        Written(KB)
+                        Written
                     </th>
                     <th>
                         Fsyncs
@@ -1197,7 +1197,7 @@
                     <th>
 
                     </th>
-                    <th colspan="8" rowspan="1" class="text-center">
+                    <th colspan="9" rowspan="1" class="text-center">
                         LSN Value
                     </th>
                 </tr>
@@ -1229,6 +1229,9 @@
                     <th>
                         Undo_Len
                     </th>
+                    <th>
+                        Undo_Size
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -1258,8 +1261,11 @@
                         <td>
                             {{ status.checkpoint_diff_value }}
                         </td>
-                        <td>
+                        <td {% if(status.history_list_length > 5000) %} class="text-danger" {% endif %}>
                             {{ status.history_list_length }}
+                        </td>
+                        <td>
+                            {{ status.undo_size }}
                         </td>
                     </tr>
                 {% endfor %}
