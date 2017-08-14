@@ -66,11 +66,12 @@ function check_slow_log()
     --user=${db_user} --password=${db_password} --port=${db_port} --charset=utf8 \
     --review h=${db_host},D=${db_database},t=mysql_slow_query_review  \
     --history h=${db_host},D=${db_database},t=mysql_slow_query_review_history  \
-    --no-report --limit=100% --filter=" \$event->{add_column} = length(\$event->{arg}) and \$event->{serverid}=$mysql_host_id and \$event->{user} !~ m/^serverdev/i" ${slow_log_file} > /tmp/slowquery.log
+    --no-report --limit=100% \
+    --filter=" \$event->{add_column} = length(\$event->{arg}) and \$event->{serverid}=$mysql_host_id and \$event->{user} !~ m/^serverdev/i" ${slow_log_file} > /tmp/slowquery.log
 
     echo "================check slow log [$slow_log_file] ok===================="
     if [ -f "$slow_log_file" ]; then
-        rm -rf "$slow_log_file"
+        rm -f "$slow_log_file"
         echo "remove $slow_log_file ok."
     fi
     echo ""
