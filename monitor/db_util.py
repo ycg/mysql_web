@@ -102,5 +102,3 @@ class DBUtil(object):
 
     def escape(self, string):
         return pymysql.escape_string(string)
-
-

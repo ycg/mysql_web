@@ -35,7 +35,7 @@
     </thead>
     <tbody>
         {% for status in processlist_infos %}
-        <tr>
+        <tr {% if(status.time > 1) %} class="bg-danger" {% endif %}>
             <td>
                 {{ status.id }}
             </td>
@@ -51,7 +51,7 @@
             <td>
                 {{ status.command }}
             </td>
-            <td >
+            <td>
                 {{ status.time }}
             </td>
             <td>

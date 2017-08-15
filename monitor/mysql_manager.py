@@ -9,7 +9,9 @@ def get_show_processlist(host_id):
 
 
 def get_show_processlist_infos(host_id):
-    return db_util.DBUtil().get_list_infos_to_lower(cache.Cache().get_host_info(host_id), "SELECT * FROM information_schema.processlist where COMMAND != 'Sleep';")
+    return db_util.DBUtil().get_list_infos_to_lower(cache.Cache().get_host_info(host_id),
+                                                    "SELECT * FROM information_schema.processlist where COMMAND != 'Sleep' and LENGTH(info) > 0;")
+
 
 # 获取从库复制信息
 def get_show_slave_status(host_id):
@@ -102,4 +104,3 @@ def skip_slave_error(host_id):
 def optimized_table_space(host_id, table_name):
     db_util.DBUtil().execute(cache.Cache().get_host_info(host_id), "alter table {0} engine=innodb;".format(table_name))
     return "optimized ok."
-

@@ -171,7 +171,7 @@ def search_table():
 
 # endregion
 
-# region common methon
+# region common method
 
 def gzip_compress(content):
     zbuf = StringIO.StringIO()
