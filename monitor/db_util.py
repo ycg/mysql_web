@@ -91,5 +91,16 @@ class DBUtil(object):
             result.append(info)
         return result
 
+    def get_list_infos_to_lower(self, host_info, sql):
+        result = []
+        for row in self.fetchall(host_info, sql):
+            info = BaseClass(None)
+            for key, value in row.items():
+                setattr(info, key.lower(), value)
+            result.append(info)
+        return result
+
     def escape(self, string):
         return pymysql.escape_string(string)
+
+

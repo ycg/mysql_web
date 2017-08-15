@@ -1,0 +1,67 @@
+{% if(processlist_infos != None) %}
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th class="text-center" colspan="8">
+                {{ host_name }}
+            </th>
+        </tr>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                User
+            </th>
+            <th>
+                Host
+            </th>
+            <th>
+                DB
+            </th>
+            <th>
+                Command
+            </th>
+            <th>
+                Time
+            </th>
+            <th>
+                State
+            </th>
+            <th>
+                Info
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for status in processlist_infos %}
+        <tr>
+            <td>
+                {{ status.id }}
+            </td>
+            <td>
+                {{ status.user }}
+            </td>
+            <td>
+                {{ status.host }}
+            </td>
+            <td >
+                {{ status.db }}
+            </td>
+            <td>
+                {{ status.command }}
+            </td>
+            <td >
+                {{ status.time }}
+            </td>
+            <td>
+                {{ status.state }}
+            </td>
+            <td>
+                {{ status.info }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}

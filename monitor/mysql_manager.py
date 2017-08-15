@@ -8,6 +8,9 @@ def get_show_processlist(host_id):
     return get_mysql_status_fetchall(host_id, "SELECT * FROM information_schema.processlist where COMMAND != 'Sleep';")
 
 
+def get_show_processlist_infos(host_id):
+    return db_util.DBUtil().get_list_infos_to_lower(cache.Cache().get_host_info(host_id), "SELECT * FROM information_schema.processlist where COMMAND != 'Sleep';")
+
 # 获取从库复制信息
 def get_show_slave_status(host_id):
     return get_mysql_status_fetchone(host_id, "show slave status;")

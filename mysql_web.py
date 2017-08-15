@@ -62,6 +62,12 @@ def get_mysql_data_by_id(id):
                             data_engine_innodb=mysql_cache.get_engine_innodb_status_infos(id))
 
 
+@app.route("/mysql/processlist/<int:host_id>", methods=['GET', 'POST'])
+@login_required
+def get_mysql_processlist(host_id):
+    return render_template("show_processlist.html", processlist_infos=mysql_manager.get_show_processlist_infos(host_id), host_name=cache.Cache().get_host_info(host_id).remark)
+
+
 # endregion
 
 # region mysql status api
