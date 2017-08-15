@@ -28,6 +28,7 @@ class BackupInfo():
         pass
 
 
+# 获取调用脚本参数
 def check_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--ssh-user", type=str, dest="ssh_user", help="ssh user", default="root")
