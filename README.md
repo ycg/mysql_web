@@ -46,6 +46,7 @@ insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yang
 6.基于mysqldump的创建从库脚本</br>
 
 # 界面展示:</br>
+![image](https://github.com/ycg/mysql_web/blob/master/static/img/125.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/111.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/112.png)
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/113.png)
