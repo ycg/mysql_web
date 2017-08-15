@@ -76,10 +76,10 @@ def get_slow_logs(server_id, start_datetime="", stop_datetime="", order_by_type=
 def get_slow_log_detail(checksum, server_id):
     sql = """select t1.checksum, sum(ifnull(t2.ts_cnt, 1)) as ts_cnt,  t1.first_seen, t1.last_seen, t1.fingerprint, t2.sample,
              t2.serverid_max, t2.db_max, t2.user_max,
-             t2.Query_time_min, t2.Query_time_max, t2.Query_time_sum, t2.Query_time_pct_95,
-             Lock_time_sum,Lock_time_min,Lock_time_max,Lock_time_pct_95,
-             Rows_sent_sum,Rows_sent_min,Rows_sent_max,Rows_sent_pct_95,
-             Rows_examined_sum,Rows_examined_min,Rows_examined_max,Rows_examined_pct_95
+             t2.Query_time_min, t2.Query_time_max, sum(t2.Query_time_sum) as Query_time_sum, t2.Query_time_pct_95,
+             sum(Lock_time_sum) as Lock_time_sum, Lock_time_min, Lock_time_max, Lock_time_pct_95,
+             sum(Rows_sent_sum) as Rows_sent_sum, Rows_sent_min, Rows_sent_max, Rows_sent_pct_95,
+             sum(Rows_examined_sum) as Rows_examined_sum, Rows_examined_min, Rows_examined_max, Rows_examined_pct_95
              from mysql_web.mysql_slow_query_review t1
              left join mysql_web.mysql_slow_query_review_history t2 on t1.checksum = t2.checksum and t2.serverid_max={0}
              where t1.checksum={1} limit 1;""".format(server_id, checksum)
