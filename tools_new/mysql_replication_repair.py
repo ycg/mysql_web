@@ -16,10 +16,10 @@ from pymysqlreplication.row_event import WriteRowsEvent, UpdateRowsEvent, Delete
 # --execute：此参数将会在slave上执行补全或删除数据，不加就打印数据
 
 # 检查复制状态示例
-# python mysql_replication_error_check.py --host=192.168.11.102 --user=yangcg --password=yangcaogui
+# python mysql_replication_repair.py --host=192.168.11.102 --user=yangcg --password=yangcaogui
 
 # 检查复制状态并进行修复
-# python mysql_replication_error_check.py --host=192.168.11.102 --user=yangcg --password=yangcaogui --execute
+# python mysql_replication_repair.py --host=192.168.11.102 --user=yangcg --password=yangcaogui --execute
 
 
 KEY_NOT_FOUND = 1032
