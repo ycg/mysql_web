@@ -4,11 +4,9 @@ import argparse, sys, pymysql, time
 from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.row_event import WriteRowsEvent, UpdateRowsEvent, DeleteRowsEvent
 
-
 # 复制错误检查
 # 1032 - MySQL error code 1032 (ER_KEY_NOT_FOUND): Can't find record in '%-.192s'
 # 1062 - MySQL error code 1062 (ER_DUP_ENTRY): Duplicate entry '%-.192s' for key %d
-
 
 # 参数详解
 # --host
