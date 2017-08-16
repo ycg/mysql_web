@@ -1,6 +1,7 @@
 #! /bin/sh
 
-yum install -y zip unzip openssl-devel python-devel libffi-devel wget gcc sysstat
+#yum install -y openssl-devel
+yum install -y zip unzip python-devel libffi-devel wget gcc sysstat
 
 function install_package()
 {
@@ -27,7 +28,7 @@ cd pip-9.0.1
 install_package
 
 #pip install package
-pip install flask flask-login gevent threadpool pymysql DBUtils six packaging appdirs pymysqlreplication sqlparse
+pip install flask flask-login gevent threadpool pymysql DBUtils six packaging appdirs mysql-replication sqlparse
 
 #new setuptools
 cd /tmp
