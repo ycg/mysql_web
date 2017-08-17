@@ -7,6 +7,13 @@ import argparse, sys, os, traceback, subprocess
 # 是在原有上进行备份恢复，还是把数据拷贝到一个目录中去再进行恢复
 # 可想而知还是不要在原有的基础上恢复，还是拷贝一下吧
 
+# 参数详解
+# --ssh-user：备份机器用户名，默认为root
+# --ssh-host：备份机器host
+# --ssh-password：密码
+# --log-file：备份日志文件路径
+# --recovery-dir：备份恢复目录
+
 # backup.log各个分割字段含义
 # {0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}
 # 备份模式:备份路径:备份日志路径:备份开始时间:备份结束时间:备份日期:备份是否正常:备份目录名称
@@ -16,7 +23,6 @@ import argparse, sys, os, traceback, subprocess
 
 # 远程恢复调用：
 # python bk_recovery_xtrabackup.py --ssh-host=192.168.11.101 --log-file=/backup_test/bk_dir/backup.log --recovery-dir=/backup_test/recovery_dir/
-
 
 BACKUP_OK = "1"
 FULL_BACKUP = "1"
