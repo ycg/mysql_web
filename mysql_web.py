@@ -65,7 +65,13 @@ def get_mysql_data_by_id(id):
 @app.route("/mysql/processlist/<int:host_id>", methods=['GET', 'POST'])
 @login_required
 def get_mysql_processlist(host_id):
-    return render_template("show_processlist.html", processlist_infos=mysql_manager.get_show_processlist_infos(host_id), host_name=cache.Cache().get_host_info(host_id).remark)
+    return render_template("show_processlist.html", processlist_infos=mysql_manager.get_show_processlist_infos(host_id), host_info=cache.Cache().get_host_info(host_id))
+
+
+@app.route("/mysql/kill/<int:host_id>/<int:thread_id>", methods=['GET', 'POST'])
+@login_required
+def kill_mysql_thread(host_id, thread_id):
+    return mysql_manager.kill_mysql_thread(host_id, thread_id)
 
 
 # endregion

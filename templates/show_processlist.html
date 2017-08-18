@@ -3,7 +3,7 @@
     <thead>
         <tr>
             <th class="text-center" colspan="9">
-                {{ host_name }}
+                {{ host_info.remark }}
             </th>
         </tr>
         <tr>
@@ -64,7 +64,7 @@
                 {{ status.info }}
             </td>
             <td>
-                <button class="btn btn-danger btn-xs">Kill Thread</button>
+                <button class="btn btn-danger btn-xs" onclick="kill_mysql_thread_id({{ host_info.host_id }}, {{ status.id }})">Kill Thread</button>
             </td>
         </tr>
         {% endfor %}

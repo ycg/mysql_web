@@ -104,3 +104,10 @@ def skip_slave_error(host_id):
 def optimized_table_space(host_id, table_name):
     db_util.DBUtil().execute(cache.Cache().get_host_info(host_id), "alter table {0} engine=innodb;".format(table_name))
     return "optimized ok."
+
+
+# kill掉mysql的线程
+def kill_mysql_thread(host_id, thread_id):
+    db_util.DBUtil().execute(cache.Cache().get_host_info(host_id), "kill {0};".format(thread_id))
+    return "kill thread {0} ok!".format(thread_id)
+
