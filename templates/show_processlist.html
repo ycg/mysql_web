@@ -2,7 +2,7 @@
 <table class="table table-hover table-bordered">
     <thead>
         <tr>
-            <th class="text-center" colspan="8">
+            <th class="text-center" colspan="9">
                 {{ host_name }}
             </th>
         </tr>
@@ -31,6 +31,9 @@
             <th>
                 Info
             </th>
+            <th style="width: 100px">
+                Opertion
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -45,7 +48,7 @@
             <td>
                 {{ status.host }}
             </td>
-            <td >
+            <td>
                 {{ status.db }}
             </td>
             <td>
@@ -59,6 +62,9 @@
             </td>
             <td>
                 {{ status.info }}
+            </td>
+            <td>
+                <button class="btn btn-danger btn-xs">Kill Thread</button>
             </td>
         </tr>
         {% endfor %}
