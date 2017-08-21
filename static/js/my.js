@@ -215,7 +215,7 @@ function skip_slave_error(host_id) {
 }
 
 function kill_mysql_thread_id(host_id, thread_id) {
-    if (confirm("确认kill掉?") == true) {
+    if (window.confirm("确认kill掉?")) {
         $.post("/mysql/kill/" + host_id + "/" + thread_id, "", function (data) {
             alert(data);
             myrefresh();
