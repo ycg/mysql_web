@@ -40,6 +40,6 @@ def decrypt(key, value):
 
 if (__name__ == "__main__"):
     key = 20
-    s1 = encrypt(key, "yangcaogui123!.+")
+    s1 = encrypt(key, "yangcg")
     s2 = decrypt(key, s1)
     print s1, '\n', s2

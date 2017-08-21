@@ -41,7 +41,7 @@ class Cache(object):
                 self.__host_infos[host_info_temp.host_id] = host_info_temp
             host_info_temp.host = row["host"]
             host_info_temp.port = row["port"]
-            host_info_temp.user = row["user"]
+            host_info_temp.user = custom_algorithm.decrypt(settings.MY_KEY, row["user"])
             host_info_temp.password = custom_algorithm.decrypt(settings.MY_KEY, row["password"])
             host_info_temp.remark = row["remark"]
             host_info_temp.master_host_id = 0
