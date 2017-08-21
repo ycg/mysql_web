@@ -12,12 +12,12 @@
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/host.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/list.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/user.html" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/../mysql_audit/test.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/backup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/mydumper.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/mysqldump.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/xtrabackup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/install.sh" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/monitor/custom_algorithm.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/db_util.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/mysql_enum.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/mysql_manager.py" charset="UTF-8" />
