@@ -48,6 +48,7 @@ class Cache(object):
             host_info_temp.is_master = bool(row["is_master"])
             host_info_temp.is_slave = bool(row["is_slave"])
             host_info_temp.master_id = row["master_id"]
+            host_info_temp.ssh_user = row["ssh_user"]
             host_info_temp.ssh_port = row["ssh_port"]
             if (len(row["ssh_password"]) <= 0):
                 host_info_temp.ssh_password = None

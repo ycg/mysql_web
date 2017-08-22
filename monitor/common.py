@@ -27,7 +27,7 @@ def execute_remote_command(host_info, command):
     try:
         host_client = paramiko.SSHClient()
         host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
+        host_client.connect(host_info.host, port=host_info.ssh_port, username=host_info.ssh_user, password=host_info.ssh_password)
         stdin, stdout, stderr = host_client.exec_command(command)
         return stdin, stdout, stderr
     finally:

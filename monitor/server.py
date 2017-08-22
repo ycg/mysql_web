@@ -586,7 +586,7 @@ class MonitorServer(threading.Thread):
     def create_remote_ssh_client(self, host_info):
         host_client = paramiko.SSHClient()
         host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        host_client.connect(host_info.host, port=host_info.ssh_port, username="root", password=host_info.ssh_password)
+        host_client.connect(host_info.host, port=host_info.ssh_port, username=host_info.ssh_user, password=host_info.ssh_password)
         host_client.get_transport().set_keepalive(1)
         return host_client
 
