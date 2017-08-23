@@ -615,6 +615,9 @@
                     <th colspan="8" class="text-center">
                         Tmp Table Binlog Table Lock
                     </th>
+                    <th colspan="2" class="text-center">
+                        Query Cache
+                    </th>
                 </tr>
                 <tr>
                     <th>
@@ -640,6 +643,12 @@
                     </th>
                     <th title="table locks waited">
                         T_L_W
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        Size
                     </th>
                 </tr>
             </thead>
@@ -669,6 +678,12 @@
                     </td>
                     <td {% if(status.table_locks_waited > 0) %} class="text-danger" {% endif %}>
                         {{ status.table_locks_waited }}
+                    </td>
+                    <td {% if(status.query_cache_type == 'ON') %} class="text-danger" {% endif %}>
+                        {{ status.query_cache_type }}
+                    </td>
+                    <td {% if(status.query_cache_size > 0) %} class="text-danger" {% endif %}>
+                        {{ status.query_cache_size }}
                     </td>
                 </tr>
                 {% endfor %}

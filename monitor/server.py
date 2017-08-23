@@ -144,6 +144,10 @@ class MonitorServer(threading.Thread):
         status_info.sort_range = int(mysql_status_new["Sort_range"]) - int(mysql_status_old["Sort_range"])
         status_info.sort_scan = int(mysql_status_new["Sort_scan"]) - int(mysql_status_old["Sort_scan"])
 
+        # query cache
+        status_info.query_cache_type = mysql_variables["query_cache_type"]
+        status_info.query_cache_size = int(mysql_variables["query_cache_size"])
+
         # 2.---------------------------------------------------------获取innodb的相关数据-------------------------------------------------------------------
         innodb_info = self.__cache.get_innodb_info(host_info.key)
         innodb_info.commit = status_info.commit
@@ -1035,7 +1039,9 @@ show global variables where variable_name in
 'innodb_buffer_pool_size',
 'read_only',
 'innodb_spin_wait_delay',
-'innodb_sync_spin_loops'
+'innodb_sync_spin_loops',
+'query_cache_type',
+'query_cache_size'
 );
 """
 
