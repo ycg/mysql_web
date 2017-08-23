@@ -576,7 +576,7 @@
                     <td>
                         {{ status.table_open_cache }}
                     </td>
-                    <td>
+                    <td {% if(status.table_open_cache_instances >= 1 and status.table_open_cache <= 1000) %} class="text-danger" {% endif %}>
                         {{ status.table_open_cache_instances }}
                     </td>
                     <td {% if(status.open_tables >= status.table_open_cache) %} class="text-danger" {% endif %}>
