@@ -571,7 +571,7 @@ class MonitorServer(threading.Thread):
                 linux_info.mysql_memory = float(values[9])
                 break
 
-        # 监测MySQL数据目录大小
+        # mysql数据目录总大小
         result = self.get_remote_command_result(host_info, "du -h %s | tail -n1 | awk '{print $1'}" % host_info.mysql_data_dir)
         linux_info.mysql_data_size = result[0].replace("\n", "").replace("G", "")
 
