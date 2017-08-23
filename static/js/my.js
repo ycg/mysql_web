@@ -228,3 +228,11 @@ function post_request(url, json_data) {
         alert(data)
     });
 }
+
+function logout() {
+    if (window.confirm("是否确认退出?")) {
+        $.post("/logout", "", function (data) {
+            alert("logout ok!")
+        });
+    }
+}
