@@ -30,7 +30,7 @@ class Cache(object):
     def load_all_host_infos(self):
         if (self.__thread_pool == None):
             self.__thread_pool = threadpool.ThreadPool(settings.THREAD_POOL_SIZE)
-        sql = "select host_id, host, port, user, password, remark, is_master, is_slave, master_id, is_deleted, ssh_port, ssh_password from mysql_web.host_infos;"
+        sql = "select * from mysql_web.host_infos;"
         for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
             host_id = row["host_id"]
             if (self.__host_infos.has_key(host_id) == True):
