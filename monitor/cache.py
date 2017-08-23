@@ -3,7 +3,7 @@
 import os, threadpool
 from mysql_enum import MySQLBranch
 from entitys import BaseClass, HoseInfo
-import collections, db_util, settings, tablespace, custom_algorithm
+import collections, db_util, settings, tablespace, custom_algorithm, common
 
 class Cache(object):
     __number = False
@@ -32,30 +32,18 @@ class Cache(object):
             self.__thread_pool = threadpool.ThreadPool(settings.THREAD_POOL_SIZE)
         sql = "select * from mysql_web.host_infos;"
         for row in db_util.DBUtil().fetchall(settings.MySQL_Host, sql):
-            host_id = row["host_id"]
-            if (self.__host_infos.has_key(host_id) == True):
-                host_info_temp = self.__host_infos[host_id]
-            else:
-                host_info_temp = HoseInfo()
-                host_info_temp.host_id = host_id
-                self.__host_infos[host_info_temp.host_id] = host_info_temp
-            host_info_temp.host = row["host"]
-            host_info_temp.port = row["port"]
-            host_info_temp.user = custom_algorithm.decrypt(settings.MY_KEY, row["user"])
-            host_info_temp.password = custom_algorithm.decrypt(settings.MY_KEY, row["password"])
-            host_info_temp.remark = row["remark"]
+            host_info_temp = common.get_object(row)
             host_info_temp.master_host_id = 0
-            host_info_temp.is_master = bool(row["is_master"])
-            host_info_temp.is_slave = bool(row["is_slave"])
-            host_info_temp.master_id = row["master_id"]
-            host_info_temp.ssh_user = row["ssh_user"]
-            host_info_temp.ssh_port = row["ssh_port"]
-            if (len(row["ssh_password"]) <= 0):
-                host_info_temp.ssh_password = None
-            else:
-                host_info_temp.ssh_password = custom_algorithm.decrypt(settings.MY_KEY, row["ssh_password"])
             host_info_temp.key = host_info_temp.host_id
-            if (row["is_deleted"] == 1):
+            host_info_temp.is_slave = bool(host_info_temp.is_slave)
+            host_info_temp.is_master = bool(host_info_temp.is_master)
+            host_info_temp.user = custom_algorithm.decrypt(settings.MY_KEY, host_info_temp.user)
+            host_info_temp.password = custom_algorithm.decrypt(settings.MY_KEY, host_info_temp.password)
+            host_info_temp.ssh_password = custom_algorithm.decrypt(settings.MY_KEY, host_info_temp.ssh_password) if (len(host_info_temp.ssh_password) > 0) else None
+
+            host_id = host_info_temp.host_id
+            self.__host_infos[host_info_temp.host_id] = host_info_temp
+            if (host_info_temp.is_deleted == 1):
                 self.remove_key(self.__tablespace, host_id)
                 self.remove_key(self.__host_infos, host_id)
                 self.remove_key(self.__repl_infos, host_id)
