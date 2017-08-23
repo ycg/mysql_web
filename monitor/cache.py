@@ -2,7 +2,7 @@
 
 import os, threadpool
 from mysql_enum import MySQLBranch
-from entitys import BaseClass, HoseInfo
+from entitys import BaseClass
 import collections, db_util, settings, tablespace, custom_algorithm, common
 
 class Cache(object):
