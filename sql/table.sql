@@ -15,6 +15,7 @@ create table host_infos
     is_master tinyint not null default 0 comment '是否是主库',
     is_slave tinyint not null default 0 comment '是否是从库',
     master_id mediumint unsigned not null default 0 comment '如果是从库-关联他主库的id',
+    ssh_user VARCHAR(20) NOT NULL DEFAULT 'root' COMMENT 'ssh远程执行命令的用户，默认是root',
     ssh_port SMALLINT UNSIGNED NOT NULL DEFAULT 22 COMMENT '用于ssh远程执行的端口',
     ssh_password VARCHAR(100) NOT NULL DEFAULT '' COMMENT '如果不能免密码登录，需要配置密码',
     is_deleted tinyint not null default 0 comment '删除的将不再监控',
@@ -392,4 +393,42 @@ CREATE TABLE backup_log
   created_time TIMESTAMP NOT NULL DEFAULT now() COMMENT '数据插入时间'
 ) ENGINE=innodb CHARSET=utf8 COMMENT='备份日志表';
 
-INSERT  INTO  backup_log (id, task_id, file, size, start_datetime, stop_datetime, status, result, created_time)
+INSERT  INTO  backup_log (id, task_id, file, size, start_datetime, stop_datetime, status, result, created_time);
+
+
+CREATE TABLE table_size_log
+(
+  id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  host_id MEDIUMINT UNSIGNED NOT NULL COMMENT '主机id',
+  db_name VARCHAR(50) NOT NULL DEFAULT '' COMMENT '数据库名称',
+  table_name VARCHAR(50) NOT NULL DEFAULT '' COMMENT '表名称',
+  data_size BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '数据大小',
+  index_size BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '索引大小',
+  total_size BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '总大小=数据+索引',
+  rows INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '行数',
+  auto_increment BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '自增长ID',
+  file_size BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '文件大小-ibd文件',
+  free_size BIGINT NOT NULL DEFAULT 0 COMMENT '数据碎片大小',
+  increase_size INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '相比于昨天数据增长的大小=total_szie-total_size(昨天的)',
+  `date` DATE NOT NULL COMMENT '数据生成日期',
+  created_time TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '行更新时间',
+  UNIQUE KEY host_id_date(`host_id`, `date`)
+) ENGINE=innodb CHARSET=utf8 COMMENT='表大小日志表';
+
+CREATE TABLE host_all_table_size_log
+(
+  id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  host_id MEDIUMINT UNSIGNED NOT NULL COMMENT '主机id',
+  data_size BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '总数据大小',
+  index_size BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '总索引大小',
+  total_size BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '总大小=总数据+总索引',
+  rows BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '总行数',
+  file_size BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '总文件大小-ibd文件',
+  free_size BIGINT NOT NULL DEFAULT 0 COMMENT '总数据碎片大小',
+  increase_size BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '相比于昨天数据增长的大小=total_szie-total_size(昨天的)',
+  `date` DATE NOT NULL COMMENT '数据生成日期',
+  created_time TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '行更新时间',
+  UNIQUE KEY host_id_date(`host_id`, `date`)
+) ENGINE=innodb CHARSET=utf8 COMMENT='mysql实例表数据总大小';

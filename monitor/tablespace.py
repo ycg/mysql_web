@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import paramiko, time
-import db_util, settings, cache
+import time
+import db_util, settings, cache, common
 
 B = 1024
 KB = B * 1024
@@ -31,7 +31,7 @@ def get_table_infos(host_info):
     for db_name in db_names:
         sql = "select table_schema, table_name, DATA_LENGTH, INDEX_LENGTH, TABLE_ROWS, AUTO_INCREMENT, create_time, engine, update_time " \
               "from information_schema.tables " \
-              "where  table_schema = '{0}' and " \
+              "where table_schema = '{0}' and " \
               "table_schema != 'mysql' and table_schema != 'information_schema' and table_schema != 'performance_schema' and table_schema != 'sys'".format(db_name["Database"])
         for row in db_util.DBUtil().fetchall(host_info, sql):
             table_info = TableInfo()
@@ -76,12 +76,9 @@ def get_tablespace_infos(host_info):
     print(host_info.remark, "start check tablespace")
     result_lst = []
     table_infos = get_table_infos(host_info)
-    host_client = paramiko.SSHClient()
-    host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    host_client.connect(host_info.host, port=host_info.ssh_port, username="root")
 
     shell = "du -ab {0} | grep ibd".format(host_info.mysql_data_dir)
-    stdin, stdout, stderr = host_client.exec_command(shell)
+    stdin, stdout, stderr = common.execute_remote_command(host_info, shell)
     result = stdout.readlines()
     if(len(result) > 0):
         for line in result:
@@ -99,7 +96,6 @@ def get_tablespace_infos(host_info):
                 result_lst.append(table_info)
                 convert_bytes(table_info)
 
-    host_client.close()
     sum_tablespace_info(host_info, result_lst)
     insert_tablespace_data(host_info, result_lst)
     insert_host_tablespace_data(cache.Cache().get_tablespace_info(host_info.host_id))
@@ -245,3 +241,34 @@ def analysis_table_data(host_info):
     sql = "insert into mysql_web.mysql_data_size_for_day (host_id, data_size_incr)" \
           "select sum(data_size), sum(index_size), sum(rows), sum(auto_increment), sum(file_size), sum(diff) from mysql_web.mysql_data_size_log" \
           "where host_id={0} group by `date`;".format(host_info.key)'''
+
+
+# 使用pt工具进行冗余索引检测
+def pt_duplicate_key_checker(host_id):
+    host_info = cache.Cache().get_host_info(host_id)
+    print("[{0}]start check index".format(host_info.remark))
+    command = "pt-duplicate-key-checker -u{0} -p'{1}' -P{2} -h{3} --charset=utf8 > /tmp/{4}.txt".format(host_info.user, host_info.password, host_info.port, host_info.host, host_info.remark)
+    print(command)
+    common.execute_localhost_command(command)
+    print("[{0}]check index ok.".format(host_info.remark))
+    return "check index ok."
+
+
+# region 新的表数据插入
+
+def insert_table_size_log(host_info, table_info):
+    increase_size = 0
+    sql = "select total_size from mysql_web.table_size_log where host_id = {0} and `date` = date(date_sub(now(), interval 1 day))".format(host_info.host_id)
+    result = db_util.DBUtil().fetchone(settings.MySQL_Host, sql)
+    if (result != None):
+        increase_size = table_info.total_size - result["total_size"]
+    sql = """insert into mysql_web.mysql_data_size_log
+             (host_id, `db_name`, table_name, data_size, index_size, total_size, rows, auto_increment, file_size, free_size, increase_size, `date`)
+             values
+             ({0}, '{1}', '{2}', {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, date(now()))"""\
+             .format(host_info.host_id, table_info.schema, table_info.t_name,
+                     table_info.data_size_o, table_info.index_size_o, table_info.total_size_o, table_info.rows_o, table_info.auto_increment, table_info.file_size_o, table_info.free_size, increase_size)
+    db_util.DBUtil().execute(settings.MySQL_Host, sql)
+
+# endregion
+

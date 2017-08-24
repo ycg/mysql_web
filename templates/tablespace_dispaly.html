@@ -159,7 +159,8 @@
                     {{ status.last_update_time }}
                 </td>
                 <td class="text-center">
-                    <button class="btn btn-primary btn-xs" onclick="get_tables_by_host_id({{ status.host_info.host_id }})">查看</button>
+                    <button class="btn btn-info btn-xs" onclick="get_tables_by_host_id({{ status.host_info.host_id }})">表空间</button>
+                    <button class="btn btn-primary btn-xs" onclick="pt_duplicate_key_checker({{ status.host_info.host_id }})">冗余索引</button>
                 </td>
             </tr>
         {% endfor %}

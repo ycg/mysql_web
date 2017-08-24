@@ -175,6 +175,11 @@ def search_table():
     return get_table_html(table_list=tablespace.search_table(int(request.form["host_id"]), request.form["table_name"]))
 
 
+@app.route("/index/duplicate/<int:host_id>", methods=["POST"])
+@login_required
+def pt_duplicate_key_checker(host_id):
+    return tablespace.pt_duplicate_key_checker(host_id)
+
 # endregion
 
 # region common method
