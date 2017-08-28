@@ -9,11 +9,12 @@
 # password 数据库密码
 # 注意点：尽量数据库用同一个账号
 # 日志保存在/tmp目录下
-
+# 注意：如果默认不是3306端口，需要给host_post指定端口
 
 user=""
 password=""
 host_list=("192.168.1.101" "192.168.1.102")
+host_post=("3306" "3306")
 
 start_timestamp=`date +%s -d "2017-08-04 00:49:00"`
 stop_timestamp=`date +%s -d "2017-08-04 00:53:00"`
@@ -21,20 +22,31 @@ echo ${start_timestamp}, ${stop_timestamp}
 
 innodb_engine_status="show engine innodb status\G"
 show_processlist="SELECT * FROM information_schema.processlist where COMMAND != 'Sleep' and LENGTH(info) > 0\G"
+innodb_lock="SELECT * FROM information_schema.INNODB_TRX\G SELECT * FROM information_schema.INNODB_LOCKS\G SELECT * FROM information_schema.INNODB_LOCK_WAITS\G"
 
 function collect_status_log()
 {
+    index=0
     for host in ${host_list[*]}
     do
+        mysql_port=${host_post[${index}]}
+        innodb_lock_file="/tmp/${host}_innodb_lock.txt"
         processlist_file="/tmp/${host}_processlist.txt"
         innodb_status_file="/tmp/${host}_innodb_status.txt"
+
         echo "-----------------------------------------`date "+%Y-%m-%d %H:%M:%S"`-------------------------------------------" >> ${processlist_file}
-        mysql -h${host} -u${user} -p${password} --default-character-set=utf8 -e"$show_processlist" >> ${processlist_file}
+        mysql -h${host} -u${user} -p${password} -P${mysql_port} --default-character-set=utf8 -e"$show_processlist" >> ${processlist_file}
         echo "" >> ${processlist_file}
 
         echo "-----------------------------------------`date "+%Y-%m-%d %H:%M:%S"`-------------------------------------------" >> ${innodb_status_file}
-        mysql -h${host} -u${user} -p${password} --default-character-set=utf8 -e"$innodb_engine_status" >> ${innodb_status_file}
+        mysql -h${host} -u${user} -p${password} -P${mysql_port} --default-character-set=utf8 -e"$innodb_engine_status" >> ${innodb_status_file}
         echo "" >> ${innodb_status_file}
+
+        echo "-----------------------------------------`date "+%Y-%m-%d %H:%M:%S"`-------------------------------------------" >> ${innodb_lock_file}
+        mysql -h${host} -u${user} -p${password} -P${mysql_port} --default-character-set=utf8 -e"$innodb_lock" >> ${innodb_lock_file}
+        echo "" >> ${innodb_lock_file}
+
+        let "index ++"
     done
 }
 
