@@ -3,7 +3,7 @@
 import os, threadpool
 from mysql_enum import MySQLBranch
 from entitys import BaseClass
-import collections, db_util, settings, tablespace, custom_algorithm, common
+import collections, db_util, settings, tablespace, custom_algorithm, common, server
 
 class Cache(object):
     __number = False
@@ -285,7 +285,7 @@ class Cache(object):
 
     def check_mysql_server_version_and_branch(self):
         for host_info in self.__host_infos.values():
-            result = db_util.DBUtil().fetchall(host_info, "show global variables where variable_name in ('version', 'version_comment', 'datadir', 'pid_file', 'innodb_buffer_pool_size', 'server_uuid');")
+            result = db_util.DBUtil().fetchall(host_info, server.show_global_variables_sql)
             data = {}
             for row in result:
                 data[row.get("Variable_name")] = row.get("Value")
@@ -293,6 +293,8 @@ class Cache(object):
             str_branch = data["version_comment"]
             host_info.mysql_data_dir = data["datadir"]
             host_info.server_uuid = data["server_uuid"]
+            host_info.innodb_log_file_size = int(data["innodb_log_file_size"])
+            host_info.innodb_log_buffer_size = int(data["innodb_log_buffer_size"])
             host_info.innodb_buffer_pool_size = tablespace.get_data_length(long(data["innodb_buffer_pool_size"]))
             if (str_branch.find(MySQLBranch.Percona.name) >= 0):
                 host_info.branch = MySQLBranch.Percona

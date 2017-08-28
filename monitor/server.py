@@ -636,7 +636,9 @@ class MonitorServer(threading.Thread):
         innodb_info.log_flush_lsn = info_tmp.log_flush_lsn
         innodb_info.page_flush_lsn = info_tmp.page_flush_lsn
         innodb_info.checkpoint_lsn = info_tmp.checkpoint_lsn
+        # log_flush_diff 如果大于innodb_log_buffer_size说明buffer不够用，要注意
         innodb_info.log_flush_diff = info_tmp.log_flush_diff
+        # page_flush_diff 其实他跟 checkpoint_diff 比较接近，如果大于innodb_log_file_size大小，要注意
         innodb_info.page_flush_diff = info_tmp.page_flush_diff
         innodb_info.checkpoint_diff = info_tmp.checkpoint_diff
         innodb_info.log_flush_diff_value = info_tmp.log_flush_diff_value
@@ -1029,6 +1031,9 @@ show global status where variable_name in
 show_global_variables_sql = """
 show global variables where variable_name in
 (
+'version',
+'version_comment',
+'server_uuid',
 'datadir',
 'pid_file',
 'log_bin',
@@ -1041,7 +1046,9 @@ show global variables where variable_name in
 'innodb_spin_wait_delay',
 'innodb_sync_spin_loops',
 'query_cache_type',
-'query_cache_size'
+'query_cache_size',
+'innodb_log_file_size',
+'innodb_log_buffer_size'
 );
 """
 

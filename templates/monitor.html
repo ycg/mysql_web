@@ -1261,19 +1261,19 @@
                         <td>
                             {{ status.log_flush_lsn }}
                         </td>
-                        <td>
+                        <td {% if(status.log_flush_diff >= status.host_info.innodb_log_buffer_size) %} class="text-danger" {% endif %}>
                             {{ status.log_flush_diff_value }}
                         </td>
                         <td >
                             {{ status.page_flush_lsn }}
                         </td>
-                        <td>
+                        <td {% if(status.page_flush_diff >= status.host_info.innodb_log_file_size) %} class="text-danger" {% endif %}>
                             {{ status.page_flush_diff_value }}
                         </td>
-                        <td >
+                        <td>
                             {{ status.checkpoint_lsn }}
                         </td>
-                        <td>
+                        <td {% if(status.checkpoint_diff >= status.host_info.innodb_log_file_size) %} class="text-danger" {% endif %}>
                             {{ status.checkpoint_diff_value }}
                         </td>
                         <td {% if(status.history_list_length > 5000) %} class="text-danger" {% endif %}>
