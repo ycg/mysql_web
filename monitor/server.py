@@ -3,7 +3,7 @@
 import traceback
 import cache, db_util, settings, entitys, tablespace
 from mysql_enum import MonitorEnum, MySQLBranch
-import time, threadpool, threading, paramiko, collections, datetime
+import time, threadpool, threading, paramiko, collections
 
 
 class MonitorServer(threading.Thread):
