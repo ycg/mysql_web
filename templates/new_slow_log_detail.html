@@ -265,7 +265,7 @@
                     </tr>
                     </thead>
                     <tbody style="word-break:break-all">
-                    {% for status in slow_low_info.explain_infos %}
+                    {% for status in slow_low_info.explain_infos.info %}
                         <tr>
                             <td>
                                 {{ status.id }}
@@ -296,6 +296,43 @@
                             </td>
                             <td>
                                 {{ status.Extra }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </br>
+                </br>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr class="my_titile">
+                        <td colspan="10" class="text-center">
+                            Show Warnings结果
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Level
+                        </th>
+                        <th>
+                            Code
+                        </th>
+                        <th>
+                            Message
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody style="word-break:break-all">
+                    {% for status in slow_low_info.explain_infos.warnings %}
+                        <tr>
+                            <td>
+                                {{ status.level }}
+                            </td>
+                            <td>
+                                {{ status.code }}
+                            </td>
+                            <td>
+                                {{ status.message }}
                             </td>
                         </tr>
                     {% endfor %}

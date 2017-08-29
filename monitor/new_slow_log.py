@@ -117,13 +117,16 @@ def get_slow_log_detail(checksum, server_id):
 
 
 def get_slow_log_explain(server_id, db, sql):
-    result = []
+    explain_info = BaseClass(None)
+    explain_info.info = []
+    explain_info.warnings = []
     connection, cursor = None, None
     host_info = cache.Cache().get_host_info(server_id)
     try:
         connection, cursor = db_util.DBUtil().get_conn_and_cur(host_info)
+
         cursor.execute("use {0};".format(db))
-        cursor.execute("explain {0};".format(sql))
+        cursor.execute("explain extended {0};".format(sql))
         for row in cursor.fetchall():
             info = BaseClass(None)
             info.rows = row["rows"]
@@ -136,12 +139,20 @@ def get_slow_log_explain(server_id, db, sql):
             info.table = row["table"]
             info.type = row["type"]
             info.id = row["id"]
-            result.append(info)
-    except Exception, e:
+            explain_info.info.append(info)
+
+        cursor.execute("show warnings;")
+        for row in cursor.fetchall():
+            info = BaseClass(None)
+            info.level = row["Level"]
+            info.code = row["Code"]
+            info.message = row["Message"]
+            explain_info.warnings.append(info)
+    except Exception:
         traceback.print_exc()
     finally:
         db_util.DBUtil().close(connection, cursor)
-    return result
+    return explain_info
 
 
 def update_review_detail(obj):
