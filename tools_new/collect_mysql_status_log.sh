@@ -13,8 +13,8 @@
 
 user=""
 password=""
+host_port=("3306" "3306")
 host_list=("192.168.1.101" "192.168.1.102")
-host_post=("3306" "3306")
 
 start_timestamp=`date +%s -d "2017-08-04 00:49:00"`
 stop_timestamp=`date +%s -d "2017-08-04 00:53:00"`
@@ -29,7 +29,7 @@ function collect_status_log()
     index=0
     for host in ${host_list[*]}
     do
-        mysql_port=${host_post[${index}]}
+        mysql_port=${host_port[${index}]}
         innodb_lock_file="/tmp/${host}_innodb_lock.txt"
         processlist_file="/tmp/${host}_processlist.txt"
         innodb_status_file="/tmp/${host}_innodb_status.txt"
