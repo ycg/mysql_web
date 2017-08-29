@@ -3,7 +3,7 @@
 # 安装环境：
 1. 基于python2.7.11开发的
 2. 安装MySQL数据库
-3. 如果要监控OS，需要设置ssh免密码登录
+3. 如果要监控OS，需要设置ssh登录信息
 4. 安装依赖包，执行./install.sh脚本
 5. 在setting.py设置MySQL_Host相关账户信息
 ``` python
@@ -42,7 +42,7 @@ insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yang
 3. binlog_util.py - 基于mysql-replication的binlog分析，可生成回滚SQL，实现误操作的闪回
 4. binlog_util_new.py - 实现对binlog文件的分析，可生成回滚SQL
 5. bk_xtrabackup.py - 实现对xtrabackup的备份封装，可以增量和全备
-6. bk_recovery_xtrbackup.py - 实现对xtrabackup的备份恢复，是基于bk_xtrabackup.py实现的备份恢复，可以远程和本地恢复
+6. bk_recovery_xtrbackup.py - 是基于bk_xtrabackup.py实现的备份恢复，可以远程和本地恢复
 7. collect_mysql_status_log.sh - 实现对mysql指定时间段的日志收集，有助于排除问题
 8. mysql_auto_install.py - 实现mysql的远程自动安装
 9. mysql_replication_repair.py - 实现对slave出现1032和1062错误的自动修复功能
