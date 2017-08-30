@@ -236,3 +236,10 @@ function logout() {
         });
     }
 }
+
+function input_data_for_post(url, json_data, div_id) {
+    $.post(url, json_data, function (data) {
+        $(div_id).html(data)
+    });
+}
+

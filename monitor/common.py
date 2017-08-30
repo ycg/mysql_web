@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import paramiko, subprocess, traceback
+import paramiko, subprocess, traceback, json
 from entitys import BaseClass
 import db_util
 
@@ -26,6 +26,11 @@ def get_object_list(rows):
             setattr(info, key, value)
         info_list.append(info)
     return info_list
+
+
+# 转换对象为json数据
+def convert_obj_to_json_str(obj):
+    return json.dumps(obj, default=lambda o: o.__dict__)
 
 
 # 执行本地命令

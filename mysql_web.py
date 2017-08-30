@@ -477,10 +477,12 @@ def get_object_from_json(json_value):
 def get_object_from_json_tmp(json_value):
     obj = BaseClass(None)
     for key, value in json.loads(json_value).items():
-        if(str(value).isdigit()):
+        if (len(str(value)) <= 0):
+            setattr(obj, key, value)
+        elif (str(value).isdigit()):
             setattr(obj, key, int(value))
         else:
-            if(value == "null"):
+            if (value == "null"):
                 setattr(obj, key, None)
             else:
                 setattr(obj, key, value)
@@ -510,7 +512,13 @@ def add_backup_task():
 @app.route("/host", methods=["GET", "POST"])
 @login_required
 def get_mysql_host_home():
-    return render_template("mysql_host.html", mysql_host_infos=cache.Cache().get_all_host_infos())
+    return render_template("mysql_host.html")
+
+
+@app.route("/host/query", methods=["GET", "POST"])
+@login_required
+def get_mysql_host_infos():
+    return render_template("mysql_host_view.html", mysql_host_infos=cache.Cache().get_all_host_infos())
 
 
 @app.route("/host/add", methods=["GET", "POST"])

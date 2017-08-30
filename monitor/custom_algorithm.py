@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 def encrypt(key, value):
+    if (len(str(value)) <= 0):
+        return str(value)
     b = bytearray(str(value).encode("utf8"))
     n = len(b)
     c = bytearray(n * 2)

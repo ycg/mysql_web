@@ -1,0 +1,83 @@
+{% if(mysql_host_infos != None) %}
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>
+
+            </th>
+            <th colspan="4" rowspan="1" class="text-center">
+                MySQL
+            </th>
+            <th colspan="2" rowspan="1" class="text-center">
+                SSH
+            </th>
+            <th colspan="2" rowspan="1" class="text-center">
+
+            </th>
+        </tr>
+        <tr>
+            <th>
+                ID
+            </th>
+            <th>
+                Remark
+            </th>
+            <th>
+                IP
+            </th>
+            <th>
+                Port
+            </th>
+            <th>
+                User
+            </th>
+            <th>
+                User
+            </th>
+            <th>
+                Port
+            </th>
+            <th>
+                Created_Time
+            </th>
+            <th>
+
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for info in mysql_host_infos %}
+            <tr>
+                <td>
+                    {{ info.host_id }}
+                </td>
+                <td>
+                    {{ info.remark }}
+                </td>
+                <td>
+                    {{ info.host }}
+                </td>
+                <td>
+                    {{ info.port }}
+                </td>
+                <td>
+                    {{ info.user }}
+                </td>
+                <td>
+                    {{ info.ssh_user }}
+                </td>
+                <td>
+                    {{ info.ssh_port }}
+                </td>
+                <td>
+                    {{ info.created_time }}
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-primary btn-xs">编辑</button>
+                    <button class="btn btn-danger btn-xs">禁用</button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

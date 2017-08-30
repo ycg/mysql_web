@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import db_util, cache, common, settings, entitys, traceback
+import db_util, cache, custom_algorithm, settings, common, entitys
 
 
 # 获取mysql线程信息
@@ -114,6 +114,41 @@ def kill_mysql_thread(host_id, thread_id):
 
 # 获取所有的MySQL主机信息
 def add_mysql_host_info(obj):
-    return "ok"
+    result = entitys.BaseClass(None)
+    result.flag = True
+    if (len(obj.host_name) <= 0):
+        result.flag = False
+        result.message = "请输入主机名称"
+    elif (len(obj.host_ip) <= 0):
+        result.flag = False
+        result.message = "请输入主机IP地址"
+    elif (len(obj.host_user) <= 0):
+        result.flag = False
+        result.message = "请输入MySQL账号"
+    elif (len(obj.host_password) <= 0):
+        result.flag = False
+        result.message = "请输入MySQL密码"
+    elif (common.test_mysql_connection_is_ok(obj) == False):
+        result.flag = False
+        result.message = "mysql connection error."
+    elif (settings.LINUX_OS):
+        if (common.test_ssh_connection_is_ok(obj) == False):
+            result.flag = False
+            result.message = "ssh connection error"
 
-
+    if (result.flag == True):
+        sql = """insert into mysql_web.host_infos
+                 (`host`,`port`,`user`,`password`,`remark`,`ssh_user`,`ssh_port`,`ssh_password`)
+                 values ('{0}', {1}, '{2}', '{3}', '{4}', '{5}', {6}, '{7}')""" \
+            .format(obj.host_ip,
+                    obj.host_port,
+                    custom_algorithm.encrypt(settings.MY_KEY, obj.host_user),
+                    custom_algorithm.encrypt(settings.MY_KEY, obj.host_password),
+                    obj.host_name,
+                    obj.host_ssh_user,
+                    obj.host_ssh_port,
+                    custom_algorithm.encrypt(settings.MY_KEY, obj.host_ssh_password))
+        db_util.DBUtil().execute(settings.MySQL_Host, sql)
+        cache.Cache().load_all_host_infos()
+        result.message = "add mysql host ok."
+    return common.convert_obj_to_json_str(result)

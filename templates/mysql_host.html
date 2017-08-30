@@ -1,6 +1,5 @@
 <button type="button" class="btn btn-primary" onclick=show_modal_dialog("#mysql_host_add_dialog")>添加MySQL主机</button>
 
-
 <div class="modal fade" id="mysql_host_add_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -22,7 +21,7 @@
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">端口:</label>
-                        <input id="host_port" type="text" name="host_port" class="form-control">
+                        <input id="host_port" type="text" name="host_port" class="form-control" value="3306">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">用户名:</label>
@@ -30,7 +29,7 @@
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">密码:</label>
-                        <input id="host_password" type="text" name="host_password" class="form-control">
+                        <input id="host_password" type="password" name="host_password" class="form-control">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">SSH用户:</label>
@@ -42,7 +41,7 @@
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">SSH密码:</label>
-                        <input id="host_ssh_password" type="text" name="host_ssh_password" class="form-control" placeholder="如果设置了免密码登录则不需要填写">
+                        <input id="host_ssh_password" type="password" name="host_ssh_password" class="form-control" placeholder="如果设置了免密码登录则不需要填写">
                     </div>
                 </form>
             </div>
@@ -56,99 +55,29 @@
     </div>
 </div>
 
-
 </br>
 </br>
-{% if(mysql_host_infos != None) %}
-    <div class="row">
-        <div class="col-md-7">
-            <table class="table table-bordered table-hover">
-                <thead>
-                <tr>
-                    <th>
+<div class="row">
+    <div class="col-md-7" id="host_view_div">
 
-                    </th>
-                    <th colspan="4" rowspan="1" class="text-center">
-                        MySQL
-                    </th>
-                    <th colspan="2" rowspan="1" class="text-center">
-                        SSH
-                    </th>
-                    <th>
-
-                    </th>
-                </tr>
-                <tr>
-                    <th>
-                        ID
-                    </th>
-                    <th>
-                        Remark
-                    </th>
-                    <th>
-                        IP
-                    </th>
-                    <th>
-                        Port
-                    </th>
-                    <th>
-                        User
-                    </th>
-                    <th>
-                        User
-                    </th>
-                    <th>
-                        Port
-                    </th>
-                    <th>
-
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for info in mysql_host_infos %}
-                    <tr>
-                        <td>
-                            {{ info.host_id }}
-                        </td>
-                        <td>
-                            {{ info.remark }}
-                        </td>
-                        <td>
-                            {{ info.host }}
-                        </td>
-                        <td>
-                            {{ info.port }}
-                        </td>
-                        <td>
-                            {{ info.user }}
-                        </td>
-                        <td>
-                            {{ info.ssh_user }}
-                        </td>
-                        <td>
-                            {{ info.ssh_port }}
-                        </td>
-                        <td class="text-center">
-                            <button class="btn btn-primary btn-xs">编辑</button>
-                            <button class="btn btn-danger btn-xs">删除</button>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
     </div>
-{% endif %}
+</div>
 
 <script language="JavaScript">
+
+    function query_host_infos() {
+        input_data_for_post("/host/query", "", "#host_view_div")
+    }
 
     function add_mysql_host() {
         if (window.confirm("是否确认添加?")) {
             $.post("/host/add", JSON.stringify(get_form_json("#mysql_host_add_form")), function (data) {
-                alert(data);
-                hide_modal_dialog("#mysql_host_add_dialog");
-                input_data_for_get("/host", "#data");
+                var json_obj = JSON.parse(data);
+                alert(json_obj.message);
+                if (json_obj.flag) {
+                    hide_modal_dialog("#mysql_host_add_dialog");
+                    query_host_infos();
+                }
             }).error(function () {
                 alert("error");
             });
@@ -159,9 +88,9 @@
         post_request("/host/test/ssh", JSON.stringify(get_form_json("#mysql_host_add_form")))
     }
 
-
     function test_mysql_connection_is_ok() {
         post_request("/host/test/mysql", JSON.stringify(get_form_json("#mysql_host_add_form")))
     }
 
+    query_host_infos();
 </script>
