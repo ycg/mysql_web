@@ -13,11 +13,11 @@
                 <form id="mysql_host_add_form">
                     <div class="form-group">
                         <label id="user_name_lable" name="user_name_lable" class="control-label" for="user_name">名称:</label>
-                        <input id="host_name" type="text" name="host_name" class="form-control">
+                        <input id="host_name" type="text" name="host_name" class="form-control" placeholder="请输入mysql主机名称">
                     </div>
                     <div class="form-group">
                         <label id="user_password_lable" name="user_password_lable" class="control-label" for="user_password">IP地址:</label>
-                        <input id="host_ip" type="text" name="host_ip" class="form-control">
+                        <input id="host_ip" type="text" name="host_ip" class="form-control" placeholder="请输入mysql主机ip地址">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">端口:</label>
@@ -25,11 +25,11 @@
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">用户名:</label>
-                        <input id="host_user" type="text" name="host_user" class="form-control">
+                        <input id="host_user" type="text" name="host_user" class="form-control" placeholder="请输入mysql用户名">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">密码:</label>
-                        <input id="host_password" type="password" name="host_password" class="form-control">
+                        <input id="host_password" type="password" name="host_password" class="form-control" placeholder="请输入mysql密码">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">SSH用户:</label>
@@ -78,6 +78,28 @@
                     hide_modal_dialog("#mysql_host_add_dialog");
                     query_host_infos();
                 }
+            }).error(function () {
+                alert("error");
+            });
+        }
+    }
+
+    function start_mysql_host(host_id) {
+        if (window.confirm("是否确认启用?")) {
+            $.post("/host/start/" + host_id, "", function (data) {
+                alert(data);
+                query_host_infos();
+            }).error(function () {
+                alert("error");
+            });
+        }
+    }
+
+    function delete_mysql_host(host_id) {
+        if (window.confirm("是否确认删除?")) {
+            $.post("/host/delete/" + host_id, "", function (data) {
+                alert(data);
+                query_host_infos();
             }).error(function () {
                 alert("error");
             });

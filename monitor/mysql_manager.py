@@ -152,3 +152,18 @@ def add_mysql_host_info(obj):
         cache.Cache().load_all_host_infos()
         result.message = "add mysql host ok."
     return common.convert_obj_to_json_str(result)
+
+
+# 启用mysql主机信息
+def start_mysql_host_info(host_id):
+    db_util.DBUtil().execute(settings.MySQL_Host, "update mysql_web.host_infos set is_deleted = 0 where host_id = {0}".format(host_id))
+    cache.Cache().load_all_host_infos()
+    return "启用成功"
+
+
+# 删除mysql主机信息
+def delete_mysql_host_info(host_id):
+    db_util.DBUtil().execute(settings.MySQL_Host, "update mysql_web.host_infos set is_deleted = 1 where host_id = {0}".format(host_id))
+    cache.Cache().load_all_host_infos()
+    return "删除成功"
+

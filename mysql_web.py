@@ -543,6 +543,17 @@ def test_mysql_connection_is_ok():
     return "mysql connection error."
 
 
+@app.route("/host/start/<int:host_id>", methods=["GET", "POST"])
+@login_required
+def start_mysql_host_info(host_id):
+    return mysql_manager.start_mysql_host_info(host_id)
+
+
+@app.route("/host/delete/<int:host_id>", methods=["GET", "POST"])
+@login_required
+def delete_mysql_host_info(host_id):
+    return mysql_manager.delete_mysql_host_info(host_id)
+
 #endregion
 
 if __name__ == '__main__':
