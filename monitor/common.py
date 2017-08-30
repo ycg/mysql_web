@@ -14,6 +14,19 @@ def get_object(row):
     return info
 
 
+# 把数据库返回数据转换为对象集合
+def get_object_list(rows):
+    info_list = []
+    for row in rows:
+        info = BaseClass(None)
+        for key, value in row.items():
+            if (value == "None"):
+                value = None
+            setattr(info, key, value)
+        info_list.append(info)
+    return info_list
+
+
 # 执行本地命令
 def execute_localhost_command(command):
     result = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE)

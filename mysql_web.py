@@ -474,6 +474,19 @@ def get_object_from_json(json_value):
     return obj
 
 
+def get_object_from_json_tmp(json_value):
+    obj = BaseClass(None)
+    for key, value in json.loads(json_value).items():
+        if(str(value).isdigit()):
+            setattr(obj, key, int(value))
+        else:
+            if(value == "null"):
+                setattr(obj, key, None)
+            else:
+                setattr(obj, key, value)
+    obj.current_user_id = current_user.id
+    return obj
+
 # endregion
 
 # region backup
@@ -491,6 +504,34 @@ def add_backup_task():
 
 
 # endregion
+
+#region mysql host
+
+@app.route("/host", methods=["GET", "POST"])
+@login_required
+def get_mysql_host_home():
+    return render_template("mysql_host.html", mysql_host_infos=cache.Cache().get_all_host_infos())
+
+
+@app.route("/host/add", methods=["GET", "POST"])
+@login_required
+def add_mysql_host_info():
+    return mysql_manager.add_mysql_host_info(get_object_from_json_tmp(request.get_data()))
+
+
+@app.route("/host/test/ssh", methods=["GET", "POST"])
+@login_required
+def test_ssh_connection_is_ok():
+    return mysql_manager.test_ssh_connection_is_ok(get_object_from_json_tmp(request.get_data()))
+
+
+@app.route("/host/test/mysql", methods=["GET", "POST"])
+@login_required
+def test_mysql_connection_is_ok():
+    return mysql_manager.test_mysql_connection_is_ok(get_object_from_json_tmp(request.get_data()))
+
+
+#endregion
 
 if __name__ == '__main__':
     if (settings.LINUX_OS):

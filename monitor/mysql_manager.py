@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import db_util, cache
+import db_util, cache, common, settings, entitys, traceback
 
 
 # 获取mysql线程信息
@@ -110,4 +110,34 @@ def optimized_table_space(host_id, table_name):
 def kill_mysql_thread(host_id, thread_id):
     db_util.DBUtil().execute(cache.Cache().get_host_info(host_id), "kill {0};".format(thread_id))
     return "kill thread {0} ok!".format(thread_id)
+
+
+# 获取所有的MySQL主机信息
+def add_mysql_host_info(obj):
+    return "ok"
+
+
+# 测试SSH连接是否OK
+def test_ssh_connection_is_ok(obj):
+    try:
+        host_info = entitys.BaseClass(None)
+        host_info.host = obj.host_ip
+        host_info.ssh_port = obj.host_ssh_port
+        host_info.ssh_user = obj.host_ssh_user
+        host_info.ssh_password = obj.host_ssh_password if(len(obj.host_ssh_password) > 0) else None
+        common.execute_remote_command(host_info, "df -h")
+    except:
+        traceback.print_exc()
+        return "ssh connection error."
+    return "ssh connection ok."
+
+
+# 测试MySQL连接是否OK
+def test_mysql_connection_is_ok(obj):
+    try:
+        db_util.DBUtil().execute_sql(obj.host_ip, obj.host_port, obj.host_user, obj.host_password, "select 1;")
+    except Exception:
+        traceback.print_exc()
+        return "mysql connection error."
+    return "ssh connection ok."
 
