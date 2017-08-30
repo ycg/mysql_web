@@ -18,7 +18,7 @@ import settings
 import backup
 from monitor.entitys import BaseClass
 from monitor import user_login, new_slow_log, report
-from monitor import cache, server, mysql_manager, tablespace, chart
+from monitor import cache, server, mysql_manager, tablespace, chart, common
 
 
 # region load data on run
@@ -522,13 +522,17 @@ def add_mysql_host_info():
 @app.route("/host/test/ssh", methods=["GET", "POST"])
 @login_required
 def test_ssh_connection_is_ok():
-    return mysql_manager.test_ssh_connection_is_ok(get_object_from_json_tmp(request.get_data()))
+    if (common.test_ssh_connection_is_ok(get_object_from_json_tmp(request.get_data()))):
+        return "ssh connection ok."
+    return "ssh connection error."
 
 
 @app.route("/host/test/mysql", methods=["GET", "POST"])
 @login_required
 def test_mysql_connection_is_ok():
-    return mysql_manager.test_mysql_connection_is_ok(get_object_from_json_tmp(request.get_data()))
+    if (common.test_mysql_connection_is_ok(get_object_from_json_tmp(request.get_data()))):
+        return "mysql connection ok."
+    return "mysql connection error."
 
 
 #endregion

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import paramiko, subprocess
+import paramiko, subprocess, traceback
 from entitys import BaseClass
+import db_util
 
 
 # 把数据库返回数据转换为对象
@@ -40,10 +41,36 @@ def execute_remote_command(host_info, command):
     try:
         host_client = paramiko.SSHClient()
         host_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        host_client.connect(host_info.host, port=host_info.ssh_port, username=host_info.ssh_user, password=host_info.ssh_password)
+        host_client.connect(host_info.host, port=host_info.ssh_port, username=host_info.ssh_user, password=host_info.ssh_password, timeout=1)
         stdin, stdout, stderr = host_client.exec_command(command)
         return stdin, stdout, stderr
     finally:
         if (host_client == None):
             host_client.close()
+
+
+# 测试SSH连接是否OK
+def test_ssh_connection_is_ok(obj):
+    try:
+        host_info = BaseClass(None)
+        host_info.host = obj.host_ip
+        host_info.ssh_port = obj.host_ssh_port
+        host_info.ssh_user = obj.host_ssh_user
+        host_info.ssh_password = obj.host_ssh_password if(len(obj.host_ssh_password) > 0) else None
+        execute_remote_command(host_info, "df -h")
+    except:
+        traceback.print_exc()
+        return False
+    return True
+
+
+# 测试MySQL连接是否OK
+def test_mysql_connection_is_ok(obj):
+    try:
+        db_util.DBUtil().execute_sql(obj.host_ip, obj.host_port, obj.host_user, obj.host_password, "select 1;")
+    except Exception:
+        traceback.print_exc()
+        return False
+    return True
+
 
