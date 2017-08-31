@@ -1,0 +1,25 @@
+
+MHA安装手册
+
+#1.安装MHA
+    #本地安装
+    python mha_auto_install.py --package=/opt/mha*
+    #远程安装
+    python mha_auto_install.py --host=192.168.1.100 --package=/opt/mha*
+
+#2.配置文件
+    配置文件要注意机器的顺序，以及一些脚本的路径等等
+
+#3.测试SSH和Repl是否正常
+    masterha_check_ssh --conf=/app.conf
+    masterha_check_repl --conf=/app.conf
+
+#4.启动MHA
+    nohup masterha_manager --conf=/app.conf --ignore_last_failover &
+
+#5.进行故障测试，并注意VIP是否转移
+
+#6.在做为主的备库上增加purge_relay_log.sh脚本，定时清除relay log
+
+#7.如果MHA进行了故障转移了，需要在切换回来，可以使用masterha_master_switch
+    masterha_master_switch --master_state=alive --conf=/app1.cnf --new_master_host=192.168.1.100  --orig_master_is_new_slave --running_updates_limit=3

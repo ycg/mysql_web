@@ -1,0 +1,50 @@
+#masterha_master_switch
+
+#如果主出现故障，手动进行故障转移
+masterha_master_switch --master_state=dead --conf=/usr/local/masterha/conf/app1.cnf --dead_master_host=192.168.1.100
+
+#当在线的MHA进行主故障转移之后，主恢复之后，重新进行切换的命令
+masterha_master_switch --master_state=alive --conf=/usr/local/masterha/conf/app1.cnf --new_master_host=192.168.1.100  --orig_master_is_new_slave --running_updates_limit=3
+
+
+参数：
+--running_updates_limit：在所有的slaves上Seconds_Behind_Master都要小于此参数值(秒数)
+
+--master_state=dead：强制的参数，参数值为"dead" 或者 "alive" . 如果 设置为 alive 模式，masterha_master_switch 开始在线主库切换操作。
+
+--dead_master_host=(hostname)：强制参数，宕机的主库所在的主机名称。--dead_master_ip 和 --dead_master_port 是可选参数，如果这些参数没有设置，--dead_master_ip 就是 --dead_master_host 解析的IP地址。--dead_master_port 为 3306
+
+--new_master_host=(hostname)：新主机地址，可选参数，这个参数在你明确新的主库的主机，非常有用。(这就意味着你不需要让MHA来决定新的主库)。如果不设置此参数，MHA 将会利用自动failover的规则来选择新的主库。如果设置--new_master_host，MHA选择此主机为新的主库，如果不能成为主库，MHA将会退出
+
+--interactive=(0|1)：如果设置为0，在masterha_master_switch，它自动执行故障转移(非交互式)。这实际上是和masterha_manager的内部运行机制一样，这种非交互式故障转移是有用的，如果你已经证实了master死了,但你想尽快做故障转移。非交互式故障转移也是有用的,如果你使用其他现有的主监控软件和要调用的非交互式故障转移命令软件。典型的例子是masterha_master_switch调用从集群软件像起搏器。
+
+--ssh_reachable=(0|1|2)：指定master 经过SSH是否可达。0:不可达、1:可达、2:未知(默认值)。 如果设置为了2，此命令内部将会检测通过SSH 是否可达master，并且跟新SSH 状态。如果可达，且设置master_ip_failover_script 或者 shutdown_script .将会执行"--command=stopssh"。否则，执行 "--command=stop"。另外，如果宕机的master通过SSH可达，failover脚本试图从宕机的master机器上拷贝没有没有发送的binlog。
+
+--skip_change_master：如果设置此参数，当发生failover的时候，MAH 在应用完不同的relay log退出，忽略CHANGE MASTER 和 START SLAVE 操作。所以 slaves 不会指向 新的master. 开启此参数，有利于手动的二次检查slave 恢复是否成功
+
+--skip_disable_read_only：设置此参数，MHA 将不会在新的主库上执行 SET GLOBAL read_only =0 操作，有利于手动操作
+
+--last_failover_minute=(minutes)：参考master_manager
+
+--ignore_last_failover：参考master_manager
+
+--wait_on_failover_error=(seconds)：类似于master_manager, 此参数只用于自动的/非交互式的failover。如果没有设置--interval=0，wait_on_failover_error 将会被忽略，在发生错误的时候不会sleep。
+
+--remove_dead_master_conf：参考masterha_manager
+
+--wait_until_gtid_in_sync(0|1)：此参数从0.56版本开始可用，如果设置成1，当基于GITD的failover时,MHA 会等待所有的从库追上新主库的GITD
+
+--skip_change_master：此参数从0.56版本开始可用，如果开启此选项，MHA 跳过 CHANGE MASTER 的操作
+
+--skip_disable_read_only：此参数从0.56版本开始可用，如果开启此选项，MHA 将会在新的master 跳过 SET GLOBAL read_only = 0;
+
+--ignore_binlog_server_error：此参数从0.56版本开始可用，如果开启此选项，当执行failover的时，MHA忽略binlog server上任何错误
+
+主在线切换时相关参数：
+--new_master_host=(hostname)：新主机地址，可选参数，这个参数在你明确新的主库的主机，非常有用。(这就意味着你不需要让MHA来决定新的主库)。如果不设置此参数，MHA 将会利用自动failover的规则来选择新的主库。如果设置--new_master_host，MHA选择此主机为新的主库，如果不能成为主库，MHA将会退出
+
+--orig_master_is_new_slave：当完成主库切换后，原先的主库将作为现在主库的slave运行。默认:不开启(原先的主库不会加入到新的复制环境中)。如果开启此选项，需要在配置文件中设置repl_password参数，由于当期的Master并不知道新的Master的replication的密码
+
+--remove_orig_master_conf：如果设置此参数，当成功failover后，MHA manager将会自动删除配置文件中关于dead master的配置选项。
+
+--skip_lock_all_tables：当在做主库切换的时候，MHA会在原先的主库上执行FLUSH TABLES WITH READ LOCK 操作，确保没有跟新操作，但是FLUSH TABLES WITH READ LOCK 操作是非常耗费资源的，并且你可以在原先的主库确定没有跟新操作(通过master_ip_online_change_script 中kill all clients操作等)。可以利用此选项避免锁表。
