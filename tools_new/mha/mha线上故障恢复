@@ -1,6 +1,7 @@
 #前提
-#1.确保故障的master启动成功
-#2.确保故障的master成为了新的master的slave
+#1.确保故障的master已经通过新的备份恢复成功了
+#2.确保故障的master启动成功
+#3.确保故障的master成为了新的master的slave
 
 #步骤
 #1.设置新的master为read only
