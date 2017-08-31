@@ -15,6 +15,9 @@ import os, argparse, sys, time, datetime, subprocess, traceback
 # --backup-time：定时备份时间，默认值为14天，也就是只保存两周
 # --expire-days：备份文件过期时间
 # --stream：是否启用压缩，0代表不压缩，1代表使用xbstream的gzip压缩
+#       0：不压缩
+#       1：使用xbstream+gzip
+#       2：使用tar+pigz
 
 # 调用方式
 # 可以放在crontab里面进行定时调用
@@ -42,9 +45,12 @@ def check_arguments():
     parser.add_argument("--backup-dir", type=str, dest="backup_dir", help="backup dir")
     parser.add_argument("--mode", type=int, dest="mode", help="backup mode", default=INCREMENT_BACKUP)
     parser.add_argument("--backup-time", type=str, dest="backup_time", help="help time", default="03:30")
-    parser.add_argument("--ssh-host", type=str, dest="ssh_host", help="backup scp remote ip")
     parser.add_argument("--expire-days", type=int, dest="expire_days", help="expire backup days", default=14)
+
     parser.add_argument("--stream", type=int, dest="stream", help="--stream", default=0)
+    parser.add_argument("--ssh-user", type=str, dest="ssh_user", help="backup remote user", default="root")
+    parser.add_argument("--ssh-host", type=str, dest="ssh_host", help="backup remote host")
+
     args = parser.parse_args()
 
     if not args.host or not args.user or not args.password or not args.port:
