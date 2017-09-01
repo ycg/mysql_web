@@ -95,6 +95,8 @@ def check_arguments():
         test_ssh_connection(args)
         args.is_local_backup = False
 
+    test_has_innobackup_bin()
+
     # 检查本地和远程的备份目录是否创建
     if (args.is_local_backup):
         execute_shell_command("mkdir -p {0}".format(args.backup_dir))
@@ -122,6 +124,13 @@ def test_ssh_connection(args):
         print_log("[Error]:Please check ssh user or host is correct.")
         sys.exit(1)
 
+
+# 检查是否有xtrabackup的命令
+def test_has_innobackup_bin():
+    status, output = commands.getstatusoutput("innobackupex --help")
+    if (int(status) > 0):
+        print_log("[Error]:" + output)
+        sys.exit(1)
 
 # 备份
 def backup(args):
