@@ -80,7 +80,7 @@ def check_arguments():
         sys.exit(1)
 
     if (args.stream != STREAM_TAR and args.stream != STREAM_XBSTREAM):
-        print("[Error]:--stream:1-tar 2-xbstream, default xbstream")
+        print_log("[Error]:--stream:1-tar 2-xbstream, default xbstream")
         sys.exit(1)
 
     if (args.compress != GZIP_COMPRESS and args.compress != PIGZ_COMPRESS):
