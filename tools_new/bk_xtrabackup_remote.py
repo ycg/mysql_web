@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, argparse, sys, time, datetime, subprocess, traceback
+import os, argparse, sys, time, datetime, subprocess, traceback, commands
 
 # xtrabackup远程流式备份脚本
 # 两种流式备份方式：
@@ -42,6 +42,7 @@ INCREMENT_BACKUP = 2
 STREAM_TAR = 1
 STREAM_XBSTREAM = 2
 CHECKPOINTS_FILE_NAME = "xtrabackup_checkpoints"
+LOG_FILE_DIR = "/tmp"
 
 
 def check_arguments():
@@ -113,7 +114,7 @@ def full_backup(args):
         command = full_backup_to_local(args, file_name)
     else:
         command = full_backup_to_remote(args, file_name)
-    execute_shell_command(command)
+    execute_xtrabackup_shell_command(command, os.path.join(args.backup_dir, log_name))
     stop_backup_time = get_current_time()
 
 
@@ -155,7 +156,7 @@ def increment_backup(args):
         command = increment_backup_to_local(args, file_name)
     else:
         command = increment_backup_to_remote(args, file_name)
-    execute_shell_command(command)
+    execute_xtrabackup_shell_command(command, os.path.join(args.backup_dir, log_name))
     stop_backup_time = get_current_time()
 
 
@@ -188,13 +189,18 @@ def get_current_time():
 
 
 def execute_shell_command(command):
-    result = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = subprocess.Popen(command, shell=True)
     result.wait()
-    print("--------------------------")
-    if (result.stdout != None):
-        print(result.stdout.readlines())
-    if (result.stderr != None):
-        print(result.stderr.readlines())
 
+
+def execute_xtrabackup_shell_command(command, log_file_path):
+    status, output = commands.getstatusoutput(command)
+    file = None
+    try:
+        file = open(log_file_path, "w+")
+        file.write(output)
+    finally:
+        if (file != None):
+            file.close()
 
 backup(check_arguments())
