@@ -76,15 +76,15 @@ def check_arguments():
 
     args = parser.parse_args()
     if (not args.host or not args.user or not args.password or not args.port):
-        print("[error]:Please input host or user or password or port")
+        print_log("[Error]:Please input host or user or password or port")
         sys.exit(1)
 
     if (args.stream != STREAM_TAR and args.stream != STREAM_XBSTREAM):
-        print("[error]:--stream：1-tar 2-xbstream，default xbstream")
+        print("[Error]:--stream:1-tar 2-xbstream, default xbstream")
         sys.exit(1)
 
     if (args.compress != GZIP_COMPRESS and args.compress != PIGZ_COMPRESS):
-        print("[error]:--compress: 1-gzip 2-pigz，default gzip")
+        print_log("[Error]:--compress:1-gzip 2-pigz, default gzip")
         sys.exit(1)
 
     if (not args.ssh_host):
@@ -118,14 +118,14 @@ def check_arguments():
 def test_ssh_connection(args):
     status, output = commands.getstatusoutput("ssh {0}@{1} 'df -h'".format(args.ssh_user, args.ssh_host))
     if (int(status) > 0):
-        print(output)
-        print("[error]:Please check ssh user or host is correct.")
+        print_log("[Error]:" + output)
+        print_log("[Error]:Please check ssh user or host is correct.")
         sys.exit(1)
 
 
 # 备份
 def backup(args):
-    print("start backup.")
+    print_log("[Info]:start backup.")
     if (args.mode == FULL_BACKUP):
         full_backup(args)
     else:
@@ -137,7 +137,7 @@ def backup(args):
                 full_backup(args)
             else:
                 increment_backup(args)
-    print("backup complete ok.")
+    print_log("[Info]:backup complete ok.")
 
 
 # 全量备份
@@ -261,7 +261,7 @@ def write_backup_log_file(args, log_file_path, backup_mode, backup_dir, backup_f
                                                                        start_time,
                                                                        stop_time,
                                                                        time.strftime('%Y-%m-%d', time.localtime(time.time())),
-                                                                       check_backup_is_correct(xtrabackup_log_name),
+                                                                       check_backup_is_correct(os.path.join(args.backup_dir, xtrabackup_log_name)),
                                                                        stream,
                                                                        compress)
         file = open(log_file_path, "a")
@@ -284,4 +284,17 @@ def check_backup_is_correct(xtrabackup_log_path):
     return 0
 
 
-backup(check_arguments())
+# 打印日志
+def print_log(log_value):
+    print("{0} {1}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), log_value))
+
+# 后台运行代码
+'''args = check_arguments()
+while (True):
+    current_time = time.strftime('%H:%M', time.localtime(time.time()))
+    if (current_time == args.backup_time):
+        backup(args)
+    time.sleep(10)'''
+
+# crontab运行代码
+# backup(check_arguments())
