@@ -104,7 +104,7 @@ def copy_backup_dir_to_recovery_dir(args, backup_infos):
 
 # 解压缩文件
 def uncompress(args, backup_infos):
-    print_log("[Info]:start uncompress all backup file.")
+    print_log("[Info]:start uncompress all backup files.")
     for log_info in backup_infos:
         dir_name = log_info.backup_file_name.split(".")[0]
         uncompress_dir = os.path.join(args.recovery_dir, dir_name)
