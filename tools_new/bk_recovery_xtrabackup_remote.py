@@ -44,13 +44,16 @@ def check_arguments():
 
     # 检查是否包含xtrabackup命令
     status, output = commands.getstatusoutput("innobackupex --help")
-    if (int(status) >= 0):
+    if (int(status) > 0):
         print_log("[Error]:" + output)
         sys.exit(1)
 
-    if (args.ssh_host != None):
+    # 创建恢复目录
+    execute_shell_command("mkdir -p {0}".format(args.recovery_dir))
+
+    if (args.host != None):
         # 检测ssh是否正常
-        status, output = commands.getstatusoutput("ssh {0}@{1} 'df -h'".format(args.user, args.password))
+        status, output = commands.getstatusoutput("ssh {0}@{1} 'df -h'".format(args.user, args.host))
         if (int(status) > 0):
             print_log("[Error]:" + output)
             print_log("[Error]:Please check ssh user or host is correct.")
@@ -73,19 +76,25 @@ def check_arguments():
 
 
 def recovery(args):
+    print_log("[Info]:start recovery mysql.")
     backup_infos = get_latest_backup_infos(args)
     copy_backup_dir_to_recovery_dir(args, backup_infos)
     uncompress(args, backup_infos)
     recovery_backup(args, backup_infos)
+    print_log("[Info]:recovery mysql ok.")
 
 
 # 拷贝文件
 def copy_backup_dir_to_recovery_dir(args, backup_infos):
+    print_log("[Info]:start copy all backup files.")
     for log_info in backup_infos:
         if (args.remote):
             # 远程拷贝文件
-            execute_shell_command("scp -r {0} {1}@{2}:{3}".format(log_info.backup_file_path, args.user, args.host, args.recovery_dir))
-            print_log("[Info]:copy remote[{0}] backup file {1} to {2} ok.".format(args.host, log_info.backup_file_path, args.recovery_dir))
+            status, output = commands.getstatusoutput("scp -r {0}@{1}:{2} {3}".format(args.user, args.host, log_info.backup_file_path, args.recovery_dir))
+            if (int(status) > 0):
+                print_log("[Error]" + output)
+            else:
+                print_log("[Info]:copy remote[{0}] backup file {1} to {2} ok.".format(args.host, log_info.backup_file_path, args.recovery_dir))
         else:
             # 本地拷贝文件
             execute_shell_command("cp -r {0} {1}".format(log_info.backup_file_path, args.recovery_dir))
@@ -95,30 +104,33 @@ def copy_backup_dir_to_recovery_dir(args, backup_infos):
 
 # 解压缩文件
 def uncompress(args, backup_infos):
+    print_log("[Info]:start uncompress all backup file.")
     for log_info in backup_infos:
         dir_name = log_info.backup_file_name.split(".")[0]
-        umcompress_dir = os.path.join(args.recovery_dir, dir_name)
-        execute_shell_command("mkdir -p {0}".format(umcompress_dir))
-        log_info.umcompress_dir = umcompress_dir
+        uncompress_dir = os.path.join(args.recovery_dir, dir_name)
+        execute_shell_command("mkdir -p {0}".format(uncompress_dir))
+        log_info.uncompress_dir = uncompress_dir
+        log_info.compress_file_path = os.path.join(args.recovery_dir, log_info.backup_file_name)
 
         if (log_info.stream == TAR_STREAM):
             if (log_info.compress == GZIP_COMPRESS):
-                execute_shell_command("tar -zxvf {0} -C {1}".format(log_info.backup_file_path, umcompress_dir))
+                execute_shell_command("tar -zxvf {0} -C {1}".format(log_info.compress_file_path, log_info.uncompress_dir))
             elif (log_info.compress == PIGZ_COMPRESS):
-                execute_shell_command("unpigz {0}".format(log_info.backup_file_path))
-                execute_shell_command("tar -xvf {0} -C {1}".format(log_info.backup_file_path, umcompress_dir))
+                execute_shell_command("unpigz {0}".format(log_info.compress_file_path))
+                execute_shell_command("tar -xvf {0} -C {1}".format(log_info.compress_file_path, log_info.uncompress_dir))
 
         elif (log_info.stream == XBSTREAM_STREAM):
             if (log_info.compress == GZIP_COMPRESS):
-                execute_shell_command("gunzip {0}".format(log_info.backup_file_path))
+                execute_shell_command("gunzip {0}".format(log_info.compress_file_path))
             elif (log_info.compress == PIGZ_COMPRESS):
-                execute_shell_command("unpigz {0}".format(log_info.backup_file_path))
-            execute_shell_command("xbstream -x < {0} -C {1}".format(os.path.join(args.recovery_dir, dir_name + ".tar"), umcompress_dir))
+                execute_shell_command("unpigz {0}".format(log_info.compress_file_path))
+            execute_shell_command("xbstream -x < {0} -C {1}".format(os.path.join(args.recovery_dir, dir_name + ".tar"), log_info.uncompress_dir))
 
         elif (log_info.stream == NONE_STREAM and log_info.compress == NONE_COMPRESS):
             pass
 
-        print_log("[Info]:uncompress {0} ok, dir is {1}".format(log_info.backup_file_path, umcompress_dir))
+        print_log("[Info]:uncompress {0} ok, dir is {1}".format(log_info.compress_file_path, log_info.uncompress_dir))
+    print_log("[Info]:uncompress all backup files ok.")
 
 
 # 恢复备份文件
@@ -128,17 +140,24 @@ def recovery_backup(args, backup_infos):
     list_count = len(backup_infos)
     for info in backup_infos:
         recovery_log_file = os.path.join(args.recovery_dir, info.backup_file_name.split(".")[0] + ".log")
-        if (info.mode == INCREMENT_BACKUP):
-            full_backup_dir = info.umcompress_dir
-            execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0}".format(info.umcompress_dir), recovery_log_file)
+        if (info.mode == FULL_BACKUP):
+            full_backup_dir = info.uncompress_dir
+            execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0}".format(info.uncompress_dir), recovery_log_file)
         else:
             if (number == list_count):
                 # 最后一个增量备份恢复
-                execute_xtrabackup_shell_command("innobackupex --apply-log {0} --incremental-dir={1}".format(full_backup_dir, info.umcompress_dir), recovery_log_file)
+                execute_xtrabackup_shell_command("innobackupex --apply-log {0} --incremental-dir={1}".format(full_backup_dir, info.uncompress_dir), recovery_log_file)
             else:
                 # 其余增量备份恢复
-                execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0} --incremental-dir={1}".format(full_backup_dir, info.umcompress_dir), recovery_log_file)
+                execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0} --incremental-dir={1}".format(full_backup_dir, info.uncompress_dir), recovery_log_file)
         number += 1
+
+        return_code, output = commands.getstatusoutput("tail -n 1 {0} | grep 'completed OK'".format(recovery_log_file))
+        if (int(return_code) == 0):
+            print_log("[Info]:recovery [{0}] ok-√, log file path {1}".format(info.uncompress_dir, recovery_log_file))
+        else:
+            print_log("[Error]:recovery [{0}] fail-X, log file path {1}".format(info.uncompress_dir, recovery_log_file))
+            sys.exit()
 
 
 # 获取备份日志最后一个全量+增量日志
@@ -195,13 +214,14 @@ def print_log(log_value):
 
 # 执行linux命令
 def execute_shell_command(command):
-    result = subprocess.Popen(command, shell=True)
-    result.wait()
+    status, output = commands.getstatusoutput(command)
+    if (int(status) > 0):
+        print_log("[Error]:" + output)
 
 
 # 执行xtrabackup的命令
 def execute_xtrabackup_shell_command(command, log_file_path):
-    status, output = commands.getstatusoutput(command)
+    return_code, output = commands.getstatusoutput(command)
     file = None
     try:
         file = open(log_file_path, "w+")
@@ -210,12 +230,9 @@ def execute_xtrabackup_shell_command(command, log_file_path):
         if (file != None):
             file.close()
 
-    status, output = commands.getstatusoutput("tail -n 1 {0} | grep 'completed OK'".format(log_file_path))
-    if (int(status) >= 0):
-        print_log("[Info]:recovery ok-√, log file path {0}".format(log_file_path))
-    else:
-        print_log("[Error]:recovery fail-X, log file path {0}".format(log_file_path))
-        sys.exit()
+    if (int(return_code) > 0):
+        print_log("[Error]:recovery error" + output)
+        sys.exit(1)
 
 
 recovery(check_arguments())
