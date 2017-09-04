@@ -107,29 +107,29 @@ def uncompress(args, backup_infos):
     print_log("[Info]:start uncompress all backup files.")
     for log_info in backup_infos:
         dir_name = log_info.backup_file_name.split(".")[0]
-        uncompress_dir = os.path.join(args.recovery_dir, dir_name)
-        execute_shell_command("mkdir -p {0}".format(uncompress_dir))
-        log_info.uncompress_dir = uncompress_dir
+        recovery_dir = os.path.join(args.recovery_dir, dir_name)
+        execute_shell_command("mkdir -p {0}".format(recovery_dir))
+        log_info.recovery_dir = recovery_dir
         log_info.compress_file_path = os.path.join(args.recovery_dir, log_info.backup_file_name)
 
         if (log_info.stream == TAR_STREAM):
             if (log_info.compress == GZIP_COMPRESS):
-                execute_shell_command("tar -zxvf {0} -C {1}".format(log_info.compress_file_path, log_info.uncompress_dir))
+                execute_shell_command("tar -zxvf {0} -C {1}".format(log_info.compress_file_path, log_info.recovery_dir))
             elif (log_info.compress == PIGZ_COMPRESS):
                 execute_shell_command("unpigz {0}".format(log_info.compress_file_path))
-                execute_shell_command("tar -xvf {0} -C {1}".format(log_info.compress_file_path, log_info.uncompress_dir))
+                execute_shell_command("tar -xvf {0} -C {1}".format(log_info.compress_file_path, log_info.recovery_dir))
 
         elif (log_info.stream == XBSTREAM_STREAM):
             if (log_info.compress == GZIP_COMPRESS):
                 execute_shell_command("gunzip {0}".format(log_info.compress_file_path))
             elif (log_info.compress == PIGZ_COMPRESS):
                 execute_shell_command("unpigz {0}".format(log_info.compress_file_path))
-            execute_shell_command("xbstream -x < {0} -C {1}".format(os.path.join(args.recovery_dir, dir_name + ".tar"), log_info.uncompress_dir))
+            execute_shell_command("xbstream -x < {0} -C {1}".format(os.path.join(args.recovery_dir, dir_name + ".tar"), log_info.recovery_dir))
 
         elif (log_info.stream == NONE_STREAM and log_info.compress == NONE_COMPRESS):
             pass
 
-        print_log("[Info]:uncompress {0} ok, dir is {1}".format(log_info.compress_file_path, log_info.uncompress_dir))
+        print_log("[Info]:uncompress {0} ok, dir is {1}".format(log_info.compress_file_path, log_info.recovery_dir))
     print_log("[Info]:uncompress all backup files ok.")
 
 
@@ -141,22 +141,23 @@ def recovery_backup(args, backup_infos):
     for info in backup_infos:
         recovery_log_file = os.path.join(args.recovery_dir, info.backup_file_name.split(".")[0] + ".log")
         if (info.mode == FULL_BACKUP):
-            full_backup_dir = info.uncompress_dir
-            execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0}".format(info.uncompress_dir), recovery_log_file)
+            full_backup_dir = info.recovery_dir
+            execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0}".format(info.recovery_dir), recovery_log_file)
         else:
             if (number == list_count):
                 # 最后一个增量备份恢复
-                execute_xtrabackup_shell_command("innobackupex --apply-log {0} --incremental-dir={1}".format(full_backup_dir, info.uncompress_dir), recovery_log_file)
+                execute_xtrabackup_shell_command("innobackupex --apply-log {0} --incremental-dir={1}".format(full_backup_dir, info.recovery_dir), recovery_log_file)
             else:
                 # 其余增量备份恢复
-                execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0} --incremental-dir={1}".format(full_backup_dir, info.uncompress_dir), recovery_log_file)
+                execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0} --incremental-dir={1}".format(full_backup_dir, info.recovery_dir), recovery_log_file)
         number += 1
 
+        # 每次恢复都检查日志最后是否有[completed OK]标记
         return_code, output = commands.getstatusoutput("tail -n 1 {0} | grep 'completed OK'".format(recovery_log_file))
         if (int(return_code) == 0):
-            print_log("[Info]:recovery [{0}] ok-√, log file path {1}".format(info.uncompress_dir, recovery_log_file))
+            print_log("[Info]:recovery [{0}] ok-√, log file path {1}".format(info.recovery_dir, recovery_log_file))
         else:
-            print_log("[Error]:recovery [{0}] fail-X, log file path {1}".format(info.uncompress_dir, recovery_log_file))
+            print_log("[Error]:recovery [{0}] fail-X, log file path {1}".format(info.recovery_dir, recovery_log_file))
             sys.exit()
 
 
