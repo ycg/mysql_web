@@ -2,6 +2,13 @@
 
 import argparse, sys, os, traceback, subprocess, time, commands
 
+# 参数详解
+# --user：备份机器用户名，默认为root
+# --host：备份机器host
+# --log-file：备份日志文件路径
+# --recovery-dir：备份恢复目录
+
+
 # backup.log各个分割字段含义
 # {0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}:{8}:{9}
 # 备份模式:备份路径:备份文件名:备份日志名:备份开始时间:备份结束时间:备份日期:备份是否正常:流式备份方式:压缩方式
@@ -27,16 +34,41 @@ def check_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--user", type=str, dest="user", help="user", default="root")
     parser.add_argument("--host", type=str, dest="host", help="host", default=None)
-    parser.add_argument("--password", type=str, dest="password", help="password", default=None)
-
-    parser.add_argument("--remote", type=bool, dest="remote", help="host is remote", default=False)
     parser.add_argument("--log-file", type=str, dest="log_file", help="backup log file path")
     parser.add_argument("--recovery-dir", type=str, dest="recovery_dir", help="backup recovery dir")
     args = parser.parse_args()
 
     if not args.log_file or not args.recovery_dir:
-        print("[error]:Please input log file path.")
+        print_log("[Error]:Please input log file path or recovery dir.")
         sys.exit(1)
+
+    # 检查是否包含xtrabackup命令
+    status, output = commands.getstatusoutput("innobackupex --help")
+    if (int(status) >= 0):
+        print_log("[Error]:" + output)
+        sys.exit(1)
+
+    if (args.ssh_host != None):
+        # 检测ssh是否正常
+        status, output = commands.getstatusoutput("ssh {0}@{1} 'df -h'".format(args.user, args.password))
+        if (int(status) > 0):
+            print_log("[Error]:" + output)
+            print_log("[Error]:Please check ssh user or host is correct.")
+            sys.exit(1)
+
+        # 拷贝日志文件
+        args.remote = True
+        log_file_name = os.path.basename(args.log_file)
+        execute_shell_command("scp {0}@{1}:{2} {3}".format(args.user, args.host, args.log_file, args.recovery_dir))
+        args.log_file = os.path.join(args.recovery_dir, log_file_name)
+    else:
+        # 检测日志文件是否存在
+        status, output = commands.getstatusoutput("cat {0}".format(args.log_file))
+        if (int(status) > 0):
+            print_log("[Error]:" + output)
+            print_log("[Error]:The log file is not exists.")
+            sys.exit(1)
+
     return args
 
 
