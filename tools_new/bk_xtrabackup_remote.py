@@ -132,6 +132,7 @@ def test_has_innobackup_bin():
         print_log("[Error]:" + output)
         sys.exit(1)
 
+
 # 备份
 def backup(args):
     print_log("[Info]:start backup.")
@@ -164,7 +165,8 @@ def full_backup(args):
                           args.backup_dir if (args.is_local_backup) else args.remote_backup_dir,
                           file_name, log_name, start_backup_time, stop_backup_time, args.stream, args.compress)
 
-# 本地压缩备份
+
+# 本地全量压缩备份
 def full_backup_to_local(args, file_name):
     return "innobackupex --host={0} --user={1} --password='{2}' --port={3} --stream={4} --slave-info --no-timestamp --extra-lsndir={5} {5} | {6} > {7}" \
         .format(args.host,
@@ -177,7 +179,7 @@ def full_backup_to_local(args, file_name):
                 os.path.join(args.backup_dir, file_name))
 
 
-# 远程流式备份
+# 远程全量流式压缩备份
 def full_backup_to_remote(args, file_name):
     return "innobackupex --host={0} --user={1} --password='{2}' --port={3} --stream={4} --slave-info --no-timestamp --extra-lsndir={5} {5} | ssh {6}@{7} \"{8} - > {9}\"" \
         .format(args.host,
@@ -297,6 +299,7 @@ def check_backup_is_correct(xtrabackup_log_path):
 def print_log(log_value):
     print("{0} {1}".format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), log_value))
 
+
 # 后台运行代码
 '''args = check_arguments()
 while (True):
@@ -304,6 +307,9 @@ while (True):
     if (current_time == args.backup_time):
         backup(args)
     time.sleep(10)'''
+
+# 上面代码执行命令如下
+# nohup python bk_xtrabackup_remote.py --host=192.168.11.101 --user=yangcg --password='yangcaogui' --mode=2 --ssh-host=master --remote-backup-dir=/opt/backup_compress &
 
 # crontab运行代码
 # backup(check_arguments())
