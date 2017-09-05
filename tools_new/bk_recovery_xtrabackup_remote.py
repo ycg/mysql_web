@@ -5,12 +5,17 @@ import argparse, sys, os, traceback, time, commands
 # 参数详解
 # --user：备份机器用户名，默认为root
 # --host：备份机器host
-# --log-file：备份日志文件路径
+# --log-file：备份日志文件路径，如果给host赋值了，那么就是远程备份日志路径
 # --recovery-dir：备份恢复目录
+# 注意：恢复好之后要记得改目录的权限
 
 # backup.log各个分割字段含义
 # {0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}:{8}:{9}
 # 备份模式:备份路径:备份文件名:备份日志名:备份开始时间:备份结束时间:备份日期:备份是否正常:流式备份方式:压缩方式
+
+
+# 远程恢复调用命令
+# python bk_recovery_xtrabackup_remote.py --host=master --log-file=/opt/backup_compress/backup_log.txt --recovery-dir=/opt/recovery_dir
 
 FULL_BACKUP = 1
 INCREMENT_BACKUP = 2
@@ -59,6 +64,7 @@ def check_arguments():
         args.log_file = os.path.join(args.recovery_dir, log_file_name)
     else:
         # 检测日志文件是否存在
+        args.remote = False
         execute_shell_command("cat {0}".format(args.log_file), error_log="[Error]:The log file is not exists.")
 
     return args
@@ -119,6 +125,13 @@ def uncompress(args, backup_infos):
             pass
 
         print_log("[Info]:uncompress {0} ok, dir is {1}".format(log_info.compress_file_path, log_info.recovery_dir))
+
+        # 删除tar包文件，释放磁盘空间
+        tar_file_path = os.path.join(args.recovery_dir, dir_name + ".tar")
+        if (os.path.exists(tar_file_path)):
+            os.remove(tar_file_path)
+            print_log("[Info]:remove {0} tar file ok.".format(tar_file_path))
+
     print_log("[Info]:uncompress all backup files ok.")
 
 
@@ -149,6 +162,9 @@ def recovery_backup(args, backup_infos):
             print_log("[Error]:recovery [{0}] fail-X, log file path {1}".format(info.recovery_dir, recovery_log_file))
             sys.exit()
 
+    # 最后要修改全量备份目录的权限
+    execute_shell_command("chown -R mysql:mysql {0}".format(full_backup_dir))
+    print_log("[Info]:change {0} own to mysql ok.".format(full_backup_dir))
 
 # 获取备份日志最后一个全量+增量日志
 def get_latest_backup_infos(args):
