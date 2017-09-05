@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import argparse, sys, os, traceback, subprocess, time, commands
+import argparse, sys, os, traceback, time, commands
 
 # 参数详解
 # --user：备份机器用户名，默认为root
 # --host：备份机器host
 # --log-file：备份日志文件路径
 # --recovery-dir：备份恢复目录
-
 
 # backup.log各个分割字段含义
 # {0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}:{8}:{9}
@@ -43,21 +42,15 @@ def check_arguments():
         sys.exit(1)
 
     # 检查是否包含xtrabackup命令
-    status, output = commands.getstatusoutput("innobackupex --help")
-    if (int(status) > 0):
-        print_log("[Error]:" + output)
-        sys.exit(1)
+    execute_shell_command("innobackupex --help")
 
     # 创建恢复目录
-    execute_shell_command("mkdir -p {0}".format(args.recovery_dir))
+    if (os.path.exists(args.recovery_dir) == False):
+        execute_shell_command("mkdir -p {0}".format(args.recovery_dir))
 
     if (args.host != None):
         # 检测ssh是否正常
-        status, output = commands.getstatusoutput("ssh {0}@{1} 'df -h'".format(args.user, args.host))
-        if (int(status) > 0):
-            print_log("[Error]:" + output)
-            print_log("[Error]:Please check ssh user or host is correct.")
-            sys.exit(1)
+        execute_shell_command("ssh {0}@{1} 'df -h'".format(args.user, args.host), error_log="[Error]:Please check ssh user or host is correct.")
 
         # 拷贝日志文件
         args.remote = True
@@ -66,11 +59,7 @@ def check_arguments():
         args.log_file = os.path.join(args.recovery_dir, log_file_name)
     else:
         # 检测日志文件是否存在
-        status, output = commands.getstatusoutput("cat {0}".format(args.log_file))
-        if (int(status) > 0):
-            print_log("[Error]:" + output)
-            print_log("[Error]:The log file is not exists.")
-            sys.exit(1)
+        execute_shell_command("cat {0}".format(args.log_file), error_log="[Error]:The log file is not exists.")
 
     return args
 
@@ -214,10 +203,13 @@ def print_log(log_value):
 
 
 # 执行linux命令
-def execute_shell_command(command):
+def execute_shell_command(command, error_log=None):
     status, output = commands.getstatusoutput(command)
     if (int(status) > 0):
         print_log("[Error]:" + output)
+        if (error_log != None):
+            print_log(error_log)
+        sys.exit(1)
 
 
 # 执行xtrabackup的命令
