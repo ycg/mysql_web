@@ -1,21 +1,25 @@
 # -*- coding: utf-8 -*-
 
-import argparse, sys, os, traceback, time, commands
+import argparse, sys, os, time, commands
 
 # 参数详解
 # --user：备份机器用户名，默认为root
 # --host：备份机器host
 # --log-file：备份日志文件路径，如果给host赋值了，那么就是远程备份日志路径
 # --recovery-dir：备份恢复目录
-# 注意：恢复好之后要记得改目录的权限
+# 注意：恢复好之后要记得改目录的权限，如果远程恢复，必须配置免密码ssh登录
 
 # backup.log各个分割字段含义
 # {0}:{1}:{2}:{3}:{4}:{5}:{6}:{7}:{8}:{9}
 # 备份模式:备份路径:备份文件名:备份日志名:备份开始时间:备份结束时间:备份日期:备份是否正常:流式备份方式:压缩方式
 
-
 # 远程恢复调用命令
 # python bk_recovery_xtrabackup_remote.py --host=master --log-file=/opt/backup_compress/backup_log.txt --recovery-dir=/opt/recovery_dir
+
+# 本地调用命令
+# 不加--host参数就是从本地拷贝备份文件用于恢复
+# python bk_recovery_xtrabackup_remote.py --log-file=/opt/backup_compress/backup_log.txt --recovery-dir=/opt/recovery_dir
+
 
 FULL_BACKUP = 1
 INCREMENT_BACKUP = 2
@@ -34,12 +38,14 @@ class BackupInfo():
         pass
 
 
+# 获取命令参数
 def check_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--user", type=str, dest="user", help="user", default="root")
-    parser.add_argument("--host", type=str, dest="host", help="host", default=None)
+    parser.add_argument("--user", type=str, dest="user", help="ssh login user, default value is root", default="root")
+    parser.add_argument("--host", type=str, dest="host", help="if backup is remote, please input host value", default=None)
     parser.add_argument("--log-file", type=str, dest="log_file", help="backup log file path")
     parser.add_argument("--recovery-dir", type=str, dest="recovery_dir", help="backup recovery dir")
+    parser.add_argument("--use-memory", type=int, dest="use_memory", help="recovery use memory the unit is G", default=2)
     args = parser.parse_args()
 
     if not args.log_file or not args.recovery_dir:
@@ -70,6 +76,7 @@ def check_arguments():
     return args
 
 
+# 恢复mysql备份文件
 def recovery(args):
     print_log("[Info]:start recovery mysql.")
     backup_infos = get_latest_backup_infos(args)
@@ -144,14 +151,14 @@ def recovery_backup(args, backup_infos):
         recovery_log_file = os.path.join(args.recovery_dir, info.backup_file_name.split(".")[0] + ".log")
         if (info.mode == FULL_BACKUP):
             full_backup_dir = info.recovery_dir
-            execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0}".format(info.recovery_dir), recovery_log_file)
+            execute_xtrabackup_shell_command("innobackupex --apply-log --use-memory={0}G --redo-only {1}".format(args.use_memory, info.recovery_dir), recovery_log_file)
         else:
             if (number == list_count):
                 # 最后一个增量备份恢复
-                execute_xtrabackup_shell_command("innobackupex --apply-log {0} --incremental-dir={1}".format(full_backup_dir, info.recovery_dir), recovery_log_file)
+                execute_xtrabackup_shell_command("innobackupex --apply-log --use-memory={0}G {1} --incremental-dir={2}".format(args.use_memory, full_backup_dir, info.recovery_dir), recovery_log_file)
             else:
                 # 其余增量备份恢复
-                execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only {0} --incremental-dir={1}".format(full_backup_dir, info.recovery_dir), recovery_log_file)
+                execute_xtrabackup_shell_command("innobackupex --apply-log --redo-only --use-memory={0}G {1} --incremental-dir={2}".format(args.use_memory, full_backup_dir, info.recovery_dir), recovery_log_file)
         number += 1
 
         # 每次恢复都检查日志最后是否有[completed OK]标记
@@ -166,18 +173,11 @@ def recovery_backup(args, backup_infos):
     execute_shell_command("chown -R mysql:mysql {0}".format(full_backup_dir))
     print_log("[Info]:change {0} own to mysql ok.".format(full_backup_dir))
 
+
 # 获取备份日志最后一个全量+增量日志
 def get_latest_backup_infos(args):
-    file = None
-    backup_log_infos = []
-    try:
-        file = open(args.log_file, "r")
+    with open(args.log_file, "r") as file:
         backup_log_infos = file.readlines()
-    except:
-        traceback.print_exc()
-    finally:
-        if (file != None):
-            file.close()
 
     if (len(backup_log_infos) <= 0):
         print_log("[Error]:the backup log file is empty.")
@@ -231,13 +231,8 @@ def execute_shell_command(command, error_log=None):
 # 执行xtrabackup的命令
 def execute_xtrabackup_shell_command(command, log_file_path):
     return_code, output = commands.getstatusoutput(command)
-    file = None
-    try:
-        file = open(log_file_path, "w+")
+    with open(log_file_path, "w+") as file:
         file.write(output)
-    finally:
-        if (file != None):
-            file.close()
 
     if (int(return_code) > 0):
         print_log("[Error]:recovery error" + output)
@@ -245,3 +240,4 @@ def execute_xtrabackup_shell_command(command, log_file_path):
 
 
 recovery(check_arguments())
+
