@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import argparse, sys, pymysql, time
+import argparse, sys, pymysql, time, traceback
 from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.row_event import WriteRowsEvent, UpdateRowsEvent, DeleteRowsEvent
 
@@ -21,6 +21,8 @@ from pymysqlreplication.row_event import WriteRowsEvent, UpdateRowsEvent, Delete
 # 检查复制状态并进行修复
 # python mysql_replication_repair.py --host=192.168.11.102 --user=yangcg --password=yangcaogui --execute
 
+reload(sys)
+sys.setdefaultencoding('UTF-8')
 
 KEY_NOT_FOUND = 1032
 DUPLICATE_KEY = 1062
@@ -61,10 +63,11 @@ def check_replication_status(args):
 # 处理复制1032和1062错误
 def check_replication_error_1032_or_1062(args, slave_status):
     args.master_host = slave_status.master_host
-    args.master_port = slave_status.master_port
+    args.master_port = int(slave_status.master_port)
     args.log_file = slave_status.relay_master_log_file
-    args.start_pos = slave_status.exec_master_log_pos
-    args.end_pos = slave_status.last_sql_error.split(" ")[-1]
+    args.start_pos = int(slave_status.exec_master_log_pos)
+    args.last_sql_errno = int(slave_status.last_sql_errno)
+    args.end_pos = int(slave_status.last_sql_error.split(" ")[-1])
     print("[INFO]:error code is {0}".format(slave_status.last_sql_errno))
     print("[INFO]:replication error binlog file {0} start pos {1}, end pos {2}".format(args.log_file, args.start_pos, args.end_pos))
     flashback_sql = binlog_process(args)
@@ -117,10 +120,13 @@ def execute_flashback_sql(args, flashback_sql):
         time.sleep(1)
         cursor.execute("start slave sql_thread;")
         print("[INFO]:Start slave sql thread ok!")
+    except:
+        traceback.print_exc()
     finally:
         if (cursor != None):
             cursor.close()
         if (connection != None):
+            connection.commit()
             connection.close()
 
 
@@ -171,21 +177,26 @@ def binlog_process(args):
 
             if (args.end_pos != None):
                 if (binlogevent.packet.log_pos > args.end_pos):
-                    break
+                    return flashback_sql
 
+            # 1032 - MySQL error code 1032 (ER_KEY_NOT_FOUND): Can't find record in '%-.192s'
+            # 1062 - MySQL error code 1062 (ER_DUP_ENTRY): Duplicate entry '%-.192s' for key %d
             if (isinstance(binlogevent, WriteRowsEvent)):
                 for row in binlogevent.rows:
                     print("[INFO]:original sql - {0}".format(insert_to_sql(row, binlogevent)))
+                    print("----------------------------------------------------------------------")
                     print("[INFO]:flashback sql - {0}".format(delete_to_sql(row, binlogevent)))
                     flashback_sql.append(delete_to_sql(row, binlogevent))
             elif (isinstance(binlogevent, DeleteRowsEvent)):
                 for row in binlogevent.rows:
                     print("[INFO]:original sql - {0}".format(delete_to_sql(row, binlogevent)))
+                    print("----------------------------------------------------------------------")
                     print("[INFO]:flashback sql - {0}".format(insert_to_sql(row, binlogevent)))
                     flashback_sql.append(insert_to_sql(row, binlogevent))
             elif (isinstance(binlogevent, UpdateRowsEvent)):
                 for row in binlogevent.rows:
                     print("[INFO]:original sql - {0}".format(update_to_sql(row, binlogevent, False)))
+                    print("----------------------------------------------------------------------")
                     print("[INFO]:flashback sql - {0}".format(update_to_sql(row, binlogevent, True)))
                     flashback_sql.append(update_to_sql(row, binlogevent, True))
     finally:
@@ -205,7 +216,12 @@ def delete_to_sql(row, binlogevent):
 
 def update_to_sql(row, binlogevent, flashback):
     if (flashback):
-        return update_sql.format(binlogevent.schema, binlogevent.table, sql_format(row['before_values'], ", "), sql_format(row['after_values'], " AND "))
+        columns = []
+        values = []
+        for key, value in row["before_values"].items():
+            values.append(value)
+            columns.append("`{0}`".format(key))
+        return "INSERT INTO `{0}`.`{1}` ({2}) VALUES ({3});".format(binlogevent.schema, binlogevent.table, ', '.join(columns), sql_format_for_insert(values))
     else:
         return update_sql.format(binlogevent.schema, binlogevent.table, sql_format(row['after_values'], ", "), sql_format(row['before_values'], " AND "))
 
