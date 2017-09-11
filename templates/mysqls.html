@@ -30,7 +30,7 @@
             <th>
                 IP:Port
             </th>
-            <th>
+            <th title="role value is master or slave">
                 Role
             </th>
             <th>
@@ -94,11 +94,11 @@
             </td>
             <td>
                 {% if(data.is_slave and data.is_master) %}
-                    M,S
+                    <label style="margin: 0px;font-weight: bold; color: #3A87AD;">M</label>&<label style="margin: 0px; font-weight: bold; color: #F99506;">S</label>
                 {% elif(data.is_master) %}
-                    M
+                    <label style="margin: 0px;font-weight: bold; color: #3A87AD;">M</label>
                 {% elif(data.is_slave) %}
-                    S
+                    <label style="margin: 0px; font-weight: bold; color: #F99506;">S</label>
                 {% endif %}
             </td>
             <td>
