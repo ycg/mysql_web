@@ -55,6 +55,63 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="mysql_host_update_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="exampleModalLabel">更新MySQL主机信息</h4>
+            </div>
+            <div class="modal-body">
+                <form id="mysql_host_update_form">
+                    <div class="form-group">
+                        <label id="user_name_lable" name="user_name_lable" class="control-label" for="user_name">名称:</label>
+                        <input id="host_name" type="text" name="host_name" class="form-control" placeholder="请输入mysql主机名称">
+                    </div>
+                    <div class="form-group">
+                        <label id="user_password_lable" name="user_password_lable" class="control-label" for="user_password">IP地址:</label>
+                        <input id="host_ip" type="text" name="host_ip" class="form-control" placeholder="请输入mysql主机ip地址">
+                    </div>
+                    <div class="form-group">
+                        <label id="email_lable" name="email_lable" class="control-label" for="email">端口:</label>
+                        <input id="host_port" type="text" name="host_port" class="form-control" value="3306">
+                    </div>
+                    <div class="form-group">
+                        <label id="email_lable" name="email_lable" class="control-label" for="email">用户名:</label>
+                        <input id="host_user" type="text" name="host_user" class="form-control" placeholder="请输入mysql用户名">
+                    </div>
+                    <div class="form-group">
+                        <label id="email_lable" name="email_lable" class="control-label" for="email">密码:</label>
+                        <input id="host_password" type="password" name="host_password" class="form-control" placeholder="请输入mysql密码">
+                    </div>
+                    <div class="form-group">
+                        <label id="email_lable" name="email_lable" class="control-label" for="email">SSH用户:</label>
+                        <input id="host_ssh_user" type="text" name="host_ssh_user" class="form-control" value="root">
+                    </div>
+                    <div class="form-group">
+                        <label id="email_lable" name="email_lable" class="control-label" for="email">SSH端口:</label>
+                        <input id="host_ssh_port" type="text" name="host_ssh_port" class="form-control" value="22">
+                    </div>
+                    <div class="form-group">
+                        <label id="email_lable" name="email_lable" class="control-label" for="email">SSH密码:</label>
+                        <input id="host_ssh_password" type="password" name="host_ssh_password" class="form-control" placeholder="如果设置了免密码登录则不需要填写">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" onclick="test_ssh_connection_is_ok()">测试SSH连接</button>
+                <button type="button" class="btn btn-info" onclick="test_mysql_connection_is_ok()">测试MySQL连接</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 </br>
 </br>
 <div class="row">

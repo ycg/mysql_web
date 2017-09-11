@@ -5,6 +5,7 @@
     <file url="file://$PROJECT_DIR$/../mysql_audit/mysql_audit.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/settings.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/src/custom_algorithm.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../mysql_audit/src/custom_entity.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/src/host_manager.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/src/user_manager.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/static/js/common.js" charset="UTF-8" />
@@ -13,7 +14,6 @@
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/host.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/list.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../mysql_audit/templates/user.html" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/../mysql_audit/test.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/backup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/mydumper.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/mysqldump.py" charset="UTF-8" />
@@ -49,7 +49,9 @@
     <file url="file://$PROJECT_DIR$/tools/mha/purge_relay_log.sh" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools/mysql/common_sql.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools_new/binlog_util.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tools_new/bk_recovery_xtrabackup_remote.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools_new/bk_xtrabackup.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tools_new/bk_xtrabackup_remote.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools_new/collect_mysql_status_log.sh" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools_new/mha/app.conf" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools_new/mha/masterha_master_switch" charset="UTF-8" />
@@ -57,6 +59,7 @@
     <file url="file://$PROJECT_DIR$/tools_new/mha/mha_manual" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools_new/mha/purge_relay_log.sh" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tools_new/mysql_processlist_monitor.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tools_new/mysql_skip_rpl_error.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../py-util/db_util.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../py-util/file_util.py" charset="UTF-8" />
   </component>
