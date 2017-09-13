@@ -572,6 +572,18 @@ def get_binlog():
 
 #endregion
 
+
+#region alarm config
+
+@app.route("/alarm", methods=["GET", "POST"])
+@login_required
+def alarm_config():
+    return render_template("alarm_config.html")
+
+
+#endregion
+
+
 if __name__ == '__main__':
     if (settings.LINUX_OS):
         print("linux start ok.")
