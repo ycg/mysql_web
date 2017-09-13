@@ -62,5 +62,6 @@
     <file url="file://$PROJECT_DIR$/tools_new/mysql_skip_rpl_error.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../py-util/db_util.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../py-util/file_util.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../py-util/test.py" charset="UTF-8" />
   </component>
 </project>

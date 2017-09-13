@@ -554,6 +554,22 @@ def start_mysql_host_info(host_id):
 def delete_mysql_host_info(host_id):
     return mysql_manager.delete_mysql_host_info(host_id)
 
+@app.route("/host/query/<int:host_id>", methods=["GET", "POST"])
+@login_required
+def get_mysql_info_by_host_id(host_id):
+    return mysql_manager.get_mysql_info(host_id)
+
+#endregion
+
+#region binlog
+
+
+@app.route("/binlog", methods=["GET", "POST"])
+@login_required
+def get_binlog():
+    return render_template("binlog.html", host_infos=cache.Cache().get_all_host_infos())
+
+
 #endregion
 
 if __name__ == '__main__':

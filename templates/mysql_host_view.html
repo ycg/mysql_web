@@ -73,8 +73,8 @@
                     {{ info.created_time }}
                 </td>
                 <td class="text-center">
-                    <button class="btn btn-primary btn-xs">编辑</button>
-                    <button class="btn btn-danger btn-xs" onclick="delete_mysql_host({{ info.host_id }})">禁用</button>
+                    <button class="btn btn-default btn-xs" onclick="show_update_mysql_host_dialog({{ info.host_id }})">编辑</button>
+                    <button class="btn btn-danger btn-xs" onclick="delete_mysql_host({{ info.host_id }})">删除</button>
                 </td>
             </tr>
         {% endfor %}

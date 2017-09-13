@@ -1,0 +1,40 @@
+<div class="row">
+    <form action="/binlog/" method="post" class="form-inline col-md-12" target="nm_iframe" role="form" id="binlog_form">
+        <div class="form-group" style="width: 180px">
+            <select id="host_ids" name="host_ids" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
+                {% for info in host_infos %}
+                    <option value="{{ info.host_id }}">{{ info.remark }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group" style="width: 180px">
+            <select id="order_by_options" name="order_by_options" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
+                <option value="1">Last Seen</option>
+                <option value="2">Query Time</option>
+                <option value="3">Query Count</option>
+                <option value="4">Lock Time</option>
+            </select>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group" style="width: 180px">
+            <select id="slow_log_status" name="slow_log_status" class="selectpicker show-tick form-control bs-select-hidden" data-live-search="true">
+                <option value="2">ALL</option>
+                <option value="1">Reviewed</option>
+                <option value="0">Not Reviewed</option>
+            </select>
+        </div>
+        &nbsp;&nbsp;
+        <div class="form-group">
+            <input id="start_datetime" name="start_datetime" type="text" value="" class="form_datetime form-control" readonly>
+            -
+            <input id="stop_datetime" name="stop_datetime" type="text" value="" class="form_datetime form-control" readonly>
+        </div>
+        <div class="form-group">
+            &nbsp;&nbsp;
+            <button type="submit" class="btn btn-primary">Query</button>
+            &nbsp;&nbsp;
+            <button type="reset" class="btn btn-default">Reset</button>
+        </div>
+    </form>
+</div>

@@ -167,3 +167,10 @@ def delete_mysql_host_info(host_id):
     cache.Cache().load_all_host_infos()
     return "删除成功"
 
+
+# 根据host id获取mysql信息
+def get_mysql_info(host_id):
+    sql = "select host_id, host, port, user, password, remark, ssh_user, ssh_port, ssh_password from mysql_web.host_infos where host_id = {0};".format(host_id)
+    result = common.get_object(db_util.DBUtil().fetchone(settings.MySQL_Host, sql))
+    result.user = custom_algorithm.decrypt(settings.MY_KEY, result.user)
+    return common.convert_obj_to_json_str(result)

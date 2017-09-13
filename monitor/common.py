@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import paramiko, subprocess, traceback, json
+import paramiko, subprocess, traceback, json, datetime, time
 from entitys import BaseClass
 import db_util
+
+
+def convert_object_json(obj):
+    if isinstance(obj, datetime):
+        return obj.strftime('%Y-%m-%d %H:%M:%S')
+    elif isinstance(obj, time.date):
+        return obj.strftime('%Y-%m-%d')
+    else:
+        return obj.__dict__
 
 
 # 把数据库返回数据转换为对象
@@ -31,6 +40,8 @@ def get_object_list(rows):
 # 转换对象为json数据
 def convert_obj_to_json_str(obj):
     return json.dumps(obj, default=lambda o: o.__dict__)
+    #return json.dumps(obj, default=convert_obj_to_json_str(xxx))
+    #return json.dumps(obj, default=lambda o: o.strftime("%Y-%m-%d %H:%M:%S") if (isinstance(o, datetime)) else o.__dict__)
 
 
 # 执行本地命令
@@ -77,5 +88,4 @@ def test_mysql_connection_is_ok(obj):
         traceback.print_exc()
         return False
     return True
-
 

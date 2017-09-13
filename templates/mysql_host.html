@@ -1,4 +1,4 @@
-<button type="button" class="btn btn-primary" onclick=show_modal_dialog("#mysql_host_add_dialog")>添加MySQL主机</button>
+<button type="button" class="btn btn-primary" onclick=show_add_mysql_host_dialog()>添加MySQL主机</button>
 
 <div class="modal fade" id="mysql_host_add_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
     <div class="modal-dialog" role="document">
@@ -49,7 +49,7 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-info" onclick="test_ssh_connection_is_ok()">测试SSH连接</button>
                 <button type="button" class="btn btn-info" onclick="test_mysql_connection_is_ok()">测试MySQL连接</button>
-                <button type="button" class="btn btn-primary" onclick="add_mysql_host()">添加</button>
+                <button type="button" id="add_update_btn" class="btn btn-primary" onclick="add_mysql_host()">添加</button>
             </div>
         </div>
     </div>
@@ -69,35 +69,35 @@
                 <form id="mysql_host_update_form">
                     <div class="form-group">
                         <label id="user_name_lable" name="user_name_lable" class="control-label" for="user_name">名称:</label>
-                        <input id="host_name" type="text" name="host_name" class="form-control" placeholder="请输入mysql主机名称">
+                        <input id="host_name_u" type="text" name="host_name" class="form-control" placeholder="请输入mysql主机名称">
                     </div>
                     <div class="form-group">
                         <label id="user_password_lable" name="user_password_lable" class="control-label" for="user_password">IP地址:</label>
-                        <input id="host_ip" type="text" name="host_ip" class="form-control" placeholder="请输入mysql主机ip地址">
+                        <input id="host_ip_u" type="text" name="host_ip" class="form-control" placeholder="请输入mysql主机ip地址">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">端口:</label>
-                        <input id="host_port" type="text" name="host_port" class="form-control" value="3306">
+                        <input id="host_port_u" type="text" name="host_port" class="form-control" value="3306">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">用户名:</label>
-                        <input id="host_user" type="text" name="host_user" class="form-control" placeholder="请输入mysql用户名">
+                        <input id="host_user_u" type="text" name="host_user" class="form-control" placeholder="请输入mysql用户名">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">密码:</label>
-                        <input id="host_password" type="password" name="host_password" class="form-control" placeholder="请输入mysql密码">
+                        <input id="host_password_u" type="password" name="host_password" class="form-control" placeholder="请输入mysql密码">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">SSH用户:</label>
-                        <input id="host_ssh_user" type="text" name="host_ssh_user" class="form-control" value="root">
+                        <input id="host_ssh_user_u" type="text" name="host_ssh_user" class="form-control" value="root">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">SSH端口:</label>
-                        <input id="host_ssh_port" type="text" name="host_ssh_port" class="form-control" value="22">
+                        <input id="host_ssh_port_u" type="text" name="host_ssh_port" class="form-control" value="22">
                     </div>
                     <div class="form-group">
                         <label id="email_lable" name="email_lable" class="control-label" for="email">SSH密码:</label>
-                        <input id="host_ssh_password" type="password" name="host_ssh_password" class="form-control" placeholder="如果设置了免密码登录则不需要填写">
+                        <input id="host_ssh_password_u" type="password" name="host_ssh_password" class="form-control" placeholder="如果设置了免密码登录则不需要填写">
                     </div>
                 </form>
             </div>
@@ -105,7 +105,7 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-info" onclick="test_ssh_connection_is_ok()">测试SSH连接</button>
                 <button type="button" class="btn btn-info" onclick="test_mysql_connection_is_ok()">测试MySQL连接</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <button type="button" class="btn btn-primary" onclick="update_mysql_host()">更新</button>
             </div>
         </div>
     </div>
@@ -126,6 +126,19 @@
         input_data_for_post("/host/query", "", "#host_view_div")
     }
 
+    function show_add_mysql_host_dialog() {
+        $("#add_update_btn").text("添加");
+        $("#host_name").val("");
+        $("#host_ip").val("");
+        $("#host_port").val("3306");
+        $("#host_user").val("");
+        $("#host_password").val("");
+        $("#host_ssh_user").val("root");
+        $("#host_ssh_port").val("22");
+        $("#host_ssh_password").val("");
+        show_modal_dialog("#mysql_host_add_dialog");
+    }
+
     function add_mysql_host() {
         if (window.confirm("是否确认添加?")) {
             $.post("/host/add", JSON.stringify(get_form_json("#mysql_host_add_form")), function (data) {
@@ -138,6 +151,12 @@
             }).error(function () {
                 alert("error");
             });
+        }
+    }
+
+    function update_mysql_host() {
+        if (window.confirm("是否确认更新?")) {
+
         }
     }
 
@@ -161,6 +180,24 @@
                 alert("error");
             });
         }
+    }
+
+    function show_update_mysql_host_dialog(host_id) {
+        $.post("/host/query/" + host_id, "", function (data) {
+            var host_info = JSON.parse(data);
+            $("#add_update_btn").text("更新");
+            $("#host_name").val(host_info.remark);
+            $("#host_ip").val(host_info.host);
+            $("#host_port").val(host_info.port);
+            $("#host_user").val(host_info.user);
+            $("#host_password").val(host_info.password);
+            $("#host_ssh_user").val(host_info.ssh_user);
+            $("#host_ssh_port").val(host_info.ssh_port);
+            $("#host_ssh_password").val(host_info.ssh_password);
+            show_modal_dialog("#mysql_host_add_dialog")
+        }).error(function () {
+            alert("error");
+        });
     }
 
     function test_ssh_connection_is_ok() {
