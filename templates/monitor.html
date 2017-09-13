@@ -349,7 +349,7 @@
                     <td {% if(status.rollback > 0) %} class="text-danger" {% endif %}>
                         {{ status.rollback }}
                     </td>
-                    <td {% if(status.qps > 10000) %} class="text-danger" {% endif %}>
+                    <td {% if(status.qps > 5000) %} class="text-danger" {% endif %}>
                         {{ status.qps }}
                     </td>
                     <td>
@@ -358,10 +358,10 @@
                     <td>
                         {{ status.trx_count }}
                     </td>
-                    <td>
+                    <td {% if(status.send_bytes_bigint > 1048576) %} class="text-danger" {% endif %}>
                         {{ status.send_bytes }}
                     </td>
-                    <td>
+                    <td {% if(status.receive_bytes_bigint > 1048576) %} class="text-danger" {% endif %}>
                         {{ status.receive_bytes }}
                     </td>
                 </tr>
