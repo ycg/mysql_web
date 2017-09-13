@@ -1,99 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
-    <title></title>
-</head>
-<body>
-<!--<form class="form-horizontal col-md-3" role="form">
-    <div class="form-group">
-        <label class="col-md-2 control-label" for="ds_host">主机名</label>
-        <div>
-            <input class="form-control col-md-1" id="ds_host" type="text" placeholder="192.168.1.161"/>
-        </div>
-        <label class="col-md-2 control-label" for="ds_name">数据库名</label>
-        <div >
-            <input class="form-control col-md-1" id="ds_name" type="text" placeholder="msh"/>
+<div class="row">
+    <div class="col-lg-10">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h5>Binlog查找</h5>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-4 col-sm-8 col-xs-8 col-xxs-12">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-md-4 control-label" for="select">Host Name:</div>
+                                <div class="col-md-5">
+                                    <select class="form-control selectpicker show-tick form-control bs-select-hidden" onchange="get_master_binlog_list()">
+                                        {% for info in host_infos %}
+                                            <option value="{{ info.host_id }}">{{ info.remark }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-8 col-xs-8 col-xxs-12">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-md-4 control-label" for="select">Binlog List:</div>
+                                <div class="col-md-5">
+                                    <select class="form-control selectpicker show-tick form-control bs-select-hidden">
+                                        <option>DB1-Master</option>
+                                        <option>DB2-Master</option>
+                                        <option>db3-master</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-sm-8 col-xs-8 col-xxs-12">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-md-4 control-label" for="select">Start Position:</div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-8 col-xs-8 col-xxs-12">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-md-4 control-label" for="select">Stop Position:</div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-sm-8 col-xs-8 col-xxs-12">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-md-4 control-label" for="select">Start Datetime:</div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-8 col-xs-8 col-xxs-12">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-md-4 control-label" for="select">Stop Datetime:</div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-8 col-xs-8 col-xxs-12">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <div class="col-md-4 control-button" for="button">
+                                    <button class="btn btn-primary" style="width: 150px">Query</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</form>-->
+</div>
 
-<!--<form class="form-horizontal col-md-4" role="form">
-  <div class="form-group">
-    <label for="firstname" class="col-sm-2 control-label">名字</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="firstname" placeholder="请输入名字">
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h5>Binlog内容</h5>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <textarea id="binlog_value" class="form-control" placeholder="binlog value" rows=21 required></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="form-group">
-    <label for="lastname" class="col-sm-2 control-label">姓</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="lastname" placeholder="请输入姓">
-    </div>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-      <button type="submit" class="btn btn-default">登录</button>
-    </div>
-  </div>
-    <div class="form-group">
-        <label for="name" class="col-sm-2">Query</label>
-        <select class="form-control" class="col-sm-10">
-          <option>DateTime</option>
-          <option>Position</option>
-        </select>
-      </div>
-</form>-->
-<form role="form">
-    <div class="form-inline">
-        <div class="form-group">
-            <label for="name">Master</label>
-            <select class="form-control" id="server">
-                <option id="1" value="DB1-Master">DB1-Master</option>
-                <option>DB2-Master</option>
-                <option>db3-master</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="name">&nbsp;&nbsp;&nbsp;&nbsp;Query</label>
-            <select class="form-control" id="type">
-                <option>DateTime</option>
-                <option>Position</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="name">&nbsp;&nbsp;&nbsp;&nbsp;Binlog List:</label>
-            <select class="form-control" id="binlog">
-                <option id="1" value="bin_log.000001">bin_log.000001</option>
-                <option>bin_log.000002</option>
-                <option>bin_log.000003</option>
-                <option>bin_log.000004</option>
-                <option>bin_log.000005</option>
-                <option>bin_log.000006</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>&nbsp;&nbsp;&nbsp;&nbsp;Start Value:</label>
-            <input id="start" class="form-control" type="text" placeholder=""/>
-        </div>
-        <div class="form-group">
-            <label>&nbsp;&nbsp;&nbsp;&nbsp;Stop Value:</label>
-            <input id="stop" class="form-control" type="password" placeholder=""/>
-        </div>
-        <div class="radio">
-            <label>
-                <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>SQL
-            </label>
-        </div>
-        <div class="radio">
-            <label>
-                <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">Statistical SQL
-            </label>
-        </div>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <button type="button" class="btn btn-default">Commit</button>
-    </div>
-</form>
-</body>
-</html>
+</div>
+
+<script type="text/javascript">
+    $(".selectpicker").selectpicker({liveSearch: true});
+
+    function get_master_binlog_list() {
+
+    }
+</script>
