@@ -420,7 +420,7 @@
                     <td>
                         {{ status.host_info.remark }}
                     </td>
-                    <td {% if(status.connections_usage_rate > 80) %} class="text-danger" {% endif %}>
+                    <td {% if(status.connections_usage_rate > 80 or status.threads_count > 1000) %} class="text-danger" {% endif %}>
                         {{ status.threads_count }}
                     </td>
                     <td {% if(status.threads_run_count > 5) %} class="text-danger" {% endif %}>
