@@ -157,7 +157,7 @@
         }
 
         function get_chart_data() {
-            $.post("/chart/" + select_host_id, "", function (data) {
+            $.post("/chart/" + select_host_id, "host_id:20", function (data) {
                 var login_flag = data.substring(0, 25);
                 if (login_flag == "<p hidden>login_error</p>") {
                     window.location.href = 'login';

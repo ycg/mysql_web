@@ -64,10 +64,10 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="exampleModalLabel">ÌáÊ¾</h4>
+                <h4 class="modal-title" id="exampleModalLabel">æç¤º</h4>
             </div>
             <div class="modal-body" id="table_detail">
-                ÈßÓàË÷Òı¼ì²éÖĞ......
+                å†—ä½™ç´¢å¼•æ£€æŸ¥ä¸­......
             </div>
         </div>
     </div>
@@ -111,13 +111,13 @@
     }
 
     function pt_duplicate_key_checker(host_id) {
-        if (window.confirm("ÊÇ·ñÏÖÔÚ½øĞĞ¼ì²é?")) {
+        if (window.confirm("æ˜¯å¦ç°åœ¨è¿›è¡Œæ£€æŸ¥?")) {
             $("#index_check_dialog").modal("show");
             $.post("/index/duplicate/" + host_id, "", function (data) {
                 alert(data);
                 $("#index_check_dialog").modal("hide");
             }).error(function () {
-                alert("¼ì²éÊ§°Ü£¡");
+                alert("æ£€æŸ¥å¤±è´¥ï¼");
                 $("#index_check_dialog").modal("hide");
             });
         }
