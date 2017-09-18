@@ -50,6 +50,14 @@
             <div id="io_read_write" style="height:300px;"></div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div id="rpl_delay" style="height:300px;"></div>
+        </div>
+        <div class="col-md-6">
+            <div></div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
@@ -61,6 +69,7 @@
         var qps_chart = echarts.init(document.getElementById('qps'));
         var tps_chart = echarts.init(document.getElementById('tps'));
         var dml_chart = echarts.init(document.getElementById('dml'));
+        var rpl_delay_chart = echarts.init(document.getElementById('rpl_delay'));
         var cpu_load_chart = echarts.init(document.getElementById('cpu_load'));
         var thread_chart = echarts.init(document.getElementById('thread_chart'));
         var mysql_cpu_chart = echarts.init(document.getElementById('mysql_cpu'));
@@ -95,10 +104,12 @@
         var io_tps_data_y = [];
         var io_read_data_y = [];
         var io_write_data_y = [];
+        var rpl_delay_data_y = [];
 
         function init_chart() {
             set_chart_options(qps_chart, "QPS", qps_data_y);
             set_chart_options(tps_chart, "TPS", tps_data_y);
+            set_chart_options(rpl_delay_chart, "Rpl Delay", rpl_delay_data_y);
             set_chart_options(mysql_cpu_chart, "MySQL CPU", mysql_cpu_data_y);
             set_chart_options(mysql_mem_chart, "MySQL Mem", mysql_mem_data_y);
 
@@ -140,16 +151,23 @@
             io_tps_data_y = [];
             io_read_data_y = [];
             io_write_data_y = [];
+            rpl_delay_data_y = [];
 
             init_chart();
         }
 
         function get_chart_data() {
-            $.get("/chart/" + select_host_id, "", function (data) {
+            $.post("/chart/" + select_host_id, "", function (data) {
+                var login_flag = data.substring(0, 25);
+                if (login_flag == "<p hidden>login_error</p>") {
+                    window.location.href = 'login';
+                }
+
                 set_chart_data(jQuery.parseJSON(data))
 
                 refresh_chart(qps_chart, qps_data_y);
                 refresh_chart(tps_chart, tps_data_y);
+                refresh_chart(rpl_delay_chart, rpl_delay_data_y);
                 refresh_chart(thread_chart, thread_data_y);
                 refresh_chart(mysql_cpu_chart, mysql_cpu_data_y);
                 refresh_chart(mysql_mem_chart, mysql_mem_data_y);
@@ -160,6 +178,8 @@
                 refresh_multi_line_chart(cpu_chart, cpu_list);
                 refresh_multi_line_chart(dml_chart, dml_data_list);
                 refresh_multi_line_chart(cpu_load_chart, cpu_load_list);
+            }).error(function () {
+                alert("获取数据失败！");
             });
         }
 
@@ -186,6 +206,7 @@
                 io_tps_data_y.shift();
                 io_read_data_y.shift();
                 io_write_data_y.shift();
+                rpl_delay_data_y.shift();
             }
             qps_data_y.push(obj_data.qps);
             tps_data_y.push(obj_data.tps);
@@ -208,6 +229,7 @@
             io_tps_data_y.push(obj_data.io_tps);
             io_read_data_y.push(obj_data.io_read);
             io_write_data_y.push(obj_data.io_write);
+            rpl_delay_data_y.push(obj_data.rpl_delay);
         }
 
         function refresh_chart(chart_dom, data_y) {

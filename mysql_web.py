@@ -395,7 +395,7 @@ def chart_home():
     return render_template("chart.html", host_infos=mysql_cache.get_all_host_infos(), interval=settings.UPDATE_INTERVAL * 1000)
 
 
-@app.route("/chart/<int:host_id>")
+@app.route("/chart/<int:host_id>", methods=["GET", "POST"])
 @login_required
 def get_chart_data_by_host_id(host_id):
     return chart.get_chart_data_by_host_id(host_id)

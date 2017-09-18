@@ -25,6 +25,7 @@
     <file url="file://$PROJECT_DIR$/monitor/mysql_manager.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/new_slow_log.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/tablespace.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/monitor/user_login.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/python_upgrade.sh" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sql/table.sql" charset="GBK" />
     <file url="file://$PROJECT_DIR$/startup.sh" charset="UTF-8" />

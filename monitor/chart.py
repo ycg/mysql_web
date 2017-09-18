@@ -5,6 +5,7 @@ def get_chart_data_by_host_id(host_id):
     result = entitys.BaseClass(None)
     os_info = cache.Cache().get_linux_info(host_id)
     status_info = cache.Cache().get_status_info(host_id)
+    repl_info = cache.Cache().get_repl_info(host_id)
     result.qps = status_info.qps
     result.tps = status_info.tps
     result.threads = status_info.threads_count
@@ -19,6 +20,7 @@ def get_chart_data_by_host_id(host_id):
     result.io_tps = os_info.io_tps
     result.io_read = os_info.io_read
     result.io_write = os_info.io_write
+    result.rpl_delay = repl_info.seconds_behind_master
     result.time = time.strftime('%H:%M:%S', time.localtime(time.time()))
     if(hasattr(os_info, "cpu_1")):
         result.cpu_1 = os_info.cpu_1
@@ -99,4 +101,5 @@ chart_options[10] = get_chart_obj("IO Util", "util:2", ["util"])
 chart_options[11] = get_chart_obj("Repl Delay", "seconds_behind_master:3", ["delay"])
 chart_options[12] = get_chart_obj("MySQL CPU", "mysql_cpu:2")
 chart_options[13] = get_chart_obj("MySQL Mem", "mysql_memory:2")
+chart_options[14] = get_chart_obj("MySQL Mem", "mysql_memory:2")
 

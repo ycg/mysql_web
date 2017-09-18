@@ -263,8 +263,9 @@ class MonitorServer(threading.Thread):
 
         # 3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         repl_info = self.__cache.get_repl_info(host_info.key)
-        result = self.__db_util.fetchone(host_info, "show slave status;")
+        repl_info.seconds_behind_master = 0
         if (host_info.is_slave):
+            result = self.__db_util.fetchone(host_info, "show slave status;")
             repl_info.read_only = mysql_variables["read_only"]
             repl_info.error_message = result["Last_Error"]
             repl_info.io_status = result["Slave_IO_Running"]
