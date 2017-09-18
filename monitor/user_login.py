@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import hashlib
 from flask_login import UserMixin
 
@@ -11,12 +13,12 @@ class User(UserMixin):
 
     def verify_password(self, password, result):
         if self.id is None or self.password is None:
-            result.error = "user name incorrect"
+            result.error = "用户名不正确!"
             return False
         if(self.password == self.get_value_for_md5(password)):
             result.success = "ok"
             return True
-        result.error = "password incorrect"
+        result.error = "密码不正确!"
         return False
 
     def get_password(self):
