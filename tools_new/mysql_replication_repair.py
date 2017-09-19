@@ -113,7 +113,7 @@ def execute_flashback_sql(args, flashback_sql):
     try:
         connection = pymysql.connect(host=args.host, user=args.user, passwd=args.password, port=args.port, use_unicode=True, charset="utf8", connect_timeout=2)
         cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
-        sql = "start transaction;" + "".join(flashback_sql) + "commit;"
+        sql = "".join(flashback_sql)
         print("[INFO]:execute sql is {0}".format(sql))
         cursor.execute(sql)
         print("[INFO]:execute sql ok!")
@@ -122,6 +122,7 @@ def execute_flashback_sql(args, flashback_sql):
         print("[INFO]:Start slave sql thread ok!")
     except:
         traceback.print_exc()
+        connection.rollback()
     finally:
         if (cursor != None):
             cursor.close()
