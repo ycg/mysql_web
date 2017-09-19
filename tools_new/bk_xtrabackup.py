@@ -108,7 +108,7 @@ def full_backup(args):
     if (os.path.exists(full_backup_dir) == False):
         os.mkdir(full_backup_dir)
     full_backup_log_path = os.path.join(args.backup_dir, "full_{0}.log".format(start_backup_time))
-    command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp {4} &> {5}"\
+    command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --slave-info --no-timestamp {4} &> {5}"\
               .format(args.host, args.user, args.password, args.port, full_backup_dir, full_backup_log_path)
     result = subprocess.Popen(command, shell=True)
     result.wait()
@@ -131,7 +131,7 @@ def increment_backup(args):
         if (os.path.exists(increment_backup_dir) == False):
             os.mkdir(increment_backup_dir)
         increment_backup_log_path = os.path.join(args.backup_dir, "increment_{0}.log".format(start_backup_time))
-        command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --no-timestamp --incremental --incremental-basedir={4} {5} &> {6}"\
+        command = "innobackupex --host={0} --user={1} --password='{2}' --port={3} --slave-info --no-timestamp --incremental --incremental-basedir={4} {5} &> {6}"\
                   .format(args.host, args.user, args.password, args.port, last_backup_dir, increment_backup_dir, increment_backup_log_path)
         result = subprocess.Popen(command, shell=True)
         result.wait()
