@@ -587,8 +587,9 @@ def alarm_config():
 if __name__ == '__main__':
     if (settings.LINUX_OS):
         print("linux start ok.")
-        server = pywsgi.WSGIServer(("0.0.0.0", 5000), app)
-        server.serve_forever()
+        # server = pywsgi.WSGIServer(("0.0.0.0", 5000), app)
+        # server.serve_forever()
+        app.run(debug=False, host="0.0.0.0", port=5000, use_reloader=False, threaded=True)
     if (settings.WINDOWS_OS):
         print("windows start ok.")
-        app.run(debug=True, host="0.0.0.0", port=5000, use_reloader=False)
+        app.run(debug=True, host="0.0.0.0", port=5000, use_reloader=False, threaded=True)
