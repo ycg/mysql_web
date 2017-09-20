@@ -111,7 +111,7 @@ def get_slave_status(args):
 def execute_flashback_sql(args, flashback_sql):
     connection, cursor = None, None
     try:
-        connection = pymysql.connect(host=args.host, user=args.user, passwd=args.password, port=args.port, use_unicode=True, charset="utf8", connect_timeout=2)
+        connection = pymysql.connect(host=args.host, user=args.user, passwd=args.password, port=args.port, use_unicode=True, charset="utf8", connect_timeout=2, autocommit=True)
         cursor = connection.cursor(cursor=pymysql.cursors.DictCursor)
         sql = "".join(flashback_sql)
         print("[INFO]:execute sql is {0}".format(sql))
