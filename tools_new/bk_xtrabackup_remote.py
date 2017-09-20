@@ -72,7 +72,7 @@ def check_arguments():
     parser.add_argument("--user", type=str, dest="user", help="mysql user")
     parser.add_argument("--password", type=str, dest="password", help="mysql password")
     parser.add_argument("--port", type=int, dest="port", help="mysql port", default=3306)
-    parser.add_argument("--backup-dir", type=str, dest="backup_dir", help="backup dir", default="/opt/xtrabackup_local/")
+    parser.add_argument("--backup-dir", type=str, dest="backup_dir", help="backup dir(default path: /opt/xtrabackup_local/)", default="/opt/xtrabackup_local/")
     parser.add_argument("--mode", type=int, dest="mode", help="backup mode", default=INCREMENT_BACKUP)
     parser.add_argument("--backup-time", type=str, dest="backup_time", help="backup time", default="03:30")
     parser.add_argument("--expire-days", type=int, dest="expire_days", help="expire backup days", default=14)
@@ -131,7 +131,7 @@ def check_arguments():
             print_log("[Error]:Remote backup, must use stream, please input [0-None(default) 1-tar 2-xbstream].")
             sys.exit(1)
 
-    args.backup_log_file_path = os.path.join(args.backup_dir, "backup_log.txt")
+    args.backup_log_file_path = os.path.join(args.backup_dir, BACKUP_LOG_NAME)
     return args
 
 

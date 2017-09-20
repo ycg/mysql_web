@@ -592,4 +592,4 @@ if __name__ == '__main__':
         app.run(debug=False, host="0.0.0.0", port=5000, use_reloader=False, threaded=True)
     if (settings.WINDOWS_OS):
         print("windows start ok.")
-        app.run(debug=True, host="0.0.0.0", port=5000, use_reloader=False, threaded=True)
+        app.run(debug=True, host="0.0.0.0", port=5000, use_reloader=True, threaded=True)
