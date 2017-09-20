@@ -47,7 +47,7 @@ import os, argparse, sys, time, datetime, subprocess, commands
 
 #创建数据库备份帐号：GRANT SELECT, RELOAD, PROCESS, SUPER, LOCK TABLES, REPLICATION SLAVE, REPLICATION CLIENT, SHOW VIEW ON *.* TO 'db_user'@'localhost' IDENTIFIED BY 'db_password';
 
-#如果出现xbstream命令没有发现错误，请把xbstream命令拷贝到/usr/bin目录下
+#如果出现没有发现xbstream命令错误，请把xbstream命令拷贝到/usr/bin目录下
 
 SUNDAY_INT = 6
 FULL_BACKUP = 1
