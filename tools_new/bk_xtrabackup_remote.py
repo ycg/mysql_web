@@ -62,6 +62,7 @@ STREAM_TAR = 1
 STREAM_XBSTREAM = 2
 
 LOG_FILE_DIR = "/tmp"
+BACKUP_LOG_NAME = "backup_log.txt"
 CHECKPOINTS_FILE_NAME = "xtrabackup_checkpoints"
 
 
@@ -356,8 +357,8 @@ def write_backup_log_file(args, log_file_path, backup_mode, backup_dir, backup_f
             file.close()
 
     if (args.is_local_backup == False):
-        command = "scp {0} {1}@{2}:{3}".format(log_file_path, args.ssh_user, args.ssh_host, args.remote_backup_dir)
-        execute_shell_command(command)
+        # 远程把备份日志内容写入到文件
+        execute_shell_command("ssh {0}@{1} \"echo {2} >> {3}\"".format(args.ssh_user, args.ssh_host, log_value, os.path.join(args.remote_backup_dir, BACKUP_LOG_NAME)))
 
 
 # 根据xtrabackup的输出日志判断备份是否正常
