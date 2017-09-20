@@ -358,7 +358,7 @@ def write_backup_log_file(args, log_file_path, backup_mode, backup_dir, backup_f
 
     if (args.is_local_backup == False):
         # 远程把备份日志内容写入到文件
-        execute_shell_command("ssh {0}@{1} \"echo {2} >> {3}\"".format(args.ssh_user, args.ssh_host, log_value, os.path.join(args.remote_backup_dir, BACKUP_LOG_NAME)))
+        execute_shell_command("ssh {0}@{1} \"echo {2} >> {3}\"".format(args.ssh_user, args.ssh_host, log_value.replace("\n", ""), os.path.join(args.remote_backup_dir, BACKUP_LOG_NAME)))
 
 
 # 根据xtrabackup的输出日志判断备份是否正常
