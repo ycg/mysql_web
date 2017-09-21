@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 import cache
-import datetime, random, time
+import datetime, random, time, traceback
 from entitys import Entity
 from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.row_event import WriteRowsEvent, UpdateRowsEvent, DeleteRowsEvent
@@ -14,9 +16,9 @@ def sql_format(dic, split_value):
     list = []
     for key, value in dic.items():
         if (value == None):
-            list.append("`%s`=null" % key)
+            list.append("`%s`=NULL" % key)
             continue
-        if (isinstance(value, int)):
+        if (isinstance(value, int) or isinstance(value, float) or isinstance(value, long)):
             list.append("`%s`=%d" % (key, value))
         else:
             list.append("`%s`='%s'" % (key, value))
@@ -27,9 +29,9 @@ def sql_format_for_insert(values):
     list = []
     for value in values:
         if (value == None):
-            list.append("null")
+            list.append("NULL")
             continue
-        if (isinstance(value, int)):
+        if (isinstance(value, int) or isinstance(value, float) or isinstance(value, long)):
             list.append('%d' % value)
         else:
             list.append('\'%s\'' % value)
@@ -49,14 +51,42 @@ def get_binlog(obj):
     args.start_datetime_timestamp = time.mktime(args.start_datetime.timetuple()) if obj.start_datetime else 0
     host_info = cache.Cache().get_host_info(obj.host_id)
     args.connection_settings = {"host": host_info.host, "port": host_info.port, "user": host_info.user, "passwd": host_info.password}
+
+    message = check_args(args)
+    if (len(message) > 0):
+        return message
+
     return binlog_process(args)
+
+
+def check_args(args):
+    message = ""
+    if (args.start_datetime == None and args.stop_datetime == None):
+        if (args.stop_pos == None):
+                message = "stop position不允许为空值"
+        else:
+            if (args.stop_pos < args.start_pos):
+                message = "stop position不允许比start position值小"
+            elif (args.start_pos > args.stop_pos):
+                message = "start position不允许比stop position值大"
+    else:
+        if (args.start_datetime == None and args.stop_datetime != None):
+            message = "start datetime不允许为空值"
+        elif (args.start_datetime != None and args.stop_datetime == None):
+            message = "stop datetime不允许为空值"
+        else:
+            if (args.stop_datetime_timestamp < args.start_datetime_timestamp):
+                message = "stop datetime不允许比start datetime值小"
+            elif (args.start_datetime_timestamp > args.stop_datetime_timestamp):
+                message = "start datetime不允许比stop datetime值大"
+    return message
 
 
 def binlog_process(args):
     stream = None
     sql_list = []
     try:
-        stream = BinLogStreamReader(connection_settings=args.connection_settings, log_file=args.log_file, log_pos=args.start_pos, resume_stream=True, server_id=args.server_id)
+        stream = BinLogStreamReader(connection_settings=args.connection_settings, log_file=args.log_file, log_pos=args.start_pos, server_id=args.server_id)
 
         for binlogevent in stream:
             if (args.log_file != stream.log_file):
@@ -74,7 +104,6 @@ def binlog_process(args):
                 if (binlogevent.timestamp > args.stop_datetime_timestamp):
                     break
 
-            print(binlogevent)
             if (isinstance(binlogevent, WriteRowsEvent)):
                 for row in binlogevent.rows:
                     if (args.flashback):
@@ -90,6 +119,9 @@ def binlog_process(args):
             elif (isinstance(binlogevent, UpdateRowsEvent)):
                 for row in binlogevent.rows:
                     sql_list.append(update_to_sql(row, binlogevent, args.flashback) + "\n")
+    except Exception, e:
+        traceback.print_exc()
+        raise e
     finally:
         if (stream != None):
             stream.close()

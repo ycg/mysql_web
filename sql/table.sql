@@ -10,7 +10,7 @@ create table host_infos
     host varchar(30) not null default '' comment '主机ip地址或主机名',
     port smallint unsigned not null default 3306 comment '端口号',
     user varchar(30) not null default 'root' ,
-    password varchar(40) not null default '' comment '密码',
+    password varchar(100) not null default '' comment '密码',
     remark varchar(100) not null default '' comment '备注',
     is_master tinyint not null default 0 comment '是否是主库',
     is_slave tinyint not null default 0 comment '是否是从库',
