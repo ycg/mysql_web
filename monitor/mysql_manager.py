@@ -18,6 +18,11 @@ def get_show_slave_status(host_id):
     return get_mysql_status_fetchone(host_id, "show slave status;")
 
 
+# 获取主库binlog列表
+def get_show_master_logs(host_id):
+    return common.get_object_list(db_util.DBUtil().fetchall(cache.Cache().get_host_info(host_id), "show master logs;"))
+
+
 # 获取主库binlog信息
 def get_show_master_status(host_id):
     return get_mysql_status_fetchone(host_id, "show master status;")

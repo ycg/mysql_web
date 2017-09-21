@@ -19,3 +19,9 @@ class HoseInfo():
         self.password = password
         self.key = host + ":" + str(port)
 
+
+class Entity():
+    def __init__(self):
+        pass
+
+

@@ -18,7 +18,7 @@ import settings
 import backup
 from monitor.entitys import BaseClass
 from monitor import user_login, new_slow_log, report
-from monitor import cache, server, mysql_manager, tablespace, chart, common
+from monitor import cache, server, mysql_manager, tablespace, chart, common, binlog_util
 
 
 # region load data on run
@@ -570,8 +570,29 @@ def get_binlog():
     return render_template("binlog.html", host_infos=cache.Cache().get_all_host_infos())
 
 
-#endregion
+@app.route("/binlog/logs/<int:host_id>", methods=["GET", "POST"])
+@login_required
+def get_show_master_logs(host_id):
+    binlog_list = mysql_manager.get_show_master_logs(host_id)
+    html_str = """<select id="binlog_file_name" class="selectpicker show-tick form-control bs-select-hidden">
+                      {0}
+                  </select>"""
+    options_str = ""
+    if (len(binlog_list) > 0):
+        for info in binlog_list:
+            options_str += "<option value=\"{0}\">{1}</option>".format(info.log_name, info.log_name)
+    else:
+        options_str = "<option value=\"No Binlog\" disable>No Binlog</option>"
+    return html_str.format(options_str)
 
+
+@app.route("/binlog/data/", methods=["GET", "POST"])
+@login_required
+def get_binlog_data():
+    return binlog_util.get_binlog(get_object_from_json_tmp(request.get_data()))
+
+
+#endregion
 
 #region alarm config
 

@@ -2,7 +2,7 @@
     <div class="col-lg-10">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h5>Binlog查找</h5>
+                <h5>查询条件</h5>
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -10,8 +10,8 @@
                         <div class="form-horizontal">
                             <div class="form-group">
                                 <div class="col-md-4 control-label" for="select">Host Name:</div>
-                                <div class="col-md-5">
-                                    <select class="form-control selectpicker show-tick form-control bs-select-hidden" onchange="get_master_binlog_list()">
+                                <div class="col-md-6">
+                                    <select id="host_list" class="form-control selectpicker show-tick form-control bs-select-hidden" onchange="get_master_binlog_list()">
                                         {% for info in host_infos %}
                                             <option value="{{ info.host_id }}">{{ info.remark }}</option>
                                         {% endfor %}
@@ -24,7 +24,7 @@
                         <div class="form-horizontal">
                             <div class="form-group">
                                 <div class="col-md-4 control-label" for="select">Binlog List:</div>
-                                <div class="col-md-5">
+                                <div class="col-md-6" id="binlog_list_div">
                                     <select class="form-control selectpicker show-tick form-control bs-select-hidden">
                                         <option>DB1-Master</option>
                                         <option>DB2-Master</option>
@@ -41,7 +41,7 @@
                             <div class="form-group">
                                 <div class="col-md-4 control-label" for="select">Start Position:</div>
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control">
+                                    <input id="start_position" type="text" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                             <div class="form-group">
                                 <div class="col-md-4 control-label" for="select">Stop Position:</div>
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control"/>
+                                    <input id="stop_position" type="text" class="form-control"/>
                                 </div>
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                             <div class="form-group">
                                 <div class="col-md-4 control-label" for="select">Start Datetime:</div>
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control">
+                                    <input id="start_datetime" type="text" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                             <div class="form-group">
                                 <div class="col-md-4 control-label" for="select">Stop Datetime:</div>
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control"/>
+                                    <input id="stop_datetime" type="text" class="form-control"/>
                                 </div>
                             </div>
                         </div>
@@ -82,7 +82,7 @@
                         <div class="form-horizontal">
                             <div class="form-group">
                                 <div class="col-md-4 control-button" for="button">
-                                    <button class="btn btn-primary" style="width: 150px">Query</button>
+                                    <button class="btn btn-primary" style="width: 150px" onclick="get_binlog_value()">查询</button>
                                 </div>
                             </div>
                         </div>
@@ -95,9 +95,9 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <div class="panel panel-info">
+        <div class="panel panel-success">
             <div class="panel-heading">
-                <h5>Binlog内容</h5>
+                <h5>查询结果</h5>
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -110,10 +110,52 @@
     </div>
 </div>
 
+<div class="modal fade" id="binlog_read_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <p id="msg">正在读取binlog中...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script type="text/javascript">
-    $(".selectpicker").selectpicker({liveSearch: true});
-
     function get_master_binlog_list() {
-
+        $.post("/binlog/logs/" + $("#host_list").val(), "", function (data) {
+            $("#binlog_list_div").html(data)
+            $(".selectpicker").selectpicker({liveSearch: true});
+        }).error(function () {
+            alert("获取失败");
+        });
     }
+
+    function get_binlog_value() {
+        var obj = new Object();
+        obj.host_id = $("#host_list").val();
+        obj.log_file = $("#binlog_file_name").val();
+        obj.start_pos = $("#start_position").val();
+        obj.stop_pos = $("#stop_position").val();
+        obj.start_datetime = $("#start_datetime").val();
+        obj.stop_datetime = $("#stop_datetime").val();
+
+        show_modal_dialog("#binlog_read_dialog");
+        $.post("/binlog/data/", JSON.stringify(obj), function (data) {
+            $("#binlog_value").val(data);
+            hide_modal_dialog("#binlog_read_dialog");
+        }).error(function () {
+            hide_modal_dialog("#binlog_read_dialog");
+            alert("获取binlog失败");
+        });
+    }
+
+    get_master_binlog_list();
 </script>

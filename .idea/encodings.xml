@@ -19,6 +19,7 @@
     <file url="file://$PROJECT_DIR$/backup/mysqldump.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/backup/xtrabackup.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/install.sh" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/monitor/binlog_util.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/custom_algorithm.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/db_util.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/monitor/mysql_enum.py" charset="UTF-8" />

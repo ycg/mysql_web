@@ -20,7 +20,7 @@ def get_object(row):
     for key, value in row.items():
         if (value == "None"):
             value = None
-        setattr(info, key, value)
+        setattr(info, key.lower(), value)
     return info
 
 
@@ -32,7 +32,7 @@ def get_object_list(rows):
         for key, value in row.items():
             if (value == "None"):
                 value = None
-            setattr(info, key, value)
+            setattr(info, key.lower(), value)
         info_list.append(info)
     return info_list
 
@@ -88,4 +88,5 @@ def test_mysql_connection_is_ok(obj):
         traceback.print_exc()
         return False
     return True
+
 
