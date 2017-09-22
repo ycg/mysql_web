@@ -1,8 +1,6 @@
 import collections, traceback
 import cache, entitys, json, time, db_util, settings, common
 
-chart_config = {}
-
 
 def get_chart_data_by_host_id(host_id):
     result = entitys.BaseClass(None)
