@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ host_info.remark }}监控图表</title>
+    <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
+    <script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>
+    <script src={{ url_for("static", filename="js/bootstrap.min.js") }} type="text/javascript"></script>
+    <script type="text/javascript" src={{ url_for("static", filename="js/echarts.min.js") }}></script>
+</head>
+<body>
+<div class="container-fluid" id="chart_div">
+</div>
+</body>
+</html>
+
+<script type="text/javascript">
+    var timer = 0
+    var chart_datas = new Array();
+    chart_datas[0] = [];
+    var chart_config = new Object();
+    var host_id = {{ host_info.host_id }};
+
+    function init_all_chart() {
+        $.post("/chart/config", "", function (data) {
+            var obj_data = JSON.parse(data);
+            init_div(obj_data);
+            chart_config = obj_data;
+            for (var i = 0, list_len = obj_data.length; i < list_len; i++) {
+                var chart_info = obj_data[i];
+                var chart_div_id = "chart_" + chart_info.chart_id;
+
+                // 初始化图表实例
+                var chart_dom = echarts.init(document.getElementById(chart_div_id));
+                chart_info.chart_dom = chart_dom;
+
+                // 定义图表公共部分参数
+                var chart_option = {
+                    xAxis: {},
+                    title: {},
+                    legend: {},
+                    grid: {x2: 0},
+                    tooltip: {trigger: 'axis', axisPointer: {type: 'cross', label: {backgroundColor: '#6a7985'}}},
+                    yAxis: {}
+                };
+                chart_option.xAxis.data = chart_datas[0];
+                chart_option.title.text = chart_info.chart_title;
+                chart_option.legend.data = chart_info.line_names;
+
+                // 定义图表线条参数
+                var series = [];
+                for (var j = 0, count = chart_info.line_infos.length; j < count; j++) {
+                    var line_info = chart_info.line_infos[j];
+                    var item = {
+                        type: "line",
+                        showSymbol: false,
+                        hoverAnimation: false,
+                    };
+                    var line_data = [];
+                    item.data = line_data;
+                    item.name = line_info.line_name;
+                    chart_datas[line_info.line_id] = line_data;
+                    series.push(item)
+                }
+
+                // 设置参数
+                chart_option.series = series;
+                chart_dom.setOption(chart_option);
+            }
+        }).error(function () {
+            alert("获取失败");
+        });
+    }
+
+    function init_div(obj_data) {
+        /*for (var i = 0, list_len = obj_data.length; i < list_len; i++) {
+            var id_name = "chart_" + obj_data[i].chart_id;
+            var div_str = "<div class=\"row\"><div class=\"col-md-12\"><div id=" + id_name + " style=\"height:300px;\"></div></div></div>";
+            $("#chart_div").append(div_str);
+        }*/
+
+        for (var i = 0, list_len = 20; i < list_len; i++) {
+            var chart1_id = "chart_" + (i * 2 + 1);
+            var chart2_id = "chart_" + (i * 2 + 2);
+            var div_str = "<div class=\"row\"><div class=\"col-md-6\"><div id=" + chart1_id + " style=\"height:300px;\"></div></div><div class=\"col-md-6\"><div id=" + chart2_id + " style=\"height:300px;\"></div></div></div>";
+            $("#chart_div").append(div_str);
+        }
+    }
+
+    function get_chart_data() {
+        $.post("/chart/data/" + host_id, "", function (data) {
+            var obj_data = JSON.parse(data);
+            for (var i = 0, list_len = obj_data.length; i < list_len; i++) {
+                var info = obj_data[i];
+                chart_datas[info.line_id].push(info.value)
+            }
+            refresh_chart_data();
+        }).error(function () {
+            alert("获取失败");
+        });
+    }
+
+    function refresh_chart_data() {
+        for (var i = 0, list_len = chart_config.length; i < list_len; i++) {
+            var series = [];
+            var options = {xAxis: {}};
+            var chart_info = chart_config[i];
+            for (var j = 0, count = chart_info.line_infos.length; j < count; j++) {
+                var item = {};
+                var line_info = chart_info.line_infos[j];
+                item.data = chart_datas[line_info.line_id];
+                series.push(item)
+            }
+            options.series = series;
+            options.xAxis.data = chart_datas[0];
+            chart_info.chart_dom.setOption(options);
+        }
+    }
+
+    init_all_chart();
+    clearInterval(timer);
+    timer = setInterval(get_chart_data, 3000);
+</script>

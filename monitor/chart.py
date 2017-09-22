@@ -1,5 +1,8 @@
-import collections
-import cache, entitys, json, time
+import collections, traceback
+import cache, entitys, json, time, db_util, settings, common
+
+chart_config = {}
+
 
 def get_chart_data_by_host_id(host_id):
     result = entitys.BaseClass(None)
@@ -102,4 +105,50 @@ chart_options[11] = get_chart_obj("Repl Delay", "seconds_behind_master:3", ["del
 chart_options[12] = get_chart_obj("MySQL CPU", "mysql_cpu:2")
 chart_options[13] = get_chart_obj("MySQL Mem", "mysql_memory:2")
 chart_options[14] = get_chart_obj("MySQL Mem", "mysql_memory:2")
+
+
+def get_chart_config_infos():
+    result = collections.OrderedDict()
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, "select t1.chart_id, t1.chart_title, t2.line_id, t2.line_name, t2.attr_name, t2.obj_id from mysql_web.chart_infos t1 left join mysql_web.line_infos t2 on t1.chart_id=t2.chart_id;"):
+        info = common.get_object(row)
+        if (info.chart_id in result.keys()):
+            result[chart_info.chart_id].line_infos.append(info)
+            result[chart_info.chart_id].line_names.append(info.line_name)
+        else:
+            chart_info = entitys.Entity()
+            chart_info.line_infos = []
+            chart_info.line_names = []
+            chart_info.chart_id = info.chart_id
+            chart_info.chart_title = info.chart_title
+            chart_info.line_infos.append(info)
+            chart_info.line_names.append(info.line_name)
+            result[chart_info.chart_id] = chart_info
+    cache.Cache().chart_config = result
+    return common.convert_obj_to_json_str(result.values())
+
+
+def get_chart_data_by_config(host_id):
+    result = []
+    for chart_info in cache.Cache().chart_config.values():
+        for line_info in chart_info.line_infos:
+            data = entitys.Entity()
+            data.line_id = line_info.line_id
+            try:
+                if (line_info.obj_id == 1):
+                    data.value = getattr(cache.Cache().get_status_info(host_id), line_info.attr_name)
+                elif (line_info.obj_id == 2):
+                    data.value = getattr(cache.Cache().get_linux_info(host_id), line_info.attr_name)
+                elif (line_info.obj_id == 3):
+                    data.value = getattr(cache.Cache().get_repl_info(host_id), line_info.attr_name)
+                elif (line_info.obj_id == 4):
+                    data.value = getattr(cache.Cache().get_innodb_info(host_id), line_info.attr_name)
+            except:
+                data.value = 0
+                traceback.print_exc()
+            result.append(data)
+    data = entitys.Entity()
+    data.line_id = 0;
+    data.value = time.strftime('%H:%M:%S', time.localtime(time.time()))
+    result.append(data)
+    return common.convert_obj_to_json_str(result)
 

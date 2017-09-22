@@ -424,6 +424,25 @@ def get_chart_options(key):
 def open_new_chart_page(host_id):
     return render_template("chart_mysql.html", host_info=cache.Cache().get_host_info(host_id))
 
+
+@app.route("/chart/home/<int:host_id>", methods=["GET", "POST"])
+@login_required
+def get_chart_home(host_id):
+    return render_template("chart_auto.html", host_info=cache.Cache().get_host_info(host_id))
+
+
+@app.route("/chart/config", methods=["GET", "POST"])
+@login_required
+def get_chart_config_infos():
+    return chart.get_chart_config_infos()
+
+
+@app.route("/chart/data/<int:host_id>", methods=["GET", "POST"])
+@login_required
+def get_chart_data(host_id):
+    return chart.get_chart_data_by_config(host_id)
+
+
 # endregion
 
 # region config

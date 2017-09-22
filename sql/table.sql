@@ -433,3 +433,24 @@ CREATE TABLE host_all_table_size_log
   updated_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '行更新时间',
   UNIQUE KEY host_id_date(`host_id`, `date`)
 ) ENGINE=innodb CHARSET=utf8 COMMENT='mysql实例表数据总大小';
+
+
+create table chart_infos
+(
+	chart_id mediumint unsigned not null primary key auto_increment,
+  chart_title varchar(30) not null,
+  is_deleted TINYINT NOT NULL DEFAULT 0
+) comment='图表信息表';
+
+
+create table line_infos
+(
+	line_id mediumint unsigned not null primary key auto_increment,
+  chart_id mediumint unsigned not null,
+  line_name varchar(30) not null,
+  attr_name varchar(50) not null,
+  obj_id tinyint unsigned not null,
+  is_deleted TINYINT NOT NULL DEFAULT 0
+) comment='图表线条信息表';
+
+
