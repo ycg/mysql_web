@@ -438,7 +438,7 @@ CREATE TABLE host_all_table_size_log
 create table chart_infos
 (
 	chart_id mediumint unsigned not null primary key auto_increment,
-  chart_title varchar(30) not null,
+  chart_title varchar(30) not null COMMENT '图表标题',
   is_deleted TINYINT NOT NULL DEFAULT 0
 ) comment='图表信息表';
 
@@ -446,10 +446,10 @@ create table chart_infos
 create table line_infos
 (
 	line_id mediumint unsigned not null primary key auto_increment,
-  chart_id mediumint unsigned not null,
-  line_name varchar(30) not null,
-  attr_name varchar(50) not null,
-  obj_id tinyint unsigned not null,
+  chart_id mediumint unsigned not null COMMENT '图表id',
+  line_name varchar(30) not null COMMENT '线条名称',
+  attr_name varchar(50) not null COMMENT '线条数据对应的对象属性',
+  obj_id tinyint unsigned not null COMMENT '对象属性的类型是什么',
   is_deleted TINYINT NOT NULL DEFAULT 0
 ) comment='图表线条信息表';
 

@@ -23,7 +23,7 @@ def get_chart_data_by_host_id(host_id):
     result.io_write = os_info.io_write
     result.rpl_delay = repl_info.seconds_behind_master
     result.time = time.strftime('%H:%M:%S', time.localtime(time.time()))
-    if(hasattr(os_info, "cpu_1")):
+    if (hasattr(os_info, "cpu_1")):
         result.cpu_1 = os_info.cpu_1
         result.cpu_5 = os_info.cpu_5
         result.cpu_15 = os_info.cpu_15
@@ -34,42 +34,46 @@ def get_chart_data_by_host_id(host_id):
         result.cpu_1 = result.cpu_5 = result.cpu_15 = result.cpu_user = result.cpu_system = result.cpu_idle = 0
     return json.dumps(result, default=lambda o: o.__dict__)
 
+
 def get_chart_history_data(host_id):
     pass
+
 
 def get_chart_data(obj):
     chart_data = ChartData()
     host_id = int(obj.host_id)
     str_list = chart_options[int(obj.key)].attribute_names.split(":")
     data_type = int(str_list[-1])
-    if(data_type == 1):
+    if (data_type == 1):
         set_chart_data(cache.Cache().get_status_info(host_id), str_list, chart_data)
-    elif(data_type == 2):
+    elif (data_type == 2):
         set_chart_data(cache.Cache().get_linux_info(host_id), str_list, chart_data)
-    elif(data_type == 3):
+    elif (data_type == 3):
         set_chart_data(cache.Cache().get_repl_info(host_id), str_list, chart_data)
-    elif(data_type == 4):
+    elif (data_type == 4):
         set_chart_data(cache.Cache().get_innodb_info(host_id), str_list, chart_data)
     chart_data.time = time.strftime('%H:%M:%S', time.localtime(time.time()))
     return json.dumps(chart_data, default=lambda o: o.__dict__)
 
+
 def set_chart_data(obj, str_list, chart_data):
     list_len = len(str_list) - 1
-    if(list_len == 1):
+    if (list_len == 1):
         chart_data.data1 = getattr(obj, str_list[0])
-    if(list_len == 2):
+    if (list_len == 2):
         chart_data.data1 = getattr(obj, str_list[0])
         chart_data.data2 = getattr(obj, str_list[1])
-    if(list_len == 3):
+    if (list_len == 3):
         chart_data.data1 = getattr(obj, str_list[0])
         chart_data.data2 = getattr(obj, str_list[1])
         chart_data.data3 = getattr(obj, str_list[2])
-    if(list_len == 4):
+    if (list_len == 4):
         chart_data.data1 = getattr(obj, str_list[0])
         chart_data.data2 = getattr(obj, str_list[1])
         chart_data.data3 = getattr(obj, str_list[2])
         chart_data.data4 = getattr(obj, str_list[3])
     return chart_data
+
 
 class ChartData():
     def __init__(self):
@@ -78,6 +82,7 @@ class ChartData():
         self.data3 = 0
         self.data4 = 0
 
+
 def get_chart_obj(title, attribute_names, legend=None):
     chart_obj = ChartData()
     chart_obj.title = title
@@ -85,8 +90,10 @@ def get_chart_obj(title, attribute_names, legend=None):
     chart_obj.attribute_names = attribute_names
     return chart_obj
 
+
 def get_chart_option(key):
     return json.dumps(chart_options[key], default=lambda o: o.__dict__)
+
 
 chart_options = collections.OrderedDict()
 chart_options[1] = get_chart_obj("QPS", "qps:1")
@@ -107,7 +114,9 @@ chart_options[14] = get_chart_obj("MySQL Mem", "mysql_memory:2")
 
 def get_chart_config_infos():
     result = collections.OrderedDict()
-    for row in db_util.DBUtil().fetchall(settings.MySQL_Host, "select t1.chart_id, t1.chart_title, t2.line_id, t2.line_name, t2.attr_name, t2.obj_id from mysql_web.chart_infos t1 left join mysql_web.line_infos t2 on t1.chart_id=t2.chart_id;"):
+    for row in db_util.DBUtil().fetchall(settings.MySQL_Host,
+                                         """select t1.chart_id, t1.chart_title, t2.line_id, t2.line_name, t2.attr_name, t2.obj_id
+                                            from mysql_web.chart_infos t1 left join mysql_web.line_infos t2 on t1.chart_id=t2.chart_id WHERE t1.is_deleted = 0;"""):
         info = common.get_object(row)
         if (info.chart_id in result.keys()):
             result[chart_info.chart_id].line_infos.append(info)
@@ -149,4 +158,3 @@ def get_chart_data_by_config(host_id):
     data.value = time.strftime('%H:%M:%S', time.localtime(time.time()))
     result.append(data)
     return common.convert_obj_to_json_str(result)
-
