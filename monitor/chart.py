@@ -116,7 +116,8 @@ def get_chart_config_infos():
     result = collections.OrderedDict()
     for row in db_util.DBUtil().fetchall(settings.MySQL_Host,
                                          """select t1.chart_id, t1.chart_title, t2.line_id, t2.line_name, t2.attr_name, t2.obj_id
-                                            from mysql_web.chart_infos t1 left join mysql_web.line_infos t2 on t1.chart_id=t2.chart_id WHERE t1.is_deleted = 0;"""):
+                                            from mysql_web.chart_infos t1 left join mysql_web.line_infos t2 on t1.chart_id=t2.chart_id WHERE t1.is_deleted = 0
+                                            ORDER by t1.weight asc, t1.chart_id ASC;"""):
         info = common.get_object(row)
         if (info.chart_id in result.keys()):
             result[chart_info.chart_id].line_infos.append(info)

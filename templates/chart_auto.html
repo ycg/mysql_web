@@ -10,6 +10,7 @@
 </head>
 <body>
 <div class="container-fluid" id="chart_div">
+    </br>
 </div>
 </body>
 </html>
@@ -88,7 +89,7 @@
                 var chart1_id = "chart_" + obj_data[id1].chart_id;
                 var div_str = "<div class=\"row\"><div class=\"col-md-6\"><div id=" + chart1_id + " style=\"height:300px;\"></div></div></div>";
                 $("#chart_div").append(div_str);
-                return;
+                break;
             }
             else if (id1 + 2 == list_length || (id1 + 1) < list_length) {
                 var chart1_id = "chart_" + obj_data[id1].chart_id;
@@ -97,6 +98,8 @@
                 $("#chart_div").append(div_str);
             }
         }
+
+         $("#chart_div").append("</br></br>");
     }
 
     function get_chart_data() {
@@ -104,7 +107,7 @@
             var obj_data = JSON.parse(data);
             for (var i = 0, list_len = obj_data.length; i < list_len; i++) {
                 var info = obj_data[i];
-                chart_datas[info.line_id].push(info.value)
+                chart_datas[info.line_id].push(info.value);
             }
             refresh_chart_data();
         }).error(function () {
@@ -121,7 +124,7 @@
                 var item = {};
                 var line_info = chart_info.line_infos[j];
                 item.data = chart_datas[line_info.line_id];
-                series.push(item)
+                series.push(item);
             }
             options.series = series;
             options.xAxis.data = chart_datas[0];
