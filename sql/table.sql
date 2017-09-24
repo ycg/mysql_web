@@ -439,6 +439,7 @@ create table chart_infos
 (
 	chart_id mediumint unsigned not null primary key auto_increment,
   chart_title varchar(30) not null COMMENT '图表标题',
+  weight MEDIUMINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '权重，根据值进行图表的顺序排序',
   is_deleted TINYINT NOT NULL DEFAULT 0
 ) comment='图表信息表';
 
