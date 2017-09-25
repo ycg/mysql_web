@@ -1295,12 +1295,15 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-12">
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>
 
+                    </th>
+                    <th colspan="3" rowspan="1" class="text-center">
+                        Double Write
                     </th>
                     <th colspan="4" rowspan="1" class="text-center">
                         Innodb Page
@@ -1315,6 +1318,15 @@
                 <tr>
                     <th>
                         Host
+                    </th>
+                    <th>
+                        P_W
+                    </th>
+                    <th>
+                        Writes
+                    </th>
+                    <th>
+                        Percent
                     </th>
                     <th>
                         Size(K)
@@ -1359,6 +1371,15 @@
                     <tr>
                     <td class="text-left">
                         {{ status.host_info.remark }}
+                    </td>
+                    <td>
+                        {{ status.innodb_dblwr_pages_written }}
+                    </td>
+                    <td>
+                        {{ status.innodb_dblwr_writes }}
+                    </td>
+                    <td {% if(status.innodb_dblwr_percent > 64) %} class="text-danger" {% endif %}>
+                        {{ status.innodb_dblwr_percent }}
                     </td>
                     <td>
                         {{ status.innodb_page_size }}

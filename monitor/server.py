@@ -261,6 +261,14 @@ class MonitorServer(threading.Thread):
         else:
             innodb_info.innodb_x_ratio = round(float(innodb_info.innodb_x_lock_os_waits) / float(innodb_info.innodb_x_lock_spin_rounds) * 100, 2)
 
+        # double write
+        innodb_info.innodb_dblwr_writes = int(mysql_status_new["Innodb_dblwr_writes"]) - int(mysql_status_old["Innodb_dblwr_writes"])
+        innodb_info.innodb_dblwr_pages_written = int(mysql_status_new["Innodb_dblwr_pages_written"]) - int(mysql_status_old["Innodb_dblwr_pages_written"])
+        if (int(mysql_status_new["Innodb_dblwr_writes"]) == 0):
+            innodb_info.innodb_dblwr_percent = 0
+        else:
+            innodb_info.innodb_dblwr_percent = int(mysql_status_new["Innodb_dblwr_pages_written"]) / int(mysql_status_new["Innodb_dblwr_writes"])
+
         # 3.-----------------------------------------------------获取replcation status-------------------------------------------------------------------
         repl_info = self.__cache.get_repl_info(host_info.key)
         repl_info.seconds_behind_master = 0
@@ -1022,7 +1030,9 @@ show global status where variable_name in
 'Innodb_x_lock_os_waits',
 'Innodb_x_lock_spin_rounds',
 'Innodb_x_lock_spin_waits',
-'Slow_queries'
+'Slow_queries',
+'Innodb_dblwr_writes',
+'Innodb_dblwr_pages_written'
 );
 """
 # endregion
