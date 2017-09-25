@@ -25,6 +25,7 @@
     function init_all_chart() {
         $.post("/chart/config", "", function (data) {
             var obj_data = JSON.parse(data);
+            // 初始化图表所在的div
             init_div(obj_data);
             chart_config = obj_data;
             for (var i = 0, list_len = obj_data.length; i < list_len; i++) {
@@ -74,13 +75,6 @@
     }
 
     function init_div(obj_data) {
-        /*for (var i = 0, list_len = 20; i < list_len; i++) {
-            var chart1_id = "chart_" + (i * 2 + 1);
-            var chart2_id = "chart_" + (i * 2 + 2);
-            var div_str = "<div class=\"row\"><div class=\"col-md-6\"><div id=" + chart1_id + " style=\"height:300px;\"></div></div><div class=\"col-md-6\"><div id=" + chart2_id + " style=\"height:300px;\"></div></div></div>";
-            $("#chart_div").append(div_str);
-        }*/
-
         var list_length = obj_data.length;
         for (var i = 1, list_len = 20; i <= list_len; i++) {
             var id1 = (i * 2 - 2);
@@ -99,7 +93,7 @@
             }
         }
 
-         $("#chart_div").append("</br></br>");
+         $("#chart_div").append("</br>");
     }
 
     function get_chart_data() {

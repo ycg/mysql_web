@@ -2,10 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!--让浏览器使用最新的IE内核进行渲染页面-->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--设置视口宽度等于当前设备宽度，默认缩放比为1-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MySQL监控平台</title>
 
+    <!--
+        ①<!--[if lt IE 9]>…… <![endif]- ->这一对标签用于检测当前浏览器的版本，lt表示小于，gt表示大写。所以这句话作用是，当浏览器版本低于IE9执行。
+        ②html5shiv：解决ie9以下浏览器对html5新增标签的不识别，并导致CSS不起作用的问题。
+        ③respond.min:让不支持css3 Media Query的浏览器包括IE6-IE8等其他浏览器支持查询。
+    -->
     <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
     <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
     <!--[if lt IE 9]>
@@ -16,8 +23,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=9" />
 
-    <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
     <script src={{ url_for("static", filename="jquery/jquery.min.js") }} type="text/javascript"></script>
+    <link href={{ url_for('static', filename='css/bootstrap.css') }} rel="stylesheet" type="text/css">
     <script src={{ url_for("static", filename="js/bootstrap.min.js") }} type="text/javascript"></script>
     <script src={{ url_for("static", filename="jquery/jquery-form.js") }} type="text/javascript"></script>
 
