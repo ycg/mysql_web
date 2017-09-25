@@ -47,10 +47,11 @@ insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yang
 8. mysql_auto_install.py - 实现mysql的远程自动安装
 9. mysql_replication_repair.py - 实现对slave出现1032和1062错误的自动修复功能
 10. mysql_slow_log.sh - 基于pt工具的慢查询收集脚本，需要和mysql_web一起使用
+11. bk_xtrabackup_remote.py - 支持远程备份，比较强大
 
 # 联系方式
-1. QQ:779647966
-2. Email:ycg166911@163.com
+1. QQ: 779647966
+2. Email: ycg166911@163.com
 
 # 界面展示:
 ![image](https://github.com/ycg/mysql_web/blob/master/static/img/111.png)
