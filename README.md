@@ -3,7 +3,10 @@
 # 安装环境：
 1. 基于python2.7.11开发的
 2. 安装MySQL数据库
-3. 安装python第三方包：pip install flask flask-login gevent threadpool pymysql DBUtils six packaging appdirs mysql-replication sqlparse paramiko
+3. 安装python第三方包
+``` shell
+    pip install flask flask-login gevent threadpool pymysql DBUtils six packaging appdirs mysql-replication sqlparse paramiko
+```
 4. 在setting.py设置MySQL_Host相关账户信息
 ``` python
 MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
