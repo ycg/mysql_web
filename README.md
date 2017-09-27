@@ -3,24 +3,30 @@
 # 安装环境：
 1. 基于python2.7.11开发的
 2. 安装MySQL数据库
-3. 如果要监控OS，需要设置ssh登录信息
-4. 安装依赖包，执行./install.sh脚本
-5. 在setting.py设置MySQL_Host相关账户信息
+3. 安装python第三方包：pip install flask flask-login gevent threadpool pymysql DBUtils six packaging appdirs mysql-replication sqlparse paramiko
+4. 在setting.py设置MySQL_Host相关账户信息
 ``` python
 MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
 ```
-6. 导入sql/table.sql的SQL脚本
-7. 添加MySQL数据库用户
+5. 导入sql/table.sql的SQL脚本
+6. 添加MySQL数据库用户
 ``` mysql
 insert into host_infos (host, port, user, password, remark) values
 ("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"), ("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");
 ```
-8. 添加系统登录账号
+7. 添加系统登录账号
 ``` mysql
 insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yangcaogui", md5("123456"));
 ```
-9. 启动python mysql_web.py runserver
-10. 如果要监控慢查询还要进行几步配置
+8. 启动mysql web系统
+``` shell
+    #前台启动：
+    python mysql_web.py runserver
+    
+    #后台启动
+    nohup python mysql_web.py runserver &
+```
+9. 如果要监控慢查询还要进行几步配置
 
 # 支持的功能:
 1. mysql tps qps table_cache handler监控
