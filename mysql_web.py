@@ -10,7 +10,6 @@ import StringIO
 import base64
 import sys
 
-from gevent import pywsgi
 from flask import Flask, render_template, request, app, redirect, url_for
 from flask_login import login_user, login_required, logout_user, LoginManager, current_user
 
@@ -26,9 +25,10 @@ from monitor import cache, server, mysql_manager, tablespace, chart, common, bin
 reload(sys)
 sys.setdefaultencoding("UTF-8")
 
-app = Flask("mysql_web")
+app = Flask("mysql_web", instance_relative_config=True, instance_path=os.getcwd())
 app.secret_key = os.urandom(24)
 app.config["SECRET_KEY"] = os.urandom(24)
+app.config["SESSION_COOKIE_NAME"] = "mysql_web"
 login_manager = LoginManager()
 login_manager.session_protection = "strong"
 login_manager.login_view = "login_home"
