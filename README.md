@@ -5,8 +5,22 @@
 2. 安装MySQL数据库
 3. 安装python第三方包
 ``` shell
-    pip install flask flask-login gevent threadpool pymysql DBUtils six packaging appdirs mysql-replication sqlparse paramiko    
-    #如果遇到安装不成功问题，请先安装setuptools，在更新pip
+    #更新setuptools
+    wget http://pypi.python.org/packages/source/s/setuptools/setuptools-0.6c11.tar.gz
+    tar -zxvf setuptools-0.6c11.tar.gz
+    cd setuptools-0.6c11
+    python setup.py build
+    python setup.py install
+    
+    #更新pip
+    wget https://pypi.python.org/packages/11/b6/abcb525026a4be042b486df43905d6893fb04f05aac21c32c638e939e447/pip-9.0.1.tar.gz#md5=35f01da33009719497f01a4ba69d63c9
+    tar -zxvf pip-9.0.1.tar.gz
+    cd pip-9.0.1
+    python setup.py build
+    python setup.py install
+    
+    #安装python包
+    pip install flask flask-login gevent threadpool pymysql DBUtils six packaging appdirs mysql-replication sqlparse paramiko
 ```
 4. 在setting.py设置MySQL_Host相关账户信息
 ``` python
