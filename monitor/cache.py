@@ -164,6 +164,12 @@ class Cache(object):
             self.__thread_pool.putRequest(request)
         self.__thread_pool.poll()
 
+    def join_thread_pool_for_paras(self, method_name, paras):
+        requests = threadpool.makeRequests(method_name, paras, None)
+        for request in requests:
+            self.__thread_pool.putRequest(request)
+        self.__thread_pool.poll()
+
     def remove_key(self, dic, key):
         if (dic.has_key(key) == True):
             dic.pop(key)

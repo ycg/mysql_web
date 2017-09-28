@@ -33,6 +33,7 @@ class MonitorServer(threading.Thread):
         while (True):
             try:
                 if (self.__times % settings.UPDATE_INTERVAL == 0):
+                    # self.dispatcher()
                     self.__cache.join_thread_pool(self.get_mysql_status)
                 if (self.__times % settings.TABLE_CHECK_INTERVAL == 0):
                     self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
@@ -40,6 +41,34 @@ class MonitorServer(threading.Thread):
                 traceback.print_exc()
             time.sleep(1)
             self.__times += 1
+
+    def dispatcher(self):
+        interval = settings.UPDATE_INTERVAL / 2
+        count = len(self.__cache.get_all_host_infos())
+        mod = count % interval
+        number = count / interval
+
+        for i in range(0, number):
+            start_index = i * interval
+            end_index = (i + 1) * interval
+            paras = (self.__cache.get_all_host_infos()[start_index: end_index],)
+            self.__cache.join_thread_pool_for_paras(self.batch_get_mysql_start, paras)
+
+        if (mod > 0):
+            start_index = number * interval
+            end_index = start_index + mod
+            paras = (self.__cache.get_all_host_infos()[start_index: end_index],)
+            self.__cache.join_thread_pool_for_paras(self.batch_get_mysql_start, paras)
+
+    def batch_get_mysql_start(self, host_info_list):
+        # aa = time.time()
+        for host_info in host_info_list:
+            try:
+                self.get_mysql_status(host_info)
+            except Exception as e:
+                traceback.print_exc()
+        # bb = time.time()
+        # print(bb - aa)
 
     def invoke_check_tablespace_method(self):
         self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
@@ -1064,3 +1093,4 @@ show global variables where variable_name in
 """
 
 # endregion
+
