@@ -61,14 +61,11 @@ class MonitorServer(threading.Thread):
             self.__cache.join_thread_pool_for_paras(self.batch_get_mysql_start, paras)
 
     def batch_get_mysql_start(self, host_info_list):
-        # aa = time.time()
         for host_info in host_info_list:
             try:
                 self.get_mysql_status(host_info)
             except Exception as e:
                 traceback.print_exc()
-        # bb = time.time()
-        # print(bb - aa)
 
     def invoke_check_tablespace_method(self):
         self.__cache.join_thread_pool(tablespace.get_tablespace_infos)
