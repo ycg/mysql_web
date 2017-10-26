@@ -236,12 +236,6 @@ def get_table_columns(host_id, table_schema, table_name):
 
 #endregion
 
-'''
-def analysis_table_data(host_info):
-    sql = "insert into mysql_web.mysql_data_size_for_day (host_id, data_size_incr)" \
-          "select sum(data_size), sum(index_size), sum(rows), sum(auto_increment), sum(file_size), sum(diff) from mysql_web.mysql_data_size_log" \
-          "where host_id={0} group by `date`;".format(host_info.key)'''
-
 
 # 使用pt工具进行冗余索引检测
 def pt_duplicate_key_checker(host_id):
@@ -254,7 +248,54 @@ def pt_duplicate_key_checker(host_id):
     return "check index ok."
 
 
-# region 新的表数据插入
+# 插入主机表空间汇总信息
+# 先把昨天的查出来，然后进行差值计算
+def insert_host_table_total(host_info, table_total_info):
+    yesterday_data = db_util.DBUtil().fetchone(settings.MySQL_Host, "select * from mysql_web.host_table_total WHERE host_id = {0} AND `date` = date(date_sub(now(), interval 1 day));".format(host_info.host_id))
+    yesterday_data = yesterday_data if (yesterday_data is not None) else table_total_info
+    sql = """INSERT INTO mysql_web.host_table_total
+             (host_id, data_size, index_size, total_size, rows, file_size, free_size, `date`, diff_data_size, diff_index_size, diff_total_size, diff_rows, diff_file_size, diff_free_size)
+             VALUES
+             ({0}, {1}, {2}, {3}, {4}, {5}, {6}, DATE(NOW()), {7}, {8}, {9}, {10}, {11}, {12})""" \
+             .format(host_info.host_id,
+                     table_total_info.data_total,
+                     table_total_info.index_total,
+                     table_total_info.data_total + table_total_info.index_total,
+                     table_total_info.rows_total,
+                     table_total_info.file_total,
+                     table_total_info.free_total,
+                     table_total_info.data_total - yesterday_data.data_size,
+                     table_total_info.index_total - yesterday_data.index_size,
+                     table_total_info.total - yesterday_data.total_size,
+                     table_total_info.rows_total - yesterday_data.rows,
+                     table_total_info.file_total - yesterday_data.file_size,
+                     table_total_info.free_total - yesterday_data.free_size)
+    db_util.DBUtil().execute(settings.MySQL_Host, sql)
+
+
+def insert_host_table_detail(host_info, table_detail_infos):
+    yesterday_data_dic = {}
+    yesterday_data = db_util.DBUtil().fetchone(settings.MySQL_Host, "select db_name, table_name, data_size, index_size, total_size, rows, auto_increment, file_size, free_size from mysql_web.host_table_detail WHERE host_id = {0} AND `date` = date(date_sub(now(), interval 1 day));".format(host_info.host_id))
+
+    for data in yesterday_data:
+        yesterday_data_dic[data.db_name + "." + data.table_name]
+
+    insert_sql_list = []
+    sql_head = "INSERT INTO mysql_web.host_table_detail (host_id, db_name, table_name, data_size, index_size, total_size, rows, auto_increment, file_size, free_size, `date`, diff_data_size, diff_index_size, diff_total_size, diff_rows, diff_auto_increment, diff_file_size, diff_free_size) VALUES"
+    sql_format = "({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, DATE(NOW()), {10}, {11}, {12}, {13}, {14}, {15}, {16})"
+    for table_info in table_detail_infos:
+        insert_sql_list.append(sql_format.format(host_info.host_id,
+                                                 table_info.schema,
+                                                 table_info.t_name,
+                                                 table_info.data_size_o,
+                                                 table_info.index_size_o,
+                                                 table_info.total_size_o,
+                                                 table_info.rows_o,
+                                                 table_info.auto_increment,
+                                                 table_info.file_size_o,
+                                                 table_info.free_size))
+    db_util.DBUtil().execute(settings.MySQL_Host, sql_head + ",".join(insert_sql_list) + ";")
+
 
 def insert_table_size_log(host_info, table_info):
     increase_size = 0
@@ -270,5 +311,4 @@ def insert_table_size_log(host_info, table_info):
                      table_info.data_size_o, table_info.index_size_o, table_info.total_size_o, table_info.rows_o, table_info.auto_increment, table_info.file_size_o, table_info.free_size, increase_size)
     db_util.DBUtil().execute(settings.MySQL_Host, sql)
 
-# endregion
 
