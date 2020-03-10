@@ -27,16 +27,11 @@
 MySQL_Host = host_info.HoseInfo(host="192.168.11.128", port=3306, user="yangcg", password="yangcaogui", remark="Monitor")
 ```
 5. 导入sql/table.sql的SQL脚本
-6. 添加MySQL数据库用户
-``` mysql
-insert into host_infos (host, port, user, password, remark) values
-("192.168.11.129", 3306, "yangcg", "yangcaogui", "Master"), ("192.168.11.130", 3306, "yangcg", "yangcaogui", "Slave");
-```
-7. 添加系统登录账号
+6. 添加系统登录账号
 ``` mysql
 insert into mysql_web.mysql_web_user_info (user_name, user_password)values("yangcaogui", md5("123456"));
 ```
-8. 启动mysql web系统
+7. 启动mysql web系统
 ``` shell
     #前台启动：
     python mysql_web.py runserver
